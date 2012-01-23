@@ -9,7 +9,7 @@ namespace Linalg {
 
 
 /**
- * Defines a view to a matrix.
+ * Defines a matrix.
  *
  * @ingroup linalg
  */
@@ -33,14 +33,10 @@ protected:
   size_t _cols;
 
   /**
-   * Number of rows in the outer most matrix.
+   * Number of rows in the outer most matrix if matrix is in column-major form and number of
+   * columns if matrix is in row-major form.
    */
-  size_t _row_stride;
-
-  /**
-   * Number of columns in the outer most matrix.
-   */
-  size_t _col_stride;
+  size_t _stride;
 
   /**
    * Holds the offset of the first element in the matrix, starting from the first element of the
@@ -65,18 +61,20 @@ protected:
    * Full constructor. Shall not be used from the outside.
    */
   Matrix(ArrayBase<Scalar> &data, size_t rows, size_t cols,
-         size_t row_stride, size_t col_stride, size_t offset,
+         size_t stride, size_t offset,
          bool transposed, bool rowmajor)
     : _data(data), _rows(rows), _cols(cols),
-      _row_stride(row_stride), _col_stride(col_stride), _offset(offset),
+      _stride(_stride), _offset(offset),
       _transposed(transposed), _is_rowmajor(rowmajor)
   {
     // Pass...
   }
 
-
   /**
    * Calculates the index (in flattened data array) for the given row/col index.
+   *
+   * @param i Specifies the row index (zero-based).
+   * @param j Specifies the column index (zero-based).
    */
   inline size_t _getIndex(size_t i, size_t j) const
   {
@@ -84,9 +82,9 @@ protected:
       std::swap(i,j);
 
     if (this->_is_rowmajor)
-      return this->_offset + i*this->_row_stride + j;
+      return this->_offset + this->_stride*i + j;
     else
-      return this->_offset + this->_col_stride*j + i;
+      return this->_offset + this->_stride*j + i;
   }
 
 
@@ -96,30 +94,30 @@ public:
    */
   Matrix(Matrix<Scalar> &other)
     : _data(other._data), _rows(other._rows), _cols(other._cols),
-      _row_stride(other._row_stride), _col_stride(other._col_stride), _offset(other._offset),
+      _stride(other._stride), _offset(other._offset),
       _transposed(other._transposed), _is_rowmajor(other._is_rowmajor)
   {
     // Pass...
   }
-
 
   /**
    * Constructs a new matrix (allocates new memory) with given rows and columns.
    */
   Matrix(size_t rows, size_t cols)
     : _data(rows*cols), _rows(rows), _cols(cols),
-      _row_stride(rows), _col_stride(cols), _offset(0)
+      _stride(cols), _offset(0), _is_rowmajor(true)
   {
     // Pass...
   }
 
-
   /**
    * Explicit copy.
    */
-  Matrix<Scalar> copy()
+  inline Matrix<Scalar> copy()
   {
+    // Construct dense row-major matrix:
     Matrix ret(this->rows(), this->cols());
+    // copy values:
     for (size_t i=0; i<this->rows(); i++)
     {
       for (size_t j=0; j<this->cols(); j++)
@@ -127,13 +125,24 @@ public:
         ret(i,j) = (*this)(i,j);
       }
     }
-
+    // Done...
     return ret;
   }
 
+  /**
+   * Returns a weak reference to this array.
+   */
+  inline Matrix<Scalar> weak()
+  {
+    return Matrix<Scalar>(this->_data.weak(), this->_rows, this->_cols,
+                          this->_stride, this->_offset,
+                          this->_transposed, this->_is_rowmajor);
+  }
 
   /**
    * Returns the number of rows of the matrix.
+   *
+   * @note This method does not return the number of rows in the memory representation!
    */
   inline size_t rows() const
   {
@@ -142,9 +151,10 @@ public:
     return this->_rows;
   }
 
-
   /**
    * Returns the number of columns.
+   *
+   * @note This method does not return the number of columns in the memory representation!
    */
   inline size_t cols() const
   {
@@ -153,6 +163,14 @@ public:
     return this->_cols;
   }
 
+  /**
+   * Returns the number of rows if matrix in in column-major (Fortran) form otherwise
+   * return the number columns of the outer-most matrix.
+   */
+  inline size_t stride() const
+  {
+    return this->_stride;
+  }
 
   /**
    * Retuns true, if the matrix is transposed.
@@ -160,7 +178,6 @@ public:
   inline bool transposed() const {
     return this->_transposed;
   }
-
 
   /**
    * Returns a matrix in column-major order.
@@ -170,15 +187,14 @@ public:
     // If this matrix is in row-major:
     if (this->_is_rowmajor)
     {
-      return Matrix<Scalar>(this->_data, this->rows(), this->cols(),
-                            this->_row_stride, this->_col_stride, this->_offset,
+      return Matrix<Scalar>(this->_data, this->_cols, this->_rows,
+                            this->_stride, this->_offset,
                             ! this->transposed(), false);
     }
 
     // If matrix is in column-major:
-    return *this;
+    return this->weak();
   }
-
 
   /**
    * Returns a matrix in column-major order.
@@ -188,15 +204,14 @@ public:
     // If this matrix is in col-major:
     if (! this->_is_rowmajor)
     {
-      return Matrix<Scalar>(this->_data, this->rows(), this->cols(),
-                            this->_row_stride, this->_col_stride, this->_offset,
+      return Matrix<Scalar>(this->_data.weak(), this->_cols, this->_rows,
+                            this->_stride, this->_offset,
                             ! this->transposed(), true);
     }
 
     // If matrix is in column-major:
-    return *this;
+    return this->weak();
   }
-
 
   /**
    * Returns the pointer to the first element of the array.
@@ -206,7 +221,6 @@ public:
     return *(this->_data) + sizeof(Scalar)*this->_offset;
   }
 
-
   /**
    * Returns a const pointer to the first element of the array.
    */
@@ -214,7 +228,6 @@ public:
   {
     return *(this->_data) + sizeof(Scalar)*this->_offset;
   }
-
 
   /**
    * Returns a reference to the element of the i-th row and j-th column in the matrix.
@@ -224,7 +237,6 @@ public:
     return this->_data->getPtr()[this->_getIndex(i, j)];
   }
 
-
   /**
    * Returns a const reference to the element of the i-th row and j-th column in the matrix.
    */
@@ -232,7 +244,6 @@ public:
   {
     return this->_data->getPtr()[this->_getIndex(i,j)];
   }
-
 
   /**
    * Returns the (0,0) element of the matrix if the matrix is 1,1 dimensional.
@@ -247,16 +258,11 @@ public:
     return (*this)(0,0);
   }
 
-
   /**
    * Returns the i-th row as a vector.
    */
   inline Vector<Scalar> row(size_t i)
   {
-    size_t leading_dimension = this->_col_stride;
-    if (this->_is_rowmajor)
-      leading_dimension = this->_row_stride;
-
     if (this->_transposed)
     {
       if (i >= this->_cols)
@@ -266,7 +272,7 @@ public:
         throw err;
       }
 
-      return Vector<Scalar>(this->data, this->_cols, this->_getIndex(i,0), leading_dimension);
+      return Vector<Scalar>(this->data, this->_cols, this->_getIndex(i,0), this->_stride);
     }
 
     if (i >= this->_rows)
@@ -277,19 +283,14 @@ public:
     }
 
     // Construct vector from matrix
-    Vector<Scalar>(this->_data, this->_rows, this->_getIndex(i, 0), leading_dimension);
+    Vector<Scalar>(this->_data, this->_rows, this->_getIndex(i, 0), this->_stride);
   }
-
 
   /**
    * Returns the j-th column as a vector.
    */
   Vector<Scalar> col(size_t j)
   {
-    size_t leading_dimension = this->_col_stride;
-    if (this->_is_rowmajor)
-      leading_dimension = this->_row_stride;
-
     if (this->_transposed)
     {
       if (j >= this->_rows)
@@ -300,7 +301,7 @@ public:
       }
 
       // Construct vector from matrix
-      Vector<Scalar>(this->_data, this->_rows, this->_getIndex(j, 0), leading_dimension);
+      Vector<Scalar>(this->_data, this->_rows, this->_getIndex(j, 0), this->_stride);
     }
 
     if (j >= this->_cols)
@@ -310,9 +311,8 @@ public:
       throw err;
     }
 
-    return Vector<Scalar>(this->data, this->_cols, this->_getIndex(j,0), leading_dimension);
+    return Vector<Scalar>(this->data, this->_cols, this->_getIndex(j,0), this->_stride);
   }
-
 
   /**
    * Returns a sub-matrix (block) of the matrix.
@@ -336,20 +336,24 @@ public:
     }
 
     // Assemble new Matrix<T> view:
-    return Matrix<Scalar>(this->_data, rows, cols, this->_leading_dimension, this->_getIndex(i,j));
+    return Matrix<Scalar>(this->_data.weak(), rows, cols, this->_stride, this->_getIndex(i,j));
   }
 
-
+  /**
+   * Returns a transposed view of the matrix.
+   */
   inline Matrix<Scalar> t() const
   {
     return Matrix<Scalar>(this->_data, this->_rows,
-                          this->_columns, this->_leading_dimension,
+                          this->_cols, this->_stride,
                           this->_offset, !this->_transposed);
   }
 
 
-
 public:
+  /**
+   * Returns a matrix initialized with all values = 0.
+   */
   static Matrix<Scalar> zeros(size_t rows, size_t cols)
   {
     Matrix<Scalar> m(rows, cols);
@@ -366,6 +370,9 @@ public:
   }
 
 
+  /**
+   * Returns a unit matrix.
+   */
   static Matrix<Scalar> unit(size_t rows, size_t cols)
   {
     Matrix<Scalar> U = Matrix<Scalar>::zeros(rows, cols);
@@ -379,12 +386,18 @@ public:
   }
 
 
+  /**
+   * Returns a squere-unit matrix.
+   */
   static Matrix<Scalar> unit(size_t N)
   {
     return Matrix<Scalar>::unit(N,N);
   }
 
 
+  /**
+   * Constructs a new matrix initialized with [0,1] uniform distributed random-numbers.
+   */
   static Matrix<Scalar> rand(size_t rows, size_t cols)
   {
     Matrix<Scalar> m(rows, cols);

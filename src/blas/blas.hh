@@ -5,11 +5,13 @@
  * BLAS LEVEL 1 routoines:
  */
 #include "dot.hh"
+#include "nrm2.hh"
 
 /*
  * BLAS LEVEL 2 routines.
  */
 #include "gemv.hh"
+#include "getc2.hh"
 
 /*
  * BLAS LEVEL 3 routines.

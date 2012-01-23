@@ -28,7 +28,7 @@ void gemv(const double alpha, const Matrix<double> &A, const Vector<double> &x,
   Matrix<double> Acol = A.colMajor();
 
   // Check if shape matches:
-  if ((A.cols() != x.dim()) || (A.rows() != y.dim()))
+  if ((Acol.cols() != x.dim()) || (Acol.rows() != y.dim()))
   {
     Linalg::IndexError err;
     err << "Shape mismatch!";
@@ -36,17 +36,19 @@ void gemv(const double alpha, const Matrix<double> &A, const Vector<double> &x,
   }
 
   char trans = 'N';
-  if (Acol.trasposed())
+  int m = Acol.rows();
+  int n = Acol.cols();
+
+  if (Acol.trasposed()) {
     trans = 'T';
+    std::swap(m,n);
+  }
 
-  int m = A.rows();
-  int n = A.cols();
-  int lda = A.colStride();
-
+  int lda = Acol.stride();
   int incx = x.stride();
   int incy = y.stride();
 
-  dgemv_(&trans, &m, &n, &alpha, *A, &lda, *x, &incx, &beta, *y, &incy);
+  dgemv_(&trans, &m, &n, &alpha, *Acol, &lda, *x, &incx, &beta, *y, &incy);
 }
 
 

@@ -7,6 +7,7 @@
 
 namespace Linalg {
 
+
 /**
  * Just a container holding the data as a dense 1D array.
  *
@@ -33,6 +34,12 @@ protected:
 
 
 public:
+  ArrayBase(T *data, size_t size, bool owns_data)
+    : data(data), size(size), owns_data(owns_data)
+  {
+    // Pass...
+  }
+
   /**
    * Constructs a array with given size.
    */
@@ -109,6 +116,14 @@ public:
   inline T &operator [](size_t i)
   {
     return this->data[i];
+  }
+
+  /**
+   * Returns a weak reference to this array.
+   */
+  inline ArrayBase<T> &weak() const
+  {
+    return ArrayBase<T>(this->data, this->size, false);
   }
 };
 

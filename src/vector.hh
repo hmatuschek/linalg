@@ -103,7 +103,7 @@ public:
   /**
    * Returns the increment within memory.
    */
-  inline size_t increment()
+  inline size_t stride()
   {
     return this->_increment;
   }
