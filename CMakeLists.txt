@@ -36,5 +36,6 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
 # traverse into source tree:
 #
 add_subdirectory(src)
+add_subdirectory(test)
 
 

@@ -17,7 +17,10 @@ namespace Blas {
 /**
  * Direct access to the dgemm LAPACK function.
  *
- * @ingroup linalg
+ * Calculates:
+ * \f[ C = \alpha A * B + \beta * C \f]
+ *
+ * @ingroup blas3
  */
 void gemm(const double alpha, const Matrix<double> &a, const Matrix<double> &b,
           const double beta, Matrix<double> &c)

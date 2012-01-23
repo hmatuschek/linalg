@@ -14,15 +14,21 @@ namespace Blas {
 
 
 /**
- * Direct access to the dgemv LAPACK function.
+ * Direct access to the dgemv BLAS function.
  *
- * @ingroup linalg
+ * Calculates in-place:
+ * \f[y = \alpha*A*x + \beta*y\f]
+ *
+ * @ingroup blas2
  */
-void gemv(const double alpha, const Matrix<double> &a, const Vector<double> &x,
+void gemv(const double alpha, const Matrix<double> &A, const Vector<double> &x,
           const double beta, Vector<double> &y)
 {
+  // Get matrix in column order (Fortran)
+  Matrix<double> Acol = A.colMajor();
+
   // Check if shape matches:
-  if ((a.cols() != x.dim()) || (a.rows() != y.dim()))
+  if ((A.cols() != x.dim()) || (A.rows() != y.dim()))
   {
     Linalg::IndexError err;
     err << "Shape mismatch!";
@@ -30,14 +36,17 @@ void gemv(const double alpha, const Matrix<double> &a, const Vector<double> &x,
   }
 
   char trans = 'N';
-  int m = a.rows();
-  int n = a.cols();
-  int lda = a.leading_dimension();
+  if (Acol.trasposed())
+    trans = 'T';
+
+  int m = A.rows();
+  int n = A.cols();
+  int lda = A.colStride();
 
   int incx = x.stride();
   int incy = y.stride();
 
-  dgemv_(&trans, &m, &n, &alpha, *a, &lda, *x, &incx, &beta, *y, &incy);
+  dgemv_(&trans, &m, &n, &alpha, *A, &lda, *x, &incx, &beta, *y, &incy);
 }
 
 

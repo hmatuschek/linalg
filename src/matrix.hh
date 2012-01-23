@@ -115,7 +115,7 @@ public:
 
 
   /**
-   * True copy, also copies the memory.
+   * Explicit copy.
    */
   Matrix<Scalar> copy()
   {
@@ -155,13 +155,10 @@ public:
 
 
   /**
-   * Returns the leading-dimension of the array.
+   * Retuns true, if the matrix is transposed.
    */
-  inline size_t leading_dimension() const
-  {
-    if (this->_is_rowmajor)
-      return this->_row_stride;
-    return this->_col_stride;
+  inline bool transposed() const {
+    return this->_transposed;
   }
 
 
