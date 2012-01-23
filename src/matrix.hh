@@ -163,6 +163,42 @@ public:
 
 
   /**
+   * Returns a matrix in column-major order.
+   */
+  inline Matrix<Scalar> colMajor() const
+  {
+    // If this matrix is in row-major:
+    if (this->_is_rowmajor)
+    {
+      return Matrix<Scalar>(this->_data, this->rows(), this->cols(),
+                            this->_row_stride, this->_col_stride, this->_offset,
+                            ! this->transposed(), false);
+    }
+
+    // If matrix is in column-major:
+    return *this;
+  }
+
+
+  /**
+   * Returns a matrix in column-major order.
+   */
+  inline Matrix<Scalar> rowMajor() const
+  {
+    // If this matrix is in col-major:
+    if (! this->_is_rowmajor)
+    {
+      return Matrix<Scalar>(this->_data, this->rows(), this->cols(),
+                            this->_row_stride, this->_col_stride, this->_offset,
+                            ! this->transposed(), true);
+    }
+
+    // If matrix is in column-major:
+    return *this;
+  }
+
+
+  /**
    * Returns the pointer to the first element of the array.
    */
   inline Scalar* operator* ()
