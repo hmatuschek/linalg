@@ -12,8 +12,8 @@
 
 #include "workspace.hh"
 
-#include "blas.hh"
-#include "lapack.hh"
+#include "blas/blas.hh"
+#include "lapack/lapack.hh"
 
 #include "exception.hh"
 

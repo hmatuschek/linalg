@@ -18,7 +18,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 #
 # Search for libraries
 #
-
+FIND_PACKAGE(LAPACK)
 
 
 #

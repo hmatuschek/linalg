@@ -1,6 +1,9 @@
 #ifndef __LINALG_MATRIX_HH__
 #define __LINALG_MATRIX_HH__
 
+#include "arraybase.hh"
+#include "vector.hh"
+
 
 namespace Linalg {
 
@@ -10,14 +13,14 @@ namespace Linalg {
  *
  * @ingroup linalg
  */
-template <class T>
+template <class Scalar>
 class Matrix
 {
 protected:
   /**
    * Holds a managed reference to the data array, the matrix lives in.
    */
-  SmartPtr< ArrayBase<T> > _data;
+  ArrayBase<Scalar> _data;
 
   /**
    * Holds the number of rows of the matrix.
@@ -30,34 +33,60 @@ protected:
   size_t _cols;
 
   /**
-   * Holds the leading dimension of the matrix.
-   *
-   * This is used to address a matrix-in-matrix. Usually, the LD (leading dimension) is the number
-   * of rows of the most-outer matrix.
+   * Number of rows in the outer most matrix.
    */
-  size_t _leading_dimension;
+  size_t _row_stride;
 
+  /**
+   * Number of columns in the outer most matrix.
+   */
+  size_t _col_stride;
+
+  /**
+   * Holds the offset of the first element in the matrix, starting from the first element of the
+   * original memory element.
+   */
   size_t _offset;
 
+  /**
+   * If true, the matrix is assumed to be transposed.
+   */
   bool _transposed;
+
+  /**
+   * If true, the matrix is stored in row-major (C) order, if false then it is stored in
+   * column major (Fortran) order.
+   */
+  bool _is_rowmajor;
 
 
 protected:
   /**
    * Full constructor. Shall not be used from the outside.
    */
-  Matrix(SmartPtr< ArrayBase<T> > data, size_t rows, size_t cols, size_t ld, size_t offset, bool transposed)
-    : _data(data), _rows(rows), _cols(cols), _leading_dimension(ld), _offset(offset), _transposed()
+  Matrix(ArrayBase<Scalar> &data, size_t rows, size_t cols,
+         size_t row_stride, size_t col_stride, size_t offset,
+         bool transposed, bool rowmajor)
+    : _data(data), _rows(rows), _cols(cols),
+      _row_stride(row_stride), _col_stride(col_stride), _offset(offset),
+      _transposed(transposed), _is_rowmajor(rowmajor)
   {
     // Pass...
   }
+
 
   /**
    * Calculates the index (in flattened data array) for the given row/col index.
    */
   inline size_t _getIndex(size_t i, size_t j) const
   {
-    return this->_offset + this->_leading_dimension*i + j;
+    if (this->_transposed)
+      std::swap(i,j);
+
+    if (this->_is_rowmajor)
+      return this->_offset + i*this->_row_stride + j;
+    else
+      return this->_offset + this->_col_stride*j + i;
   }
 
 
@@ -65,9 +94,10 @@ public:
   /**
    * Copy constructor, does not copy the memory of the matrix.
    */
-  Matrix(const Matrix<T> &other)
+  Matrix(Matrix<Scalar> &other)
     : _data(other._data), _rows(other._rows), _cols(other._cols),
-      _leading_dimension(other._leading_dimension), _offset(other._offset)
+      _row_stride(other._row_stride), _col_stride(other._col_stride), _offset(other._offset),
+      _transposed(other._transposed), _is_rowmajor(other._is_rowmajor)
   {
     // Pass...
   }
@@ -77,89 +107,184 @@ public:
    * Constructs a new matrix (allocates new memory) with given rows and columns.
    */
   Matrix(size_t rows, size_t cols)
-    : _data(0), _rows(rows), _cols(cols), _leading_dimension(rows), _offset(0)
+    : _data(rows*cols), _rows(rows), _cols(cols),
+      _row_stride(rows), _col_stride(cols), _offset(0)
   {
-    // allocate some data
-    this->_data = SmartPtr< ArrayBase<T> >(new ArrayBase<T>(rows*cols));
+    // Pass...
   }
 
 
   /**
    * True copy, also copies the memory.
    */
-  Matrix<T> copy()
+  Matrix<Scalar> copy()
   {
-    return Matrix<T>(SmartPtr< ArrayBase<T> >(new ArrayBase<T>(*(this->_data.get_ptr()))),
-                     this->_rows, this->_cols, this->_leading_dimension, this->_offset);
+    Matrix ret(this->rows(), this->cols());
+    for (size_t i=0; i<this->rows(); i++)
+    {
+      for (size_t j=0; j<this->cols(); j++)
+      {
+        ret(i,j) = (*this)(i,j);
+      }
+    }
+
+    return ret;
   }
 
 
+  /**
+   * Returns the number of rows of the matrix.
+   */
   inline size_t rows() const
   {
+    if (this->_transposed)
+      return this->_cols;
     return this->_rows;
   }
 
 
+  /**
+   * Returns the number of columns.
+   */
   inline size_t cols() const
   {
+    if (this->_transposed)
+      return this->_rows;
     return this->_cols;
   }
 
 
+  /**
+   * Returns the leading-dimension of the array.
+   */
   inline size_t leading_dimension() const
   {
-    return this->_leading_dimension;
+    if (this->_is_rowmajor)
+      return this->_row_stride;
+    return this->_col_stride;
   }
 
 
-  inline T* operator* ()
+  /**
+   * Returns the pointer to the first element of the array.
+   */
+  inline Scalar* operator* ()
   {
-    return this->_data->getPtr() + sizeof(T)*this->_offset;
+    return *(this->_data) + sizeof(Scalar)*this->_offset;
   }
 
 
-  const inline T* operator* () const
+  /**
+   * Returns a const pointer to the first element of the array.
+   */
+  inline const Scalar* operator* () const
   {
-    return this->_data->getPtr() + sizeof(T)*this->_offset;
+    return *(this->_data) + sizeof(Scalar)*this->_offset;
   }
 
 
-  T &operator() (size_t i, size_t j)
+  /**
+   * Returns a reference to the element of the i-th row and j-th column in the matrix.
+   */
+  Scalar &operator() (size_t i, size_t j)
   {
     return this->_data->getPtr()[this->_getIndex(i, j)];
   }
 
 
-  const T &operator() (size_t i, size_t j) const
+  /**
+   * Returns a const reference to the element of the i-th row and j-th column in the matrix.
+   */
+  const Scalar &operator() (size_t i, size_t j) const
   {
     return this->_data->getPtr()[this->_getIndex(i,j)];
   }
 
 
-  Vector<T> row(size_t i)
+  /**
+   * Returns the (0,0) element of the matrix if the matrix is 1,1 dimensional.
+   */
+  inline Scalar asScalar() const {
+    if (1 != this->_rows || 1 != this->_cols)
+    {
+      IndexError err; err << "Can not convert matrix to scalar, matrix has more than one element.";
+      throw err;
+    }
+
+    return (*this)(0,0);
+  }
+
+
+  /**
+   * Returns the i-th row as a vector.
+   */
+  inline Vector<Scalar> row(size_t i)
   {
+    size_t leading_dimension = this->_col_stride;
+    if (this->_is_rowmajor)
+      leading_dimension = this->_row_stride;
+
+    if (this->_transposed)
+    {
+      if (i >= this->_cols)
+      {
+        Linalg::IndexError err;
+        err << "Row-index " << i << " out of range 0-" << this->_cols-1;
+        throw err;
+      }
+
+      return Vector<Scalar>(this->data, this->_cols, this->_getIndex(i,0), leading_dimension);
+    }
+
     if (i >= this->_rows)
     {
       Linalg::IndexError err;
       err << "Row-index " << i << " out of range 0-" << this->_rows-1;
+      throw err;
     }
 
     // Construct vector from matrix
-    Vector<T>(this->_data, this->_rows, this->_getIndex(i, 0), this->_leading_dimension);
+    Vector<Scalar>(this->_data, this->_rows, this->_getIndex(i, 0), leading_dimension);
   }
 
 
-  Vector<T> col(size_t j)
+  /**
+   * Returns the j-th column as a vector.
+   */
+  Vector<Scalar> col(size_t j)
   {
+    size_t leading_dimension = this->_col_stride;
+    if (this->_is_rowmajor)
+      leading_dimension = this->_row_stride;
+
+    if (this->_transposed)
+    {
+      if (j >= this->_rows)
+      {
+        Linalg::IndexError err;
+        err << "Row-index " << j << " out of range 0-" << this->_rows-1;
+        throw err;
+      }
+
+      // Construct vector from matrix
+      Vector<Scalar>(this->_data, this->_rows, this->_getIndex(j, 0), leading_dimension);
+    }
+
     if (j >= this->_cols)
     {
       Linalg::IndexError err;
-      err << "Column-index " << j << " out of range 0-"<< this->_cols-1;
+      err << "Row-index " << j << " out of range 0-" << this->_cols-1;
+      throw err;
     }
+
+    return Vector<Scalar>(this->data, this->_cols, this->_getIndex(j,0), leading_dimension);
   }
 
 
-  Matrix<T> sub(size_t i, size_t j, size_t rows, size_t cols)
+  /**
+   * Returns a sub-matrix (block) of the matrix.
+   */
+  Matrix<Scalar> sub(size_t i, size_t j, size_t rows, size_t cols)
   {
     // Test if row-indices match
     if (i >= this->_rows || i+rows > this->_rows)
@@ -178,45 +303,23 @@ public:
     }
 
     // Assemble new Matrix<T> view:
-    return Matrix<T>(this->_data, rows, cols, this->_leading_dimension, this->_getIndex(i,j));
+    return Matrix<Scalar>(this->_data, rows, cols, this->_leading_dimension, this->_getIndex(i,j));
   }
 
 
-  void set(const Matrix<T> &other)
+  inline Matrix<Scalar> t() const
   {
-    // Check dims:
-    if (this->rows() != other.rows() || this->cols() != other.cols())
-    {
-      throw Linalg::IndexError("Shape mismatch!");
-    }
-
-    for (size_t i=0; i<this->rows(); i++)
-    {
-      for (size_t j=0; j<this->cols(); j++)
-      {
-        (*this)(i,j) = other(i,j);
-      }
-    }
-  }
-
-
-  inline void set(size_t i, size_t j, size_t rows, size_t cols, const Matrix<T> other)
-  {
-    this->sub(i,j, rows,cols).set(other);
-  }
-
-  
-  inline Matrix<T> T() const
-  {
-    return Matrix<T>(this->_data, this->_rows, this->_columns, this->_leading_dimension, this->_offset, !this->_transposed);
+    return Matrix<Scalar>(this->_data, this->_rows,
+                          this->_columns, this->_leading_dimension,
+                          this->_offset, !this->_transposed);
   }
 
 
 
 public:
-  static Matrix<T> zeros(size_t rows, size_t cols)
+  static Matrix<Scalar> zeros(size_t rows, size_t cols)
   {
-    Matrix<T> m(rows, cols);
+    Matrix<Scalar> m(rows, cols);
 
     for (size_t i=0; i<rows; i++)
     {
@@ -230,9 +333,9 @@ public:
   }
 
 
-  static Matrix<T> unit(size_t rows, size_t cols)
+  static Matrix<Scalar> unit(size_t rows, size_t cols)
   {
-    Matrix<T> U = Matrix<T>::zeros(rows, cols);
+    Matrix<Scalar> U = Matrix<Scalar>::zeros(rows, cols);
 
     for (size_t i=0; i<std::min(rows, cols); i++)
     {
@@ -243,21 +346,21 @@ public:
   }
 
 
-  static Matrix<T> unit(size_t N)
+  static Matrix<Scalar> unit(size_t N)
   {
-    return Matrix<T>::unit(N,N);
+    return Matrix<Scalar>::unit(N,N);
   }
 
 
-  static Matrix<T> rand(size_t rows, size_t cols)
+  static Matrix<Scalar> rand(size_t rows, size_t cols)
   {
-    Matrix<T> m(rows, cols);
+    Matrix<Scalar> m(rows, cols);
 
     for (size_t i=0; i<rows; i++)
     {
       for (size_t j=0; j<cols; j++)
       {
-        m(i,j) = T(std::rand())/RAND_MAX;
+        m(i,j) = Scalar(std::rand())/RAND_MAX;
       }
     }
 

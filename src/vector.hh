@@ -1,8 +1,8 @@
 #ifndef __LINALG_VECTOR_HH__
 #define __LINALG_VECTOR_HH__
 
-#include "smartptr.hh"
 #include "arraybase.hh"
+#include "exception.hh"
 
 
 namespace Linalg {
@@ -12,14 +12,14 @@ namespace Linalg {
  *
  * @ingroup core
  */
-template <class T>
+template <class Scalar>
 class Vector
 {
 protected:
   /**
    * Holds a managed reference to the memory used by the vector.
    */
-  SmartPtr< ArrayBase<T> > _data;
+  ArrayBase<Scalar> _data;
 
   /**
    * Holds the dimension (number of elements) of the vector.
@@ -42,7 +42,7 @@ protected:
   /**
    * Assembles a complete vector from given memory.
    */
-  Vector(SmartPtr< ArrayBase<T> > data, size_t dim, size_t offset, size_t incr)
+  Vector(ArrayBase<Scalar> data, size_t dim, size_t offset, size_t incr)
     : _data(data), _dimension(dim), _offset(offset), _increment(incr)
   {
     // Pass...
@@ -53,7 +53,7 @@ public:
   /**
    * Copy constructor, does not copy the memory.
    */
-  Vector(const Vector &other)
+  Vector(Vector &other)
     : _data(other._data), _dimension(other._dimension), _offset(other._offset),
       _increment(other._increment)
   {
@@ -65,10 +65,8 @@ public:
    * Constructs a new vector with the given dimension.
    */
   Vector(size_t dim)
-    : _data(0), _dimension(dim), _offset(0), _increment(1)
+    : _data(dim), _dimension(dim), _offset(0), _increment(1)
   {
-    // Allocate some space for vector:
-    this->_data = SmartPtr< ArrayBase<T> >(new ArrayBase<T>(dim));
   }
 
 
@@ -77,8 +75,10 @@ public:
    */
   Vector copy()
   {
-    return Vector(SmartPtr< ArrayBase<T> > (new ArrayBase<T>(*(this->_data.get_ptr()))),
-                  this->_dimension, this->_offset, this->_increment);
+    Vector out(this->dim());
+
+    for (size_t i=0; i<this->dim(); i++)
+      out(i) = (*this)(i);
   }
 
 
@@ -112,45 +112,45 @@ public:
   /**
    * Retunrs a pointer to the first element.
    */
-  inline T *operator *()
+  inline Scalar *operator *()
   {
-    return this->_data->getPtr() + sizeof(T)*this->offset();
+    return *(this->_data) + sizeof(Scalar)*this->offset();
   }
 
 
   /**
    * Returns a const pointer to the first element.
    */
-  inline const T *operator *() const
+  inline const Scalar *operator *() const
   {
-    return this->_data->getPtr() + sizeof(T)*this->offset();
+    return *(this->_data) + sizeof(Scalar)*this->offset();
   }
 
 
   /**
    * Returns a reference to the i-th element.
    */
-  inline T &operator ()(size_t i)
+  inline Scalar &operator ()(size_t i)
   {
-    return this->_data->getPtr()[this->_offset + i*this->_increment];
+    return this->_data[this->_offset + i*this->_increment];
   }
 
 
   /**
    * Returns a const reference to the i-th element.
    */
-  inline const T &operator ()(size_t i) const
+  inline const Scalar &operator ()(size_t i) const
   {
-    return this->_data->getPtr()[this->_offset + i*this->_increment];
+    return this->_data[this->_offset + i*this->_increment];
   }
 
   /**
    * Returns a sub-vector of this vector.
    */
-  Vector<T> sub(size_t i, size_t n);
+  Vector<Scalar> sub(size_t i, size_t n);
 
 
-  void set(const Vector<T> &other)
+  void set(const Vector<Scalar> &other)
   {
     if (! this->dim() == other.dim())
     {
@@ -166,7 +166,7 @@ public:
   }
 
 
-  inline void set(size_t i, size_t n, const Vector<T> &other)
+  inline void set(size_t i, size_t n, const Vector<Scalar> &other)
   {
     this->sub(i,n).set(other);
   }

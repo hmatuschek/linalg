@@ -1,28 +1,42 @@
 #ifndef __FLUC_LINALG_EXCEPTION_HH__
 #define __FLUC_LINALG_EXCEPTION_HH__
 
-#include <exception.hh>
+#include <exception>
+#include <string>
+#include <sstream>
 
 
-namespace Fluc {
 namespace Linalg {
 
-class Exception : public Fluc::Exception
+class Exception : public std::exception, public std::ostringstream
 {
 public:
   Exception(const std::string &msg = "")
-    : Fluc::Exception("Linalg: ")
+    : std::exception()
   {
     (*this) << msg;
   }
 
-  ~Exception() throw()
-  {}
-
   Exception(const Exception &other)
-    : Fluc::Exception(other)
+    : std::exception()
+  {
+    (*this) << other.what();
+  }
+
+  /**
+   * Is needed by the std::exception interface. Does nothing.
+   */
+  virtual ~Exception() throw ()
   {
     // Pass...
+  }
+
+  /**
+   * Returns the message of the exception. This method is needed by the std::exception interface.
+   */
+  virtual const char *what() const throw()
+  {
+    return this->str().c_str();
   }
 };
 
@@ -37,15 +51,14 @@ public:
     // Pass...
   }
 
-  ~IndexError() throw ()
-  {
-
-  }
-
   IndexError(const IndexError &other)
     : Exception(other)
   {
     // Pass...
+  }
+
+  virtual ~IndexError() throw ()
+  {
   }
 };
 
@@ -72,6 +85,6 @@ public:
   }
 };
 }
-}
+
 
 #endif // EXCEPTION_HH
