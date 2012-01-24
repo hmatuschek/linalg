@@ -23,12 +23,12 @@ namespace Blas {
  * Calculates:
  * \f[ C = \alpha A * B + \beta * C \f]
  *
- * @todo This function is untested!
+ * @bug This function did not pass the unit-tests.
  *
  * @ingroup blas3
  */
-void gemm(const double alpha, const Matrix<double> &A, const Matrix<double> &B,
-          const double beta, Matrix<double> &C)
+void gemm(double alpha, const Matrix<double> &A, const Matrix<double> &B,
+          double beta, Matrix<double> &C)
 {
   // Get matrices in column-major from:
   Matrix<double> Acol = A.colMajor();
@@ -44,13 +44,9 @@ void gemm(const double alpha, const Matrix<double> &A, const Matrix<double> &B,
     Ccol = Ccol.t();
   }
 
-  // Check if shape matches:
-  if ( (A.cols() != B.rows()) || (A.rows() != C.rows()) || (B.cols() != C.cols()))
-  {
-    Linalg::IndexError err;
-    err << "Shape mismatch.";
-    throw err;
-  }
+  LINALG_SHAPE_ASSERT(Acol.cols() == Bcol.rows());
+  LINALG_SHAPE_ASSERT(Acol.rows() == Ccol.rows());
+  LINALG_SHAPE_ASSERT(Bcol.cols() == Ccol.cols());
 
   char transa='N';
   char transb='N';

@@ -6,6 +6,14 @@
 #include <sstream>
 
 
+#define LINALG_SHAPE_ASSERT(exp) if (!(exp)) { \
+  Linalg::IndexError err; \
+  err << "ShapeError at " << __FILE__ \
+  << " (" << __LINE__ << "): " \
+  << #exp << " failed."; \
+  throw err; \
+  }
+
 namespace Linalg {
 
 class Exception : public std::exception, public std::ostringstream
