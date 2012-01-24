@@ -12,11 +12,21 @@ template <class Scalar>
 class TriMatrix : public Matrix<Scalar>
 {
 protected:
+  /**
+   * Specifies if the triangular matrix is storred in the upper or lower half.
+   */
   bool _is_upper;
+
+  /**
+   * Specifies if the matrix has a unit diagonal.
+   */
   bool _is_unit_triangular;
 
 
 public:
+  /**
+   * Constructs a triangular matrix-view from the given marix.
+   */
   TriMatrix(Matrix<Scalar> &matrix, bool upper, bool unit)
     : Matrix<Scalar>(matrix.weak()), _is_upper(upper), _is_unit_triangular(unit)
   {
@@ -25,6 +35,9 @@ public:
   }
 
 
+  /**
+   * Copy constructor.
+   */
   TriMatrix(TriMatrix<Scalar> &other)
     : Matrix<Scalar>(other.weak()),
       _is_upper(other._is_upper), _is_unit_triangular(other._is_unit_triangular)
@@ -33,6 +46,23 @@ public:
   }
 
 
+  /**
+   * Assignment operation.
+   */
+  TriMatrix<Scalar> &operator= (TriMatrix<Scalar> &other)
+  {
+    // Assign Matrix:
+    static_cast< Matrix<Scalar> >(*this) = other;
+    this->_is_upper = other._is_upper;
+    this->_is_unit_triangular = other._is_unit_triangular;
+
+    return *this;
+  }
+
+
+  /**
+   * Returns true if the matrix is a upper or lower triangular matrix.
+   */
   inline bool isUpper() const
   {
     if (this->_transposed)
@@ -41,11 +71,27 @@ public:
   }
 
 
+  /**
+   * Retruns true, if the matrix has a unit diagonal.
+   */
   inline bool isUnit() const
   {
     return this->_is_unit_triangular;
   }
 
+
+  /**
+   * Constructs a weak view of this matrix in column-major storage order.
+   */
+  inline TriMatrix<Scalar> colMajor() const
+  {
+    // If storage order is column-major:
+    if (! this->_is_rowmajor)
+      return *this;
+
+    return TriMatrix<Scalar>(Matrix<Scalar>::colMajor(),
+                             ! this->_is_unit_triangular, this->_is_unit_triangular);
+  }
 };
 
 }
