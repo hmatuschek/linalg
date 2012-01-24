@@ -8,6 +8,8 @@ extern void dgemv_(const char *trans, const int *m, const int *n,
                    const double *beta, double *y, const int *incy);
 }
 
+#include "matrix.hh"
+
 
 namespace Linalg {
 namespace Blas {
@@ -25,7 +27,7 @@ void gemv(const double alpha, const Matrix<double> &A, const Vector<double> &x,
           const double beta, Vector<double> &y)
 {
   // Get matrix in column order (Fortran)
-  Matrix<double> Acol = A.colMajor();
+  Matrix<double> Acol(A.colMajor());
 
   // Check if shape matches:
   if ((Acol.cols() != x.dim()) || (Acol.rows() != y.dim()))
@@ -39,7 +41,7 @@ void gemv(const double alpha, const Matrix<double> &A, const Vector<double> &x,
   int m = Acol.rows();
   int n = Acol.cols();
 
-  if (Acol.trasposed()) {
+  if (Acol.transposed()) {
     trans = 'T';
     std::swap(m,n);
   }

@@ -4,10 +4,10 @@
 
 SET(LINALG_TEST_SOURCES main.cc
     unittest.cc cputime.cc
-    nrm2test.cc dottest.cc)
+    nrm2test.cc dottest.cc gemvtest.cc)
 SET(LINALG_TEST_HEADERS
     unittest.hh cputime.hh
-    nrm2test.hh dottest.hh)
+    nrm2test.hh dottest.hh gemvtest.hh)
 
 
 ADD_EXECUTABLE(linalg-test ${LINALG_TEST_SOURCES})

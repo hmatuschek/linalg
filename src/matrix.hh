@@ -64,7 +64,7 @@ protected:
          size_t stride, size_t offset,
          bool transposed, bool rowmajor)
     : _data(data), _rows(rows), _cols(cols),
-      _stride(_stride), _offset(offset),
+      _stride(stride), _offset(offset),
       _transposed(transposed), _is_rowmajor(rowmajor)
   {
     // Pass...
@@ -94,6 +94,14 @@ public:
    */
   Matrix(Matrix<Scalar> &other)
     : _data(other._data), _rows(other._rows), _cols(other._cols),
+      _stride(other._stride), _offset(other._offset),
+      _transposed(other._transposed), _is_rowmajor(other._is_rowmajor)
+  {
+    // Pass...
+  }
+
+  Matrix(const Matrix<Scalar> &other)
+    : _data(other._data.weak()), _rows(other._rows), _cols(other._cols),
       _stride(other._stride), _offset(other._offset),
       _transposed(other._transposed), _is_rowmajor(other._is_rowmajor)
   {
@@ -132,9 +140,10 @@ public:
   /**
    * Returns a weak reference to this array.
    */
-  inline Matrix<Scalar> weak()
+  inline Matrix<Scalar> weak() const
   {
-    return Matrix<Scalar>(this->_data.weak(), this->_rows, this->_cols,
+    ArrayBase<Scalar> data(this->_data.weak());
+    return Matrix<Scalar>(data, this->_rows, this->_cols,
                           this->_stride, this->_offset,
                           this->_transposed, this->_is_rowmajor);
   }
@@ -187,7 +196,8 @@ public:
     // If this matrix is in row-major:
     if (this->_is_rowmajor)
     {
-      return Matrix<Scalar>(this->_data, this->_cols, this->_rows,
+      ArrayBase<Scalar> data(this->_data.weak());
+      return Matrix<Scalar>(data, this->_cols, this->_rows,
                             this->_stride, this->_offset,
                             ! this->transposed(), false);
     }
@@ -360,9 +370,10 @@ public:
    */
   inline Matrix<Scalar> t() const
   {
-    return Matrix<Scalar>(this->_data, this->_rows,
+    ArrayBase<Scalar> data(this->_data.weak());
+    return Matrix<Scalar>(data, this->_rows,
                           this->_cols, this->_stride,
-                          this->_offset, !this->_transposed);
+                          this->_offset, !this->_transposed, this->_is_rowmajor);
   }
 
 
