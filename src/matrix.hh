@@ -113,7 +113,7 @@ public:
    */
   Matrix(size_t rows, size_t cols, bool rowmajor=true)
     : _data(rows*cols), _rows(rows), _cols(cols),
-      _stride(cols), _offset(0), _is_rowmajor(rowmajor)
+      _stride(cols), _offset(0), _transposed(false), _is_rowmajor(rowmajor)
   {
     if (! this->_is_rowmajor)
       this->_stride = this->_rows;
@@ -302,13 +302,13 @@ public:
       stride = this->_stride;
 
     // Construct vector from matrix
-    Vector<Scalar>(this->_data.weak(), this->_cols, this->_getIndex(i, 0), stride);
+    return Vector<Scalar>(this->_data.weak(), this->_cols, this->_getIndex(i, 0), stride);
   }
 
   /**
    * Returns the j-th column as a vector.
    */
-  Vector<Scalar> col(size_t j)
+  inline Vector<Scalar> col(size_t j)
   {
     if (this->_transposed)
     {

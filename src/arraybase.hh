@@ -20,22 +20,22 @@ protected:
   /**
    * Holds the size of the data array.
    */
-  size_t size;
+  size_t _size;
 
   /**
    * Holds the pointer to the data owned by the container.
    */
-  T* data;
+  T* _data;
 
   /**
    * If true, the array base owns the data and the data will freed if the instance gets destroyed.
    */
-  bool owns_data;
+  bool _owns_data;
 
 
 public:
   ArrayBase(T *data, size_t size, bool owns_data)
-    : data(data), size(size), owns_data(owns_data)
+    : _data(data), _size(size), _owns_data(owns_data)
   {
     // Pass...
   }
@@ -44,26 +44,26 @@ public:
    * Constructs a array with given size.
    */
   ArrayBase(size_t size)
-    : size(size), data(0), owns_data(true)
+    : _size(size), _data(0), _owns_data(true)
   {
     // Just allocate the data
-    this->data = new T[size];
+    this->_data = new T[size];
   }
 
   /**
    * Copy constructor, takes the ownership, if the other array holds it.
    */
   ArrayBase(ArrayBase<T> &other)
-    : size(other.size), data(other.data), owns_data(other.owns_data)
+    : _size(other._size), _data(other._data), _owns_data(other._owns_data)
   {
-    if (this->owns_data) {
-      other.data = 0;
-      other.owns_data = false;
+    if (this->_owns_data) {
+      other._data = 0;
+      other._owns_data = false;
     }
   }
 
   ArrayBase(const ArrayBase<T> &other)
-    : size(other.size), data(other.data), owns_data(false)
+    : _size(other._size), _data(other._data), _owns_data(false)
   {
     // Pass...
   }
@@ -73,8 +73,8 @@ public:
    */
   ~ArrayBase()
   {
-    if (this->owns_data)
-      delete this->data;
+    if (this->_owns_data)
+      delete this->_data;
   }
 
   /**
@@ -82,18 +82,18 @@ public:
    */
   const ArrayBase<T> &operator= (ArrayBase<T> &other)
   {
-    if (this->owns_data && 0 != this->data)
+    if (this->_owns_data && 0 != this->_data)
     {
-      delete this->data;
+      delete this->_data;
     }
 
-    this->owns_data = other.owns_data;
-    this->data      = other.data;
-    this->size      = other.size;
+    this->_owns_data = other._owns_data;
+    this->_data      = other._data;
+    this->_size      = other._size;
 
-    if (this->owns_data) {
-      other.owns_data = false;
-      other.data = 0;
+    if (this->_owns_data) {
+      other._owns_data = false;
+      other._data = 0;
     }
   }
 
@@ -102,7 +102,7 @@ public:
    */
   inline size_t getSize() const
   {
-    return this->size;
+    return this->_size;
   }
 
   /**
@@ -110,7 +110,7 @@ public:
    */
   inline T* operator* ()
   {
-    return this->data;
+    return this->_data;
   }
 
   /**
@@ -118,7 +118,7 @@ public:
    */
   inline const T* operator* () const
   {
-    return this->data;
+    return this->_data;
   }
 
   /**
@@ -126,7 +126,7 @@ public:
    */
   inline T &operator [](size_t i)
   {
-    return this->data[i];
+    return this->_data[i];
   }
 
   /**
@@ -134,7 +134,7 @@ public:
    */
   inline ArrayBase<T> weak() const
   {
-    return ArrayBase<T>(this->data, this->size, false);
+    return ArrayBase<T>(this->_data, this->_size, false);
   }
 };
 
