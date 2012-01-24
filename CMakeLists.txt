@@ -20,7 +20,6 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 #
 FIND_PACKAGE(LAPACK)
 
-
 #
 # Make sure libfluctuator can be found
 #

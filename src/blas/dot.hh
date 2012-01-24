@@ -1,10 +1,10 @@
 #ifndef __LINALG_BLAS_DOT_HH__
 #define __LINALG_BLAS_DOT_HH__
 
-#include "vector.h"
+#include "vector.hh"
 
 extern "C" {
-ddot_(const int *N, const double *DX, const int *INCX, double *DY, const int *INCY);
+double ddot_(const int *N, const double *DX, const int *INCX, const double *DY, const int *INCY);
 }
 
 

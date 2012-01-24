@@ -103,9 +103,9 @@ public:
   /**
    * Constructs a new matrix (allocates new memory) with given rows and columns.
    */
-  Matrix(size_t rows, size_t cols)
+  Matrix(size_t rows, size_t cols, bool rowmajor=true)
     : _data(rows*cols), _rows(rows), _cols(cols),
-      _stride(cols), _offset(0), _is_rowmajor(true)
+      _stride(cols), _offset(0), _is_rowmajor(rowmajor)
   {
     // Pass...
   }
@@ -218,7 +218,7 @@ public:
    */
   inline Scalar* operator* ()
   {
-    return *(this->_data) + sizeof(Scalar)*this->_offset;
+    return *(this->_data) + this->_offset;
   }
 
   /**
@@ -226,7 +226,7 @@ public:
    */
   inline const Scalar* operator* () const
   {
-    return *(this->_data) + sizeof(Scalar)*this->_offset;
+    return *(this->_data) + this->_offset;
   }
 
   /**
@@ -234,7 +234,7 @@ public:
    */
   Scalar &operator() (size_t i, size_t j)
   {
-    return this->_data->getPtr()[this->_getIndex(i, j)];
+    return this->_data[this->_getIndex(i, j)];
   }
 
   /**
@@ -242,7 +242,7 @@ public:
    */
   const Scalar &operator() (size_t i, size_t j) const
   {
-    return this->_data->getPtr()[this->_getIndex(i,j)];
+    return this->_data[this->_getIndex(i,j)];
   }
 
   /**
@@ -272,7 +272,11 @@ public:
         throw err;
       }
 
-      return Vector<Scalar>(this->data, this->_cols, this->_getIndex(i,0), this->_stride);
+      size_t stride = this->stride();
+      if (! this->_is_rowmajor)
+        stride = 1;
+
+      return Vector<Scalar>(this->_data.weak(), this->_rows, this->_getIndex(i,0), stride);
     }
 
     if (i >= this->_rows)
@@ -282,8 +286,12 @@ public:
       throw err;
     }
 
+    size_t stride = 1;
+    if (! this->_is_rowmajor)
+      stride = this->_stride;
+
     // Construct vector from matrix
-    Vector<Scalar>(this->_data, this->_rows, this->_getIndex(i, 0), this->_stride);
+    Vector<Scalar>(this->_data.weak(), this->_cols, this->_getIndex(i, 0), stride);
   }
 
   /**
@@ -300,8 +308,12 @@ public:
         throw err;
       }
 
+      size_t stride = 1;
+      if (! this->_is_rowmajor)
+        stride = this->_stride;
+
       // Construct vector from matrix
-      Vector<Scalar>(this->_data, this->_rows, this->_getIndex(j, 0), this->_stride);
+      return Vector<Scalar>(this->_data.weak(), this->_cols, this->_getIndex(0, j), stride);
     }
 
     if (j >= this->_cols)
@@ -311,7 +323,11 @@ public:
       throw err;
     }
 
-    return Vector<Scalar>(this->data, this->_cols, this->_getIndex(j,0), this->_stride);
+    size_t stride = this->_stride;
+    if (! this->_is_rowmajor)
+      stride = 1;
+
+    return Vector<Scalar>(this->_data.weak(), this->_rows, this->_getIndex(0, j), stride);
   }
 
   /**

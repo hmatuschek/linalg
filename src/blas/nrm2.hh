@@ -3,12 +3,15 @@
 
 
 extern "C" {
-void dnrm2_(int *N, double *x, int *INC);
+double dnrm2_(int *N, const double *x, int *INC);
 }
+
+#include "vector.hh"
 
 
 namespace Linalg {
 namespace Blas {
+
 
 /**
  * Calculates 2-norm of vector.

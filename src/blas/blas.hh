@@ -17,5 +17,6 @@
  * BLAS LEVEL 3 routines.
  */
 #include "gemm.hh"
+#include "trmm.hh"
 
 #endif

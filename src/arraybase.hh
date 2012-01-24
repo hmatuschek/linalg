@@ -62,6 +62,12 @@ public:
     }
   }
 
+  ArrayBase(const ArrayBase<T> &other)
+    : size(other.size), data(other.data), owns_data(false)
+  {
+    // Pass...
+  }
+
   /**
    * Destructor, also frees the data held.
    */
@@ -84,6 +90,11 @@ public:
     this->owns_data = other.owns_data;
     this->data      = other.data;
     this->size      = other.size;
+
+    if (this->owns_data) {
+      other.owns_data = false;
+      other.data = 0;
+    }
   }
 
   /**
@@ -121,7 +132,7 @@ public:
   /**
    * Returns a weak reference to this array.
    */
-  inline ArrayBase<T> &weak() const
+  inline ArrayBase<T> weak() const
   {
     return ArrayBase<T>(this->data, this->size, false);
   }

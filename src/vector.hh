@@ -38,7 +38,7 @@ protected:
   size_t _increment;
 
 
-protected:
+public:
   /**
    * Assembles a complete vector from given memory.
    */
@@ -48,8 +48,6 @@ protected:
     // Pass...
   }
 
-
-public:
   /**
    * Copy constructor, does not copy the memory.
    */
@@ -60,6 +58,15 @@ public:
     // Pass...
   }
 
+  /**
+   * Const copy constructor.
+   */
+  Vector(const Vector &other)
+    : _data(other._data.weak()), _dimension(other._dimension), _offset(other._offset),
+      _increment(other._increment)
+  {
+    // Pass...
+  }
 
   /**
    * Constructs a new vector with the given dimension.
@@ -103,7 +110,7 @@ public:
   /**
    * Returns the increment within memory.
    */
-  inline size_t stride()
+  inline size_t stride() const
   {
     return this->_increment;
   }
@@ -114,7 +121,7 @@ public:
    */
   inline Scalar *operator *()
   {
-    return *(this->_data) + sizeof(Scalar)*this->offset();
+    return *(this->_data) + this->offset();
   }
 
 
@@ -123,7 +130,7 @@ public:
    */
   inline const Scalar *operator *() const
   {
-    return *(this->_data) + sizeof(Scalar)*this->offset();
+    return *(this->_data) + this->offset();
   }
 
 
@@ -147,7 +154,11 @@ public:
   /**
    * Returns a sub-vector of this vector.
    */
-  Vector<Scalar> sub(size_t i, size_t n);
+  inline Vector<Scalar> sub(size_t i, size_t n)
+  {
+    ArrayBase<Scalar> data(this->_data.weak());
+    return Vector<Scalar>(data, n, this->offset()+this->_increment*i, this->_increment);
+  }
 
 
   void set(const Vector<Scalar> &other)
