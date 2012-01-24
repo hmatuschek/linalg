@@ -96,12 +96,12 @@ GEMVTest::testRectRowMajor()
   A(0,0) = 1; A(0, 1) = 2; A(0, 2) = 3;
   A(1,0) = 4; A(1, 1) = 5; A(1, 2) = 6;
   x(0) = 10; x(1) = 11; x(2) = 12;
-  y(0) = 0; y(1) = 0; y(2) = 0;
+  y(0) = 0; y(1) = 0;
 
   Blas::gemv(1, A, x, 0.0, y);
 
   UT_ASSERT_EQUAL(y(0), 68.);
-  UT_ASSERT_EQUAL(y(1), 40.+55.+72.);
+  UT_ASSERT_EQUAL(y(1), 167.);
 }
 
 
@@ -114,12 +114,12 @@ GEMVTest::testRectColMajor()
   A(0,0) = 1; A(0, 1) = 2; A(0, 2) = 3;
   A(1,0) = 4; A(1, 1) = 5; A(1, 2) = 6;
   x(0) = 10; x(1) = 11; x(2) = 12;
-  y(0) = 0; y(1) = 0; y(2) = 0;
+  y(0) = 0; y(1) = 0;
 
   Blas::gemv(1, A, x, 0.0, y);
 
   UT_ASSERT_EQUAL(y(0), 68.);
-  UT_ASSERT_EQUAL(y(1), 40.+55.+72.);
+  UT_ASSERT_EQUAL(y(1), 167.);
 }
 
 
