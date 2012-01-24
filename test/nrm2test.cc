@@ -160,20 +160,20 @@ NRM2Test::suite()
 {
   UnitTest::TestSuite *s = new UnitTest::TestSuite("Tests for Blas::nrm2()");
 
-  s->addTest(new UnitTest::TestCaller<NRM2Test>("Blas::nrm2(Vector<double>)",
-                                                &NRM2Test::testVector));
+  s->addTest(new UnitTest::TestCaller<NRM2Test>(
+               "Blas::nrm2(double[m])", &NRM2Test::testVector));
 
-  s->addTest(new UnitTest::TestCaller<NRM2Test>("Blas::nrm2(Matrix<double>::col(i) (row-major))",
-                                                &NRM2Test::testMatrixColumnRowMajor));
+  s->addTest(new UnitTest::TestCaller<NRM2Test>(
+               "Blas::nrm2(double[m,m]::col(i) (row-major))", &NRM2Test::testMatrixColumnRowMajor));
 
-  s->addTest(new UnitTest::TestCaller<NRM2Test>("Blas::nrm2(Matrix<double>::row(i) (row-major))",
-                                                &NRM2Test::testMatrixRowRowMajor));
+  s->addTest(new UnitTest::TestCaller<NRM2Test>(
+               "Blas::nrm2(double[m,m]::row(i) (row-major))", &NRM2Test::testMatrixRowRowMajor));
 
-  s->addTest(new UnitTest::TestCaller<NRM2Test>("Blas::nrm2(Matrix<double>::col(i) (col-major))",
-                                                &NRM2Test::testMatrixColumnColMajor));
+  s->addTest(new UnitTest::TestCaller<NRM2Test>(
+               "Blas::nrm2(double[m,m]::col(i) (col-major))", &NRM2Test::testMatrixColumnColMajor));
 
-  s->addTest(new UnitTest::TestCaller<NRM2Test>("Blas::nrm2(Matrix<double>::row(i) (col-major))",
-                                                &NRM2Test::testMatrixRowColMajor));
+  s->addTest(new UnitTest::TestCaller<NRM2Test>(
+               "Blas::nrm2(double[m,m]::row(i) (col-major))", &NRM2Test::testMatrixRowColMajor));
 
   return s;
 }

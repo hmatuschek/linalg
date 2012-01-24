@@ -23,6 +23,8 @@ namespace Blas {
  * Calculates:
  * \f[ C = \alpha A * B + \beta * C \f]
  *
+ * @todo This function is untested!
+ *
  * @ingroup blas3
  */
 void gemm(const double alpha, const Matrix<double> &A, const Matrix<double> &B,
@@ -67,7 +69,8 @@ void gemm(const double alpha, const Matrix<double> &A, const Matrix<double> &B,
 
   // Perform operation:
   dgemm_(&transa, &transb, &M, &N, &K,
-         &alpha, *Acol, &lda, *Bcol, &ldb,
+         &alpha, *Acol, &lda,
+         *Bcol, &ldb,
          &beta, *Ccol, &ldc);
 
   // Done.

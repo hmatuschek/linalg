@@ -97,6 +97,23 @@ public:
     }
   }
 
+
+  /**
+   * Assignment (weak) operator.
+   */
+  const ArrayBase<T> &operator= (const ArrayBase<T> &other)
+  {
+    if (this->_owns_data && 0 != this->_data)
+    {
+      delete this->_data;
+    }
+
+    this->_owns_data = false;
+    this->_data      = other._data;
+    this->_size      = other._size;
+  }
+
+
   /**
    * Returns the size of the array.
    */

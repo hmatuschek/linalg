@@ -25,8 +25,8 @@ DOTTest::suite()
 {
   UnitTest::TestSuite *s = new UnitTest::TestSuite("Tests for Blas::dot()");
 
-  s->addTest(new UnitTest::TestCaller<DOTTest>("Blas::dot(Vector<double>, Vector<double>)",
-                                                &DOTTest::testVectorVector));
+  s->addTest(new UnitTest::TestCaller<DOTTest>(
+               "Blas::dot(double[m], double[m])", &DOTTest::testVectorVector));
 
   return s;
 }

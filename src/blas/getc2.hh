@@ -23,6 +23,8 @@ namespace Lapack {
  *
  * \f[ A = P \cdot L \cdot U \cdot Q \f]
  *
+ * @todo This function is untested!
+ *
  * @param a Specifies a N-by-N real matrix (in/out).
  * @param ipiv N-dim Vector<int> of indices of rows (out).
  * @param jpiv N-dim Vector<int> of indices of columns (out).

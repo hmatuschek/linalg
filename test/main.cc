@@ -4,6 +4,7 @@
 #include "nrm2test.hh"
 #include "dottest.hh"
 #include "gemvtest.hh"
+#include "gemmtest.hh"
 
 
 using namespace UnitTest;
@@ -17,6 +18,7 @@ int main(void)
   runner.addSuite(NRM2Test::suite());
   runner.addSuite(DOTTest::suite());
   runner.addSuite(GEMVTest::suite());
+  runner.addSuite(GEMMTest::suite());
 
   runner();
 

@@ -120,6 +120,38 @@ public:
   }
 
   /**
+   * Assignment operator.
+   */
+  const Matrix<Scalar> &operator= (Matrix<Scalar> &other)
+  {
+    this->_data = other._data;
+    this->_rows = other._rows;
+    this->_cols = other._cols;
+    this->_stride = other._stride;
+    this->_transposed = other._transposed;
+    this->_is_rowmajor = other._is_rowmajor;
+
+    return *this;
+  }
+
+
+  /**
+   * Assignment (weak) operator.
+   */
+  const Matrix<Scalar> &operator= (const Matrix<Scalar> &other)
+  {
+    this->_data = other._data.weak();
+    this->_rows = other._rows;
+    this->_cols = other._cols;
+    this->_stride = other._stride;
+    this->_transposed = other._transposed;
+    this->_is_rowmajor = other._is_rowmajor;
+
+    return *this;
+  }
+
+
+  /**
    * Explicit copy.
    */
   inline Matrix<Scalar> copy()

@@ -7,10 +7,13 @@
 class GEMVTest : public UnitTest::TestCase
 {
 public:
-  void testRowMajor();
-  void testColMajor();
-  void testTransposedRowMajor();
-  void testTransposedColMajor();
+  void testSquareRowMajor();
+  void testSquareColMajor();
+  void testSquareTransposedRowMajor();
+  void testSquareTransposedColMajor();
+
+  void testRectRowMajor();
+  void testRectColMajor();
 
 public:
   static UnitTest::TestSuite *suite();
