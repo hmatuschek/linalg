@@ -34,7 +34,7 @@ void gemm(const double alpha, const Matrix<double> &A, const Matrix<double> &B,
   Matrix<double> Ccol = C.colMajor();
 
   // If C is transposed:
-  if (Ccol.transposed()){
+  if (Ccol.isTransposed()){
     // Swap A & B
     Matrix<double> tmp(Acol.t());
     Acol = Bcol.t(); Bcol = tmp;
@@ -53,9 +53,9 @@ void gemm(const double alpha, const Matrix<double> &A, const Matrix<double> &B,
   char transa='N';
   char transb='N';
 
-  if (Acol.transposed())
+  if (Acol.isTransposed())
     transa = 'T';
-  if (Bcol.transposed())
+  if (Bcol.isTransposed())
     transb = 'T';
 
   int M = Acol.rows();

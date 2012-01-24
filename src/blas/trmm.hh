@@ -37,7 +37,7 @@ void trmm(bool left, double alpha, const TriMatrix<double> &A, Matrix<double> &B
   Matrix<double> Bcol = B.colMajor();
 
   // If Bcol is transposed: swap side and transpose Acol:
-  if (Bcol.transposed()) {
+  if (Bcol.isTransposed()) {
     Acol = Acol.t();
     Bcol = Bcol.t();
     left = !left;
@@ -55,9 +55,9 @@ void trmm(bool left, double alpha, const TriMatrix<double> &A, Matrix<double> &B
 
   if (!left)
     SIDE = 'R';
-  if ((Acol.isUpper() && Acol.transposed()) || (!Acol.isUpper() && ! Acol.transposed()))
+  if ((Acol.isUpper() && Acol.isTransposed()) || (!Acol.isUpper() && ! Acol.isTransposed()))
     UPLO = 'L';
-  if (Acol.transposed())
+  if (Acol.isTransposed())
     TRANSA = 'T';
   if (Acol.isUnit())
     DIAG = 'U';

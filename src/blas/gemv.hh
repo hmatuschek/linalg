@@ -41,7 +41,7 @@ void gemv(const double alpha, const Matrix<double> &A, const Vector<double> &x,
   int m = Acol.rows();
   int n = Acol.cols();
 
-  if (Acol.transposed()) {
+  if (Acol.isTransposed()) {
     trans = 'T';
     std::swap(m,n);
   }

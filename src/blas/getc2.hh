@@ -56,7 +56,7 @@ void getc2(Matrix<double> &A, Vector<int> &ipiv, Vector<int> &jpiv, size_t &rank
   double *ipiv_ptr = *ipiv;
   double *jpiv_ptr = *jpiv;
 
-  if (Acol.transposed())
+  if (Acol.isTransposed())
     std::swap(ipiv_ptr, jpiv_ptr);
 
   // Calling fortran:

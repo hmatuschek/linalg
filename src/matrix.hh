@@ -115,7 +115,8 @@ public:
     : _data(rows*cols), _rows(rows), _cols(cols),
       _stride(cols), _offset(0), _is_rowmajor(rowmajor)
   {
-    // Pass...
+    if (! this->_is_rowmajor)
+      this->_stride = this->_rows;
   }
 
   /**
@@ -184,7 +185,7 @@ public:
   /**
    * Retuns true, if the matrix is transposed.
    */
-  inline bool transposed() const {
+  inline bool isTransposed() const {
     return this->_transposed;
   }
 
@@ -199,7 +200,7 @@ public:
       ArrayBase<Scalar> data(this->_data.weak());
       return Matrix<Scalar>(data, this->_cols, this->_rows,
                             this->_stride, this->_offset,
-                            ! this->transposed(), false);
+                            ! this->isTransposed(), false);
     }
 
     // If matrix is in column-major:
@@ -216,7 +217,7 @@ public:
     {
       return Matrix<Scalar>(this->_data.weak(), this->_cols, this->_rows,
                             this->_stride, this->_offset,
-                            ! this->transposed(), true);
+                            ! this->isTransposed(), true);
     }
 
     // If matrix is in column-major:

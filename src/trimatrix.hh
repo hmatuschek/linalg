@@ -30,7 +30,7 @@ public:
   TriMatrix(Matrix<Scalar> &matrix, bool upper, bool unit)
     : Matrix<Scalar>(matrix.weak()), _is_upper(upper), _is_unit_triangular(unit)
   {
-    if (matrix.transposed())
+    if (matrix.isTransposed())
       this->_is_upper = ! this->_is_upper;
   }
 
