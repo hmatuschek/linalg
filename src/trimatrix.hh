@@ -94,6 +94,27 @@ public:
   }
 };
 
+
+/**
+ * Constructs an upper-triangular matrix from the given general matrix.
+ */
+template <class Scalar>
+inline TriMatrix<Scalar> triu(Matrix<Scalar> &matrix, bool unit=false)
+{
+  return TriMatrix<Scalar>(matrix, true, unit);
+}
+
+
+/**
+ * Constructs a lower-triangular matrix from the given general matrix.
+ */
+template <class Scalar>
+inline TriMatrix<Scalar> tril(Matrix<Scalar> &matrix, bool unit=false)
+{
+  return TriMatrix<Scalar>(matrix, false, unit);
+}
+
+
 }
 
 
