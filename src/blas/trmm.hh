@@ -66,7 +66,7 @@ void trmm(bool left, double alpha, const TriMatrix<double> &A, Matrix<double> &B
 
   if (!left)
     SIDE = 'R';
-  if (!Acol.isUnit())
+  if ((!Acol.isUpper() && !Acol.isTransposed()) || (Acol.isUpper() && Acol.isTransposed()))
     UPLO = 'L';
   if (Acol.isTransposed())
     TRANSA = 'T';

@@ -90,7 +90,7 @@ public:
       return *this;
 
     return TriMatrix<Scalar>(Matrix<Scalar>::colMajor(),
-                             ! this->_is_upper, this->_is_unit_triangular);
+                             this->isUpper(), this->isUnit());
   }
 
 
@@ -99,7 +99,7 @@ public:
    */
   inline TriMatrix<Scalar> t() const
   {
-    return TriMatrix<Scalar>(Matrix<Scalar>::t(), this->_is_upper, this->_is_unit_triangular);
+    return TriMatrix<Scalar>(Matrix<Scalar>::t(), !this->isUpper(), this->isUnit());
   }
 };
 

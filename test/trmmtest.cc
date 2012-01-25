@@ -19,13 +19,13 @@ TRMMTest::testRowMajor()
   // Multiply with upper triangular of A
   Matrix<double> tmp(B.copy());
   Blas::trmm(true, 1, triu(A), tmp);
-  UT_ASSERT_EQUAL(tmp(0,0), 21.);  UT_ASSERT_EQUAL(tmp(0,1), 24.);  UT_ASSERT_EQUAL(tmp(0,0), 27.);
-  UT_ASSERT_EQUAL(tmp(1,0), 32.);  UT_ASSERT_EQUAL(tmp(1,1), 36.);  UT_ASSERT_EQUAL(tmp(0,0), 40.);
+  UT_ASSERT_EQUAL(tmp(0,0), 21.);  UT_ASSERT_EQUAL(tmp(0,1), 24.);  UT_ASSERT_EQUAL(tmp(0,2), 27.);
+  UT_ASSERT_EQUAL(tmp(1,0), 32.);  UT_ASSERT_EQUAL(tmp(1,1), 36.);  UT_ASSERT_EQUAL(tmp(1,2), 40.);
 
   tmp = B.copy();
   Blas::trmm(true, 1, triu(A, true), tmp);
-  UT_ASSERT_EQUAL(tmp(0,0), 21.);  UT_ASSERT_EQUAL(tmp(0,1), 24.);  UT_ASSERT_EQUAL(tmp(0,0), 27.);
-  UT_ASSERT_EQUAL(tmp(1,0), 8.);   UT_ASSERT_EQUAL(tmp(1,1), 9.);   UT_ASSERT_EQUAL(tmp(0,0), 10.);
+  UT_ASSERT_EQUAL(tmp(0,0), 21.);  UT_ASSERT_EQUAL(tmp(0,1), 24.);  UT_ASSERT_EQUAL(tmp(0,2), 27.);
+  UT_ASSERT_EQUAL(tmp(1,0), 8.);   UT_ASSERT_EQUAL(tmp(1,1), 9.);   UT_ASSERT_EQUAL(tmp(1,2), 10.);
 }
 
 
@@ -44,14 +44,14 @@ TRMMTest::testColMajor()
   // Multiply with upper triangular of A
   Matrix<double> tmp(B.copy());
   Blas::trmm(true, 1, triu(A), tmp);
-  UT_ASSERT_EQUAL(tmp(0,0), 21.);  UT_ASSERT_EQUAL(tmp(0,1), 24.);  UT_ASSERT_EQUAL(tmp(0,0), 27.);
-  UT_ASSERT_EQUAL(tmp(1,0), 32.);  UT_ASSERT_EQUAL(tmp(1,1), 36.);  UT_ASSERT_EQUAL(tmp(0,0), 40.);
+  UT_ASSERT_EQUAL(tmp(0,0), 21.);  UT_ASSERT_EQUAL(tmp(0,1), 24.);  UT_ASSERT_EQUAL(tmp(0,2), 27.);
+  UT_ASSERT_EQUAL(tmp(1,0), 32.);  UT_ASSERT_EQUAL(tmp(1,1), 36.);  UT_ASSERT_EQUAL(tmp(1,2), 40.);
 
   // Multiply with upper triangular of A with unit diagonal
   tmp = B.copy();
   Blas::trmm(true, 1, triu(A, true), tmp);
-  UT_ASSERT_EQUAL(tmp(0,0), 21.);  UT_ASSERT_EQUAL(tmp(0,1), 24.);  UT_ASSERT_EQUAL(tmp(0,0), 27.);
-  UT_ASSERT_EQUAL(tmp(1,0), 8.);   UT_ASSERT_EQUAL(tmp(1,1), 9.);   UT_ASSERT_EQUAL(tmp(0,0), 10.);
+  UT_ASSERT_EQUAL(tmp(0,0), 21.);  UT_ASSERT_EQUAL(tmp(0,1), 24.);  UT_ASSERT_EQUAL(tmp(0,2), 27.);
+  UT_ASSERT_EQUAL(tmp(1,0), 8.);   UT_ASSERT_EQUAL(tmp(1,1), 9.);   UT_ASSERT_EQUAL(tmp(1,2), 10.);
 }
 
 
@@ -64,7 +64,7 @@ TRMMTest::suite()
   s->addTest(new UnitTest::TestCaller<TRMMTest>(
                "Blas::trmm(left, tri[m,m], double[m,n]) (row-major)", &TRMMTest::testRowMajor));
   s->addTest(new UnitTest::TestCaller<TRMMTest>(
-               "Blas::trmm(left, tri[m,m], double[m,n]) (col-major)", &TRMMTest::testRowMajor));
+               "Blas::trmm(left, tri[m,m], double[m,n]) (col-major)", &TRMMTest::testColMajor));
 
   return s;
 }

@@ -159,7 +159,7 @@ public:
   inline Matrix<Scalar> copy()
   {
     // Construct dense row-major matrix:
-    Matrix ret(this->rows(), this->cols());
+    Matrix ret(this->rows(), this->cols(), this->isRowOrder());
     // copy values:
     for (size_t i=0; i<this->rows(); i++)
     {
@@ -222,6 +222,12 @@ public:
   inline bool isTransposed() const {
     return this->_transposed;
   }
+
+
+  inline bool isRowOrder() const {
+    return this->_is_rowmajor;
+  }
+
 
   /**
    * Returns a matrix in column-major order.
