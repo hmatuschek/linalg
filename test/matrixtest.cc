@@ -138,10 +138,10 @@ void
 MatrixTest::testFromData()
 {
   double A_data[6] = {1., 2., 3., 4., 5., 6.};
-  Matrix<double> A = matrixFromData<>(A_data, 2, 3);
+  Matrix<double> A = Matrix<double>::fromData(A_data, 2, 3);
 
   double B_data[6] = {1., 4., 2., 5., 3., 6.};
-  Matrix<double> B = matrixFromData<>(B_data, 2, 3, 0, 0, false, false, false);
+  Matrix<double> B = Matrix<double>::fromData(B_data, 2, 3, 0, 0, false, false);
 
   for (size_t i=0; i<A.rows(); i++) {
     for (size_t j=0; j<A.cols(); j++) {

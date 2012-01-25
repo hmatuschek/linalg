@@ -36,7 +36,7 @@ public:
    * Constructs a triangular matrix-view from the given marix.
    */
   TriMatrix(const Matrix<Scalar> &matrix, bool upper, bool unit)
-    : Matrix<Scalar>(matrix.weak()), _is_upper(upper), _is_unit_triangular(unit)
+    : Matrix<Scalar>(matrix), _is_upper(upper), _is_unit_triangular(unit)
   {
     if (matrix.isTransposed())
       this->_is_upper = ! this->_is_upper;
@@ -47,7 +47,7 @@ public:
    * Copy constructor.
    */
   TriMatrix(const TriMatrix<Scalar> &other)
-    : Matrix<Scalar>(other.weak()),
+    : Matrix<Scalar>(other),
       _is_upper(other._is_upper), _is_unit_triangular(other._is_unit_triangular)
   {
     // Pass...
@@ -98,7 +98,7 @@ public:
       return *this;
 
     return TriMatrix<Scalar>(Matrix<Scalar>::colMajor(),
-                             this->isUpper(), this->isUnit());
+                             !this->isUpper(), this->isUnit());
   }
 
 

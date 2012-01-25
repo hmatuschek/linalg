@@ -81,6 +81,28 @@ public:
 
 
 
+class MemoryError: public Exception
+{
+public:
+  MemoryError(const std::string &msg = "")
+    : Exception(msg)
+  {
+    // Pass...
+  }
+
+  MemoryError(const MemoryError &other)
+    : Exception(other)
+  {
+    // Pass...
+  }
+
+  virtual ~MemoryError() throw ()
+  {
+  }
+};
+
+
+
 class LapackError : public Exception
 {
 public:

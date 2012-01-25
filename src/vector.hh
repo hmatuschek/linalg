@@ -1,7 +1,7 @@
 #ifndef __LINALG_VECTOR_HH__
 #define __LINALG_VECTOR_HH__
 
-#include "arraybase.hh"
+#include "memory.hh"
 #include "exception.hh"
 
 
@@ -13,14 +13,9 @@ namespace Linalg {
  * @ingroup core
  */
 template <class Scalar>
-class Vector
+class Vector : public DataPtr<Scalar>
 {
 protected:
-  /**
-   * Holds a managed reference to the memory used by the vector.
-   */
-  ArrayBase<Scalar> _data;
-
   /**
    * Holds the dimension (number of elements) of the vector.
    */
@@ -42,8 +37,8 @@ public:
   /**
    * Assembles a complete vector from given memory.
    */
-  Vector(ArrayBase<Scalar> data, size_t dim, size_t offset, size_t incr)
-    : _data(data), _dimension(dim), _offset(offset), _increment(incr)
+  Vector(Scalar *data, size_t dim, size_t offset, size_t incr, bool takes_ownership)
+    : DataPtr<Scalar>(data, takes_ownership), _dimension(dim), _offset(offset), _increment(incr)
   {
     // Pass...
   }
@@ -51,8 +46,8 @@ public:
   /**
    * Copy constructor, does not copy the memory.
    */
-  Vector(Vector &other)
-    : _data(other._data), _dimension(other._dimension), _offset(other._offset),
+  explicit Vector(Vector &other, bool take_ownership)
+    : DataPtr<Scalar>(other, take_ownership), _dimension(other._dimension), _offset(other._offset),
       _increment(other._increment)
   {
     // Pass...
@@ -62,7 +57,7 @@ public:
    * Const copy constructor.
    */
   Vector(const Vector &other)
-    : _data(other._data.weak()), _dimension(other._dimension), _offset(other._offset),
+    : DataPtr<Scalar>(other), _dimension(other._dimension), _offset(other._offset),
       _increment(other._increment)
   {
     // Pass...
@@ -72,7 +67,7 @@ public:
    * Constructs a new vector with the given dimension.
    */
   Vector(size_t dim)
-    : _data(dim), _dimension(dim), _offset(0), _increment(1)
+    : DataPtr<Scalar>(dim), _dimension(dim), _offset(0), _increment(1)
   {
   }
 
@@ -121,7 +116,7 @@ public:
    */
   inline Scalar *operator *()
   {
-    return *(this->_data) + this->offset();
+    return this->_data + this->offset();
   }
 
 
@@ -130,7 +125,7 @@ public:
    */
   inline const Scalar *operator *() const
   {
-    return *(this->_data) + this->offset();
+    return this->_data + this->offset();
   }
 
 
@@ -156,8 +151,9 @@ public:
    */
   inline Vector<Scalar> sub(size_t i, size_t n)
   {
-    ArrayBase<Scalar> data(this->_data.weak());
-    return Vector<Scalar>(data, n, this->offset()+this->_increment*i, this->_increment);
+    return Vector<Scalar>(this->_data,
+                          n, this->offset()+this->_increment*i, this->_increment,
+                          false);
   }
 
 

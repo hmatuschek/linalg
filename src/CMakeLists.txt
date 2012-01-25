@@ -12,7 +12,7 @@ SET(LINALG_BLAS_HEADERS blas/blas.hh
 
 SET(LINALG_LAPACK_HEADERS lapack/lapack.hh)
 
-SET(LINALG_HEADERS linalg.hh arraybase.hh matrix.hh trimatrix.hh vector.hh exception.hh workspace.hh)
+SET(LINALG_HEADERS linalg.hh memory.hh matrix.hh trimatrix.hh vector.hh exception.hh workspace.hh)
 
 SET(LINALG_SOURCES ${LINALG_HEADERS} ${LINALG_BLAS_HEADERS} ${LINALG_LAPACK_HEADERS})
 
