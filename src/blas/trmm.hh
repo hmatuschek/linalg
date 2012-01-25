@@ -45,6 +45,15 @@ void trmm(bool left, double alpha, const TriMatrix<double> &A, Matrix<double> &B
     left = !left;
   }
 
+  // Check dimensions:
+  if (left) {
+    LINALG_SHAPE_ASSERT(Acol.rows() == Bcol.rows());
+    LINALG_SHAPE_ASSERT(Acol.cols() == Bcol.rows());
+  } else {
+    LINALG_SHAPE_ASSERT(Acol.rows() == Bcol.cols());
+    LINALG_SHAPE_ASSERT(Acol.cols() == Bcol.cols());
+  }
+
   char SIDE = 'L';
   char UPLO = 'U';
   char TRANSA = 'N';
@@ -57,7 +66,7 @@ void trmm(bool left, double alpha, const TriMatrix<double> &A, Matrix<double> &B
 
   if (!left)
     SIDE = 'R';
-  if ((Acol.isUpper() && Acol.isTransposed()) || (!Acol.isUpper() && ! Acol.isTransposed()))
+  if (!Acol.isUnit())
     UPLO = 'L';
   if (Acol.isTransposed())
     TRANSA = 'T';

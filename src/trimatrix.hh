@@ -27,7 +27,7 @@ public:
   /**
    * Constructs a triangular matrix-view from the given marix.
    */
-  TriMatrix(Matrix<Scalar> &matrix, bool upper, bool unit)
+  TriMatrix(const Matrix<Scalar> &matrix, bool upper, bool unit)
     : Matrix<Scalar>(matrix.weak()), _is_upper(upper), _is_unit_triangular(unit)
   {
     if (matrix.isTransposed())
@@ -38,7 +38,7 @@ public:
   /**
    * Copy constructor.
    */
-  TriMatrix(TriMatrix<Scalar> &other)
+  TriMatrix(const TriMatrix<Scalar> &other)
     : Matrix<Scalar>(other.weak()),
       _is_upper(other._is_upper), _is_unit_triangular(other._is_unit_triangular)
   {
@@ -49,7 +49,7 @@ public:
   /**
    * Assignment operation.
    */
-  TriMatrix<Scalar> &operator= (TriMatrix<Scalar> &other)
+  TriMatrix<Scalar> &operator= (const TriMatrix<Scalar> &other)
   {
     // Assign Matrix:
     static_cast< Matrix<Scalar> >(*this) = other;
@@ -90,7 +90,16 @@ public:
       return *this;
 
     return TriMatrix<Scalar>(Matrix<Scalar>::colMajor(),
-                             ! this->_is_unit_triangular, this->_is_unit_triangular);
+                             ! this->_is_upper, this->_is_unit_triangular);
+  }
+
+
+  /**
+   * Creates a @c TriMatrix view of this TriMatrix as a transposed.
+   */
+  inline TriMatrix<Scalar> t() const
+  {
+    return TriMatrix<Scalar>(Matrix<Scalar>::t(), this->_is_upper, this->_is_unit_triangular);
   }
 };
 

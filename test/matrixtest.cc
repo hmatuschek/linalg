@@ -48,6 +48,26 @@ MatrixTest::testSquareRowToColMajor()
 }
 
 
+void
+MatrixTest::testSubRowToColMajor()
+{
+  Matrix<double> A(4,5);
+  A(0,0) = 1;  A(0,1) = 2;  A(0,2)=3;  A(0,3)=4;  A(0,4)=5;
+  A(1,0) = 6;  A(1,1) = 7;  A(1,2)=8;  A(1,3)=9;  A(1,4)=10;
+  A(2,0) = 11; A(2,1) = 12; A(2,2)=13; A(2,3)=14; A(2,4)=15;
+  A(3,0) = 16; A(3,1) = 17; A(3,2)=18; A(3,3)=19; A(3,4)=20;
+
+  Matrix<double> B(A.sub(1,1, 2,3).colMajor());
+
+  for (size_t i=0; i<2; i++)
+  {
+    for (size_t j=0; j<3; j++)
+    {
+      UT_ASSERT_EQUAL(B(i,j), A(i+1, j+1));
+    }
+  }
+}
+
 
 void
 MatrixTest::testRectColToRowMajor()
@@ -93,6 +113,26 @@ MatrixTest::testSquareColToRowMajor()
 }
 
 
+void
+MatrixTest::testSubColToRowMajor()
+{
+  Matrix<double> A(4,5, false);
+  A(0,0) = 1;  A(0,1) = 2;  A(0,2)=3;  A(0,3)=4;  A(0,4)=5;
+  A(1,0) = 6;  A(1,1) = 7;  A(1,2)=8;  A(1,3)=9;  A(1,4)=10;
+  A(2,0) = 11; A(2,1) = 12; A(2,2)=13; A(2,3)=14; A(2,4)=15;
+  A(3,0) = 16; A(3,1) = 17; A(3,2)=18; A(3,3)=19; A(3,4)=20;
+
+  Matrix<double> B(A.sub(1,1, 2,3).colMajor());
+
+  for (size_t i=0; i<2; i++)
+  {
+    for (size_t j=0; j<3; j++)
+    {
+      UT_ASSERT_EQUAL(B(i,j), A(i+1, j+1));
+    }
+  }
+}
+
 
 void
 MatrixTest::testFromData()
@@ -127,13 +167,19 @@ MatrixTest::suite()
                "double[m,n]::colMajor() (row-major)", &MatrixTest::testRectRowToColMajor));
 
   s->addTest(new UnitTest::TestCaller<MatrixTest>(
+               "double[m,n]::sub()::colMajor() (row-major)", &MatrixTest::testSubRowToColMajor));
+
+  s->addTest(new UnitTest::TestCaller<MatrixTest>(
                "double[m,m]::rowMajor() (col-major)", &MatrixTest::testSquareColToRowMajor));
 
   s->addTest(new UnitTest::TestCaller<MatrixTest>(
                "double[m,n]::rowMajor() (col-major)", &MatrixTest::testRectColToRowMajor));
 
   s->addTest(new UnitTest::TestCaller<MatrixTest>(
-               "double[m,n] internal data layout.", &MatrixTest::testFromData));
+               "double[m,n]::sub()::rowMajor() (col-major)", &MatrixTest::testSubColToRowMajor));
+
+  s->addTest(new UnitTest::TestCaller<MatrixTest>(
+               "double[m,n] internal data layout", &MatrixTest::testFromData));
 
   return s;
 }

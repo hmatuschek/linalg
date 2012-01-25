@@ -8,9 +8,11 @@ class GEMMTest : public UnitTest::TestCase
 {
 public:
   void testRectRowMajor();
-  void testRectColMajor();
-
+  void testRectTransposedRowMajor();
   void testSquareRowMajor();
+
+  void testRectColMajor();
+  void testRectTransposedColMajor();
   void testSquareColMajor();
 
 public:

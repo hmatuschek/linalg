@@ -398,7 +398,9 @@ public:
     }
 
     // Assemble new Matrix<T> view:
-    return Matrix<Scalar>(this->_data.weak(), rows, cols, this->_stride, this->_getIndex(i,j));
+    ArrayBase<Scalar> data(this->_data.weak());
+    return Matrix<Scalar>(data, rows, cols, this->_stride, this->_getIndex(i,j),
+                          this->_transposed, this->_is_rowmajor);
   }
 
   /**
