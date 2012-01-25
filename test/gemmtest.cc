@@ -61,7 +61,7 @@ GEMMTest::testRectColMajor()
 
   Blas::gemm(1., A, B, 0., C);
 
-  //UT_ASSERT_EQUAL(C(0,0), 58.);
+  UT_ASSERT_EQUAL(C(0,0), 58.);
   UT_ASSERT_EQUAL(C(0,1), 64.);
   UT_ASSERT_EQUAL(C(1,0), 139.);
   UT_ASSERT_EQUAL(C(1,1), 154.);

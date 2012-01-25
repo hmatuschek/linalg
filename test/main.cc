@@ -1,6 +1,7 @@
 #include "unittest.hh"
 #include <iostream>
 
+#include "matrixtest.hh"
 #include "nrm2test.hh"
 #include "dottest.hh"
 #include "gemvtest.hh"
@@ -15,6 +16,7 @@ int main(void)
   // Construct test-runner
   TestRunner runner(std::cout);
 
+  runner.addSuite(MatrixTest::suite());
   runner.addSuite(NRM2Test::suite());
   runner.addSuite(DOTTest::suite());
   runner.addSuite(GEMVTest::suite());

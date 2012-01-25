@@ -29,13 +29,8 @@ void gemv(const double alpha, const Matrix<double> &A, const Vector<double> &x,
   // Get matrix in column order (Fortran)
   Matrix<double> Acol(A.colMajor());
 
-  // Check if shape matches:
-  if ((Acol.cols() != x.dim()) || (Acol.rows() != y.dim()))
-  {
-    Linalg::IndexError err;
-    err << "Shape mismatch!";
-    throw err;
-  }
+  LINALG_SHAPE_ASSERT(Acol.cols() == x.dim());
+  LINALG_SHAPE_ASSERT(Acol.rows() == y.dim());
 
   char trans = 'N';
   int m = Acol.rows();

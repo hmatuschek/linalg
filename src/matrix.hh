@@ -247,7 +247,8 @@ public:
     // If this matrix is in col-major:
     if (! this->_is_rowmajor)
     {
-      return Matrix<Scalar>(this->_data.weak(), this->_cols, this->_rows,
+      ArrayBase<double> data(this->_data.weak());
+      return Matrix<Scalar>(data, this->_cols, this->_rows,
                             this->_stride, this->_offset,
                             ! this->isTransposed(), true);
     }
@@ -411,6 +412,22 @@ public:
 
 
 public:
+  static Matrix<Scalar> fromData(Scalar *data, size_t rows, size_t cols,
+                                 size_t stride=0, size_t offset=0, bool take_ownership=false,
+                                 bool transposed=false, bool row_major=true)
+  {
+    size_t _stride = cols;
+    if (0 != stride) {
+      _stride = stride;
+    } else if (! row_major) {
+      _stride = rows;
+    }
+
+    ArrayBase<Scalar> data_ptr(data, rows*cols, take_ownership);
+    return Matrix<Scalar>(data_ptr, rows, cols, _stride, offset, transposed, row_major);
+  }
+
+
   /**
    * Returns a matrix initialized with all values = 0.
    */
@@ -474,6 +491,20 @@ public:
   }
 };
 
+
+/**
+ * Constructs a Matrix<> instance from given data.
+ *
+ * @todo Document with more details.
+ */
+template <class T>
+Matrix<T>
+matrixFromData(T *data, size_t rows, size_t cols,
+               size_t stride=0, size_t offset=0, bool take_ownership=false,
+               bool transposed=false, bool row_major=true)
+{
+  return Matrix<T>::fromData(data, rows, cols, stride, offset, take_ownership, transposed, row_major);
+}
 
 }
 

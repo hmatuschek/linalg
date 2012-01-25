@@ -106,6 +106,25 @@ GEMVTest::testRectRowMajor()
 
 
 void
+GEMVTest::testRectTransposedRowMajor()
+{
+  Matrix<double> A(2,3);
+  Vector<double> x(2), y(3);
+
+  A(0,0) = 1; A(0, 1) = 2; A(0, 2) = 3;
+  A(1,0) = 4; A(1, 1) = 5; A(1, 2) = 6;
+  x(0) = 10; x(1) = 11;
+  y(0) = 0; y(1) = 0; y(2) = 0;
+
+  Blas::gemv(1, A.t(), x, 0.0, y);
+
+  UT_ASSERT_EQUAL(y(0), 54.);
+  UT_ASSERT_EQUAL(y(1), 75.);
+  UT_ASSERT_EQUAL(y(2), 96.);
+}
+
+
+void
 GEMVTest::testRectColMajor()
 {
   Matrix<double> A(2,3, false);
@@ -122,6 +141,24 @@ GEMVTest::testRectColMajor()
   UT_ASSERT_EQUAL(y(1), 167.);
 }
 
+
+void
+GEMVTest::testRectTransposedColMajor()
+{
+  Matrix<double> A(2,3, false);
+  Vector<double> x(2), y(3);
+
+  A(0,0) = 1; A(0, 1) = 2; A(0, 2) = 3;
+  A(1,0) = 4; A(1, 1) = 5; A(1, 2) = 6;
+  x(0) = 10; x(1) = 11;
+  y(0) = 0; y(1) = 0; y(2) = 0;
+
+  Blas::gemv(1, A.t(), x, 0.0, y);
+
+  UT_ASSERT_EQUAL(y(0), 54.);
+  UT_ASSERT_EQUAL(y(1), 75.);
+  UT_ASSERT_EQUAL(y(2), 96.);
+}
 
 
 
@@ -143,6 +180,10 @@ GEMVTest::suite()
                &GEMVTest::testSquareTransposedRowMajor));
 
   s->addTest(new UnitTest::TestCaller<GEMVTest>(
+               "Blas::gemv(double[m,n]::t(), double[m], double[n]) (row-major)",
+               &GEMVTest::testRectTransposedRowMajor));
+
+  s->addTest(new UnitTest::TestCaller<GEMVTest>(
                "Blas::gemv(double[m,m], double[m], double[m]) (col-major)",
                &GEMVTest::testSquareColMajor));
 
@@ -153,6 +194,10 @@ GEMVTest::suite()
   s->addTest(new UnitTest::TestCaller<GEMVTest>(
                "Blas::gemv(double[m,m]::t(), double[m], double[m]) (col-major)",
                &GEMVTest::testSquareTransposedColMajor));
+
+  s->addTest(new UnitTest::TestCaller<GEMVTest>(
+               "Blas::gemv(double[m,n]::t(), double[m], double[n]) (col-major)",
+               &GEMVTest::testRectTransposedColMajor));
 
   return s;
 

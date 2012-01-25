@@ -13,7 +13,9 @@ public:
   void testSquareTransposedColMajor();
 
   void testRectRowMajor();
+  void testRectTransposedRowMajor();
   void testRectColMajor();
+  void testRectTransposedColMajor();
 
 public:
   static UnitTest::TestSuite *suite();
