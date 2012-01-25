@@ -7,16 +7,19 @@
  */
 
 /**
- * 
+ * @mainpage Linalg -- A C++ frontend to BLAS and LAPACK
+ *
+ * Linalg is a template library, that provides easy to use matrix and vector classes and a
+ * collection of functions directly interfacing the BLAS and LAPACK Fortran routines.
  */
 
 
 #ifndef __LINALG_HH__
 #define __LINALG_HH__
 
-#include "arraybase.hh"
-#include "matrix.hh"
 #include "vector.hh"
+#include "matrix.hh"
+#include "trimatrix.hh"
 
 #include "workspace.hh"
 #include "exception.hh"
