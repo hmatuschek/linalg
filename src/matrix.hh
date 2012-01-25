@@ -11,6 +11,8 @@ namespace Linalg {
 /**
  * Defines a matrix.
  *
+ * @todo Implement "empty" matrix constructor.
+ *
  * @ingroup linalg
  */
 template <class Scalar>
@@ -412,6 +414,9 @@ public:
 
 
 public:
+  /**
+   * Constructs a @c Matrix from the given data.
+   */
   static Matrix<Scalar> fromData(Scalar *data, size_t rows, size_t cols,
                                  size_t stride=0, size_t offset=0, bool take_ownership=false,
                                  bool transposed=false, bool row_major=true)
@@ -492,8 +497,9 @@ public:
 };
 
 
+
 /**
- * Constructs a Matrix<> instance from given data.
+ * Constructs a @c Matrix instance from given data.
  *
  * @todo Document with more details.
  */

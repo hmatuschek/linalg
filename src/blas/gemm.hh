@@ -13,6 +13,7 @@ void dgemm_(const char *transa, const char *transb,
 }
 
 
+
 namespace Linalg {
 namespace Blas {
 
@@ -22,8 +23,6 @@ namespace Blas {
  *
  * Calculates:
  * \f[ C = \alpha A * B + \beta * C \f]
- *
- * @bug This function did not pass the unit-tests.
  *
  * @ingroup blas3
  */

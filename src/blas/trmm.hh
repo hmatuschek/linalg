@@ -24,6 +24,8 @@ namespace Blas {
  * \f[B = B\cdot A\f]
  * if @c left is false.
  *
+ * @todo This function is not tested yet.
+ *
  * @param left Specifies if @c A is multiplied from left or right to @c B.
  * @param A Specifies a unit or non-unit, upper- or lower-triangular matrix.
  * @param B Specifies some general matrix.
