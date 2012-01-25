@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "matrixtest.hh"
+#include "trimatrixtest.hh"
 #include "nrm2test.hh"
 #include "dottest.hh"
 #include "gemvtest.hh"
@@ -18,6 +19,7 @@ int main(void)
   TestRunner runner(std::cout);
 
   runner.addSuite(MatrixTest::suite());
+  runner.addSuite(TriMatrixTest::suite());
   runner.addSuite(NRM2Test::suite());
   runner.addSuite(DOTTest::suite());
   runner.addSuite(GEMVTest::suite());

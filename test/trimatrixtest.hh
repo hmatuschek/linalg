@@ -7,10 +7,12 @@
 class TriMatrixTest : public UnitTest::TestCase
 {
 public:
+  void testTranspose();
   void testRowToColMajor();
+  void testColToRowMajor();
 
 public:
-  UnitTest::TestSuite *suite();
+  static UnitTest::TestSuite *suite();
 };
 
 #endif // TRIMATRIXTEST_HH

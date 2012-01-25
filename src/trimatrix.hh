@@ -116,7 +116,7 @@ public:
  * Constructs an upper-triangular matrix from the given general matrix.
  */
 template <class Scalar>
-inline TriMatrix<Scalar> triu(Matrix<Scalar> &matrix, bool unit=false)
+inline TriMatrix<Scalar> triu(const Matrix<Scalar> &matrix, bool unit=false)
 {
   return TriMatrix<Scalar>(matrix, true, unit);
 }
@@ -126,7 +126,7 @@ inline TriMatrix<Scalar> triu(Matrix<Scalar> &matrix, bool unit=false)
  * Constructs a lower-triangular matrix from the given general matrix.
  */
 template <class Scalar>
-inline TriMatrix<Scalar> tril(Matrix<Scalar> &matrix, bool unit=false)
+inline TriMatrix<Scalar> tril(const Matrix<Scalar> &matrix, bool unit=false)
 {
   return TriMatrix<Scalar>(matrix, false, unit);
 }
