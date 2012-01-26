@@ -157,7 +157,7 @@ public:
   /**
    * Copy constructor with ownership transfer.
    */
-  Matrix(Matrix<Scalar> &other, bool take_ownership)
+  explicit Matrix(Matrix<Scalar> &other, bool take_ownership)
     : DataPtr<Scalar>(other, take_ownership), _rows(other._rows), _cols(other._cols),
       _stride(other._stride), _offset(other._offset),
       _transposed(other._transposed), _is_rowmajor(other._is_rowmajor)
@@ -169,7 +169,7 @@ public:
   /**
    * Takes the ownership of a matrix that is unowned.
    */
-  Matrix(unowned other)
+  explicit Matrix(unowned other)
     : DataPtr<Scalar>(*other, true), _rows(other->_rows), _cols(other->_cols),
       _stride(other->_stride), _offset(other->_offset),
       _transposed(other->_transposed), _is_rowmajor(other->_is_rowmajor)
@@ -205,7 +205,7 @@ public:
    *
    * This matrix takes the ownership of the data of the assigned matrix.
    */
-  const Matrix<Scalar> &operator= (Matrix<Scalar>::unowned &other)
+  inline const Matrix<Scalar> &operator= (Matrix<Scalar>::unowned other)
   {
     // Free data if owning it:
     if(this->_owns_data && this->_data != other->_data)
@@ -214,15 +214,15 @@ public:
     }
 
     // Take ownership of data:
-    this->_data = other->_data; other->release();
+    this->_data = other->_data; other->releaseData();
     this->_owns_data = true;
 
     // Copy meta-data
-    this->_rows = other._rows;
-    this->_cols = other._cols;
-    this->_stride = other._stride;
-    this->_transposed = other._transposed;
-    this->_is_rowmajor = other._is_rowmajor;
+    this->_rows = other->_rows;
+    this->_cols = other->_cols;
+    this->_stride = other->_stride;
+    this->_transposed = other->_transposed;
+    this->_is_rowmajor = other->_is_rowmajor;
 
     return *this;
   }
@@ -231,7 +231,7 @@ public:
   /**
    * Assignment (weak) operator.
    */
-  const Matrix<Scalar> &operator= (const Matrix<Scalar> &other)
+  inline const Matrix<Scalar> &operator= (const Matrix<Scalar> &other)
   {
     if (this->_owns_data && other._data != this->_data) {
       delete this->_data;
@@ -391,7 +391,7 @@ public:
   /**
    * Returns a reference to the element of the i-th row and j-th column in the matrix.
    */
-  Scalar &operator() (size_t i, size_t j)
+  inline Scalar &operator() (size_t i, size_t j)
   {
     return this->_data[this->_getIndex(i, j)];
   }
@@ -497,7 +497,7 @@ public:
   /**
    * Returns a sub-matrix (block) of the matrix.
    */
-  Matrix<Scalar> sub(size_t i, size_t j, size_t rows, size_t cols)
+  inline Matrix<Scalar> sub(size_t i, size_t j, size_t rows, size_t cols)
   {
     // Test if row-indices match
     if (i >= this->_rows || i+rows > this->_rows)

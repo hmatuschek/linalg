@@ -158,7 +158,7 @@ MatrixTest::testFromData()
 void
 MatrixTest::testValueRef()
 {
-  Matrix<double> A = Matrix<double>::rand(3,2);
+  Matrix<double> A; A = Matrix<double>::rand(3,2);
   Matrix<double> B(3,2);
   UT_ASSERT(A.ownsData()); UT_ASSERT(B.ownsData());
 
@@ -205,9 +205,8 @@ MatrixTest::testOwnershipTransfer()
   UT_ASSERT(A.isEmpty());
   UT_ASSERT(!B.ownsData());
   UT_ASSERT(!B.isEmpty());
-  UT_ASSERT(C.ownsData());
   UT_ASSERT(!C.isEmpty());
-
+  UT_ASSERT(C.ownsData());
 }
 
 
