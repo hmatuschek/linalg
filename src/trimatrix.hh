@@ -60,7 +60,7 @@ public:
   TriMatrix<Scalar> &operator= (const TriMatrix<Scalar> &other)
   {
     // Assign Matrix:
-    static_cast< Matrix<Scalar> >(*this) = other;
+    static_cast< Matrix<Scalar> &>(*this) = other;
     this->_is_upper = other._is_upper;
     this->_is_unit_triangular = other._is_unit_triangular;
 
@@ -99,7 +99,7 @@ public:
 
     TriMatrix<Scalar> col(Matrix<Scalar>::colMajor(),
                           this->isUpper(), this->hasUnitDiag());
-    col._is_rowmajor = ! this->_is_rowmajor;
+    col._is_upper = ! this->_is_upper;
     return col;
   }
 
@@ -109,7 +109,8 @@ public:
    */
   inline TriMatrix<Scalar> t() const
   {
-    return TriMatrix<Scalar>(Matrix<Scalar>::t(), !this->isUpper(), this->hasUnitDiag());
+    TriMatrix<Scalar> trans(*this); trans._transposed = !trans._transposed;
+    return trans;
   }
 };
 

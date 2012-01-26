@@ -55,8 +55,8 @@ TriMatrixTest::testRowToColMajor()
   {
     for (size_t i=j; i<A.rows(); i++)
     {
-      UT_ASSERT_EQUAL(Au(i,j), A(i,j));
-      UT_ASSERT_EQUAL(Bu(i,j), A(i,j));
+      UT_ASSERT_EQUAL(Al(i,j), A(i,j));
+      UT_ASSERT_EQUAL(Bl(i,j), A(i,j));
     }
   }
 }
@@ -89,8 +89,8 @@ TriMatrixTest::testColToRowMajor()
   {
     for (size_t i=j; i<A.rows(); i++)
     {
-      UT_ASSERT_EQUAL(Au(i,j), A(i,j));
-      UT_ASSERT_EQUAL(Bu(i,j), A(i,j));
+      UT_ASSERT_EQUAL(Al(i,j), A(i,j));
+      UT_ASSERT_EQUAL(Bl(i,j), A(i,j));
     }
   }
 }

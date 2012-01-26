@@ -6,7 +6,7 @@ using namespace Linalg;
 
 
 void
-TRMMTest::testRowMajor()
+TRMMTest::testUpperRowMajor()
 {
   Matrix<double> A(2,2);
   Matrix<double> B(2,3);
@@ -31,7 +31,7 @@ TRMMTest::testRowMajor()
 
 
 void
-TRMMTest::testColMajor()
+TRMMTest::testUpperColMajor()
 {
   Matrix<double> A(2,2, false);
   Matrix<double> B(2,3, false);
@@ -62,9 +62,9 @@ TRMMTest::suite()
   UnitTest::TestSuite *s = new UnitTest::TestSuite("Tests for Blas::trmm()");
 
   s->addTest(new UnitTest::TestCaller<TRMMTest>(
-               "Blas::trmm(left, tri[m,m], double[m,n]) (row-major)", &TRMMTest::testRowMajor));
+               "Blas::trmm(left, tri[m,m], double[m,n]) (row-major)", &TRMMTest::testUpperRowMajor));
   s->addTest(new UnitTest::TestCaller<TRMMTest>(
-               "Blas::trmm(left, tri[m,m], double[m,n]) (col-major)", &TRMMTest::testColMajor));
+               "Blas::trmm(left, tri[m,m], double[m,n]) (col-major)", &TRMMTest::testUpperColMajor));
 
   return s;
 }
