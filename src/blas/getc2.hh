@@ -54,8 +54,8 @@ void getc2(Matrix<double> &A, Vector<int> &ipiv, Vector<int> &jpiv, size_t &rank
   int lda = BLAS_LEADING_DIMENSION(Acol);
   int info = 0;
 
-  double *ipiv_ptr = *ipiv;
-  double *jpiv_ptr = *jpiv;
+  int *ipiv_ptr = *ipiv;
+  int *jpiv_ptr = *jpiv;
 
   if (BLAS_IS_TRANSPOSED(Acol)) {
     Acol = Acol.t();
@@ -73,7 +73,7 @@ void getc2(Matrix<double> &A, Vector<int> &ipiv, Vector<int> &jpiv, size_t &rank
     throw err;
   }
 
-  rank = n-info;
+  rank = N-info;
 }
 
 

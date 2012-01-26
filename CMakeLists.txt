@@ -18,12 +18,15 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 #
 # Search for libraries
 #
-FIND_PACKAGE(LAPACK)
+FIND_PACKAGE(LAPACK REQUIRED)
+
+FIND_PACKAGE(PythonLibs REQUIRED)
 
 #
 # Make sure libfluctuator can be found
 #
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
+INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 
 
 #
@@ -35,6 +38,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src)
 # traverse into source tree:
 #
 add_subdirectory(src)
+add_subdirectory(python)
 add_subdirectory(test)
 
 

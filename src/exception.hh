@@ -106,7 +106,7 @@ public:
 class LapackError : public Exception
 {
 public:
-  LapackError(const std::string &msg)
+  LapackError(const std::string &msg="")
     : Exception(msg)
   {
     // Pass...
@@ -123,6 +123,29 @@ public:
 
   }
 };
+
+
+class PythonError : public Exception
+{
+public:
+  PythonError(const std::string &msg="")
+    : Exception(msg)
+  {
+    // Pass...
+  }
+
+  PythonError(const PythonError &other)
+    : Exception(other)
+  {
+    // Pass...
+  }
+
+  ~PythonError() throw ()
+  {
+
+  }
+};
+
 }
 
 

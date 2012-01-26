@@ -11,6 +11,8 @@
 
 #include "memory.hh"
 #include "vector.hh"
+#include "blas/utils.hh"
+#include <iostream>
 
 
 namespace Linalg {
@@ -644,6 +646,32 @@ public:
   }
 };
 
+
+template <class Scalar>
+void print(const Matrix<Scalar> &matrix)
+{
+  std::cerr << "matrix(rows=" << BLAS_NUM_ROWS(matrix)
+            << ", cols=" << BLAS_NUM_COLS(matrix)
+            << ", stride=" << BLAS_LEADING_DIMENSION(matrix)
+            << ", row_major=" << matrix.isRowOrder()
+            << ", transposed=" << matrix.isTransposed()
+            << ", data=" << *matrix
+            << ", owns_data=" << matrix.ownsData()
+            << ", values=" << std::endl;
+  std::cerr << "[";
+  for (size_t i=0; i<matrix.rows(); i++) {
+    if (0 != i) std::cerr << " ";
+    std::cerr << "[";
+    for (size_t j=0; j<matrix.cols(); j++) {
+      std::cerr << matrix(i,j);
+      if (j != (matrix.cols()-1))
+        std::cerr << ", ";
+    }
+    std::cerr << "]";
+    if (i != (matrix.rows()-1)) std::cerr << std::endl;
+  }
+  std::cerr << "]);" << std::endl;
+}
 
 }
 
