@@ -19,6 +19,7 @@
  * BLAS LEVEL 2 routines.
  */
 #include "gemv.hh"
+#include "trmv.hh"
 #include "getc2.hh"
 
 /*

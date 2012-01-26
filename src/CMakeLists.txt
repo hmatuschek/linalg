@@ -3,7 +3,7 @@
 #
 
 SET(LINALG_BLAS_LEVEL1_HEADERS blas/dot.hh blas/nrm2.hh)
-SET(LINALG_BLAS_LEVEL2_HEADERS blas/gemv.hh blas/getc2.hh)
+SET(LINALG_BLAS_LEVEL2_HEADERS blas/gemv.hh blas/getc2.hh blas/trmv.hh)
 SET(LINALG_BLAS_LEVEL3_HEADERS blas/gemm.hh blas/trmm.hh)
 SET(LINALG_BLAS_HEADERS blas/blas.hh
     ${LINALG_BLAS_LEVEL1_HEADERS}
