@@ -29,6 +29,51 @@ class Matrix : public DataPtr<Scalar>
 public:
   typedef std::auto_ptr< Matrix<Scalar> > unowned;
 
+  /**
+   * Represents a weak reference to the values of a matrix. This can be used to copy values of
+   * one matrix into an other.
+   */
+  class ValueRef
+  {
+  protected:
+    Matrix<Scalar> _matrix;
+
+  public:
+    ValueRef(const Matrix &matrix)
+      : _matrix(matrix)
+    {
+      // Pass...
+    }
+
+    ValueRef(const ValueRef &other)
+      : _matrix(other._matrix)
+    {
+      // Pass...
+    }
+
+    const ValueRef &operator= (const Scalar &val)
+    {
+      for (size_t i=0; i<this->_matrix.rows(); i++) {
+        for (size_t j=0; j<this->_matrix.cols(); j++) {
+          this->_matrix(i,j) = val;
+        }
+      }
+    }
+
+    const ValueRef &operator= (const Matrix &other)
+    {
+      // Assert equal shapes:
+      LINALG_SHAPE_ASSERT(this->_matrix.rows() == other.rows());
+      LINALG_SHAPE_ASSERT(this->_matrix.cols() == other.cols());
+
+      for (size_t i=0; i<this->_matrix.rows(); i++) {
+        for (size_t j=0; j<this->_matrix.cols(); j++) {
+          this->_matrix(i,j) = other(i,j);
+        }
+      }
+    }
+  };
+
 
 protected:
   /**
@@ -98,12 +143,26 @@ protected:
 
 
 public:
+  /**
+   * Constructs an empty matrix.
+   */
+  Matrix()
+    : DataPtr<Scalar>(), _rows(0), _cols(0), _stride(0), _offset(0),
+      _transposed(false), _is_rowmajor(true)
+  {
+    // Pass...
+  }
+
+
+  /**
+   * Copy constructor with ownership transfer.
+   */
   Matrix(Matrix<Scalar> &other, bool take_ownership)
     : DataPtr<Scalar>(other, take_ownership), _rows(other._rows), _cols(other._cols),
       _stride(other._stride), _offset(other._offset),
       _transposed(other._transposed), _is_rowmajor(other._is_rowmajor)
   {
-
+    // Pass...
   }
 
 
@@ -149,15 +208,16 @@ public:
   const Matrix<Scalar> &operator= (Matrix<Scalar>::unowned &other)
   {
     // Free data if owning it:
-    if(this->_owns_data)
+    if(this->_owns_data && this->_data != other->_data)
     {
       delete this->_data;
     }
 
     // Take ownership of data:
-    this->_data = other->_data; other->_data=0; other->_owns_data=false;
+    this->_data = other->_data; other->release();
     this->_owns_data = true;
 
+    // Copy meta-data
     this->_rows = other._rows;
     this->_cols = other._cols;
     this->_stride = other._stride;
@@ -211,6 +271,12 @@ public:
 
     // Done...
     return ret.takeOwnership();
+  }
+
+
+  inline ValueRef vals()
+  {
+    return ValueRef(*this);
   }
 
 
@@ -478,9 +544,9 @@ public:
   /**
    * Constructs a @c Matrix from the given data.
    */
-  static unowned fromData(Scalar *data, size_t rows, size_t cols,
-                          size_t stride=0, size_t offset=0,
-                          bool transposed=false, bool row_major=true)
+  static Matrix<Scalar> fromData(Scalar *data, size_t rows, size_t cols,
+                                 size_t stride=0, size_t offset=0,
+                                 bool transposed=false, bool row_major=true)
   {
     size_t _stride = cols;
     if (0 != stride) {
@@ -489,7 +555,7 @@ public:
       _stride = rows;
     }
 
-    return Matrix<Scalar>(data, rows, cols, _stride, offset, transposed, row_major, false).takeOwnership();
+    return Matrix<Scalar>(data, rows, cols, _stride, offset, transposed, row_major, false);
   }
 
 

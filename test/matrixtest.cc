@@ -155,6 +155,63 @@ MatrixTest::testFromData()
 
 
 
+void
+MatrixTest::testValueRef()
+{
+  Matrix<double> A = Matrix<double>::rand(3,2);
+  Matrix<double> B(3,2);
+  UT_ASSERT(A.ownsData()); UT_ASSERT(B.ownsData());
+
+  // Assign values:
+  B.vals() = A;
+  UT_ASSERT(A.ownsData()); UT_ASSERT(B.ownsData());
+
+  // compare values:
+  for (size_t i=0; i<A.rows(); i++) {
+    for (size_t j=0; j<A.cols(); j++) {
+      UT_ASSERT_EQUAL(A(i,j), B(i,j));
+    }
+  }
+}
+
+
+void
+MatrixTest::testOwnershipTransfer()
+{
+  Matrix<double> A(1,1);
+  Matrix<double> B;
+  Matrix<double> C;
+
+  // Test initial ownership:
+  UT_ASSERT(A.ownsData());
+  UT_ASSERT(!A.isEmpty());
+  UT_ASSERT(!B.ownsData());
+  UT_ASSERT(B.isEmpty());
+  UT_ASSERT(!C.ownsData());
+  UT_ASSERT(C.isEmpty());
+
+  // Weak assignment:
+  B = A;
+  UT_ASSERT(A.ownsData());
+  UT_ASSERT(!A.isEmpty());
+  UT_ASSERT(!B.ownsData());
+  UT_ASSERT(!B.isEmpty());
+  UT_ASSERT(!C.ownsData());
+  UT_ASSERT(C.isEmpty());
+
+  // Ownership transfer A -> C:
+  C = A.takeOwnership();
+  UT_ASSERT(!A.ownsData());
+  UT_ASSERT(A.isEmpty());
+  UT_ASSERT(!B.ownsData());
+  UT_ASSERT(!B.isEmpty());
+  UT_ASSERT(C.ownsData());
+  UT_ASSERT(!C.isEmpty());
+
+}
+
+
+
 UnitTest::TestSuite *
 MatrixTest::suite()
 {
@@ -180,6 +237,12 @@ MatrixTest::suite()
 
   s->addTest(new UnitTest::TestCaller<MatrixTest>(
                "double[m,n] internal data layout", &MatrixTest::testFromData));
+
+  s->addTest(new UnitTest::TestCaller<MatrixTest>(
+               "double[m,n]::vals() value assignment", &MatrixTest::testValueRef));
+
+  s->addTest(new UnitTest::TestCaller<MatrixTest>(
+               "double[m,m] ownership transfer", &MatrixTest::testOwnershipTransfer));
 
   return s;
 }

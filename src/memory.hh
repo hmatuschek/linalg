@@ -30,6 +30,16 @@ protected:
 
 
 public:
+  /**
+   * Constructs an empty data pointer (null pointer).
+   */
+  DataPtr() throw()
+    : _data(0), _owns_data(false)
+  {
+    // Pass...
+  }
+
+
   DataPtr(Scalar *data, bool owns_data) throw()
     : _data(data), _owns_data(owns_data)
   {
@@ -47,10 +57,14 @@ public:
   DataPtr(DataPtr<Scalar> &ptr, bool take_ownership) throw()
     : _data(ptr._data), _owns_data(false)
   {
-    if (take_ownership && ptr.ownsData())
-    {
+    if (take_ownership && ptr.ownsData()) {
       this->_owns_data = true;
       ptr.releaseData();
+    }
+    else if (take_ownership && ! ptr.ownsData()) {
+      MemoryError err;
+      err << "Can not take ownership of data: Source does not own the data.";
+      throw err;
     }
   }
 

@@ -24,6 +24,10 @@ public:
   void testSubColToRowMajor();
 
   void testFromData();
+  void testValueRef();
+
+  void testOwnershipTransfer();
+
 
 public:
   static UnitTest::TestSuite *suite();
