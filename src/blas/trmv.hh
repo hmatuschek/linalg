@@ -1,14 +1,23 @@
+/*
+ * This file is part of the Linalg project, a C++ interface to BLAS and LAPACK.
+ *
+ * The source-code is licensed under the terms of the MIT license, read LICENSE for more details.
+ *
+ * (c) 2011, 2012 Hannes Matuschek <hmatuschek at gmail dot com>
+ */
+
 #ifndef __LINALG_BLAS_TRMV_HH__
 #define __LINALG_BLAS_TRMV_HH__
 
 #include "vector.hh"
 #include "trimatrix.hh"
+#include "blas/utils.hh"
 
 
 // Iternface to Fortran function:
 extern "C" {
 void dtrmv_(char *uplo, char *transa, char *diag, int *n,
-            double *a, int *lda, double *x, int *incx);
+            const double *a, int *lda, double *x, int *incx);
 }
 
 
@@ -27,26 +36,20 @@ namespace Blas {
  */
 void trmv(const TriMatrix<double> &A, Vector<double> &x)
 {
-  // Ensure, A is in column-major format:
-  TriMatrix<double> Acol = A.colMajor();
+  // Make A column-major:
+  const TriMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
 
   // Assert Acol is square:
   LINALG_SHAPE_ASSERT(Acol.rows() == Acol.cols());
+  LINALG_SHAPE_ASSERT(Acol.rows() == x.dim());
 
-  char UPLO  = 'U';
-  char TRANS = 'N';
-  char DIAG  = 'N';
-  int  N     = Acol.cols();
-  int  LDA   = Acol.stride();
-  int  INCX  = x.stride();
-
-  // Determine if Acol is upper- or lower-triangular matrix (layout in memory)
-  if ((!Acol.isUpper() && !Acol.isTransposed()) || (Acol.isUnit() && Acol.isTransposed()))
-    UPLO = 'L';
-  if (Acol.isTransposed())
-    TRANS = 'N';
-  if (Acol.isUnit())
-    DIAG = 'U';
+  // Get flags and dimensions:
+  char UPLO  = BLAS_UPLO_FLAG(Acol);
+  char TRANS = BLAS_TRANSPOSED_FLAG(Acol);
+  char DIAG  = BLAS_UNIT_DIAG_FLAG(Acol);
+  int  N     = BLAS_NUM_COLS(Acol);
+  int  LDA   = BLAS_LEADING_DIMENSION(Acol);
+  int  INCX  = BLAS_INCREMENT(x);
 
   // Call Fortran function
   dtrmv_(&UPLO, &TRANS, &DIAG, &N, *Acol, &LDA, *x, &INCX);

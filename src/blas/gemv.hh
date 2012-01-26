@@ -16,6 +16,8 @@ extern void dgemv_(const char *trans, const int *m, const int *n,
                    const double *beta, double *y, const int *incy);
 }
 
+
+#include "blas/utils.hh"
 #include "matrix.hh"
 
 
@@ -35,23 +37,17 @@ void gemv(const double alpha, const Matrix<double> &A, const Vector<double> &x,
           const double beta, Vector<double> &y)
 {
   // Get matrix in column order (Fortran)
-  Matrix<double> Acol(A.colMajor());
+  Matrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
 
   LINALG_SHAPE_ASSERT(Acol.cols() == x.dim());
   LINALG_SHAPE_ASSERT(Acol.rows() == y.dim());
 
-  char trans = 'N';
-  int m = Acol.rows();
-  int n = Acol.cols();
-
-  if (Acol.isTransposed()) {
-    trans = 'T';
-    std::swap(m,n);
-  }
-
-  int lda = Acol.stride();
-  int incx = x.stride();
-  int incy = y.stride();
+  char trans = BLAS_TRANSPOSED_FLAG(Acol);
+  int m      = BLAS_NUM_ROWS(Acol);
+  int n      = BLAS_NUM_COLS(Acol);
+  int lda    = BLAS_LEADING_DIMENSION(Acol);
+  int incx   = BLAS_INCREMENT(x);
+  int incy   = BLAS_INCREMENT(y);
 
   dgemv_(&trans, &m, &n, &alpha, *Acol, &lda, *x, &incx, &beta, *y, &incy);
 }

@@ -9,6 +9,9 @@
 #ifndef __LINALG_BLAS_HH__
 #define __LINALG_BLAS_HH__
 
+#include "utils.hh"
+
+
 /*
  * BLAS LEVEL 1 routoines:
  */

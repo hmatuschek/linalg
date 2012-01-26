@@ -14,6 +14,8 @@ extern "C" {
 double dnrm2_(int *N, const double *x, int *INC);
 }
 
+
+#include "blas/utils.hh"
 #include "vector.hh"
 
 
@@ -30,9 +32,8 @@ namespace Blas {
  */
 double nrm2(const Vector<double> &x)
 {
-  int N   = x.dim();
-  int INC = x.stride();
-
+  int N   = BLAS_DIMENSION(x);
+  int INC = BLAS_INCREMENT(x);
   return dnrm2_(&N, *x, &INC);
 }
 

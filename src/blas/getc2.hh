@@ -9,6 +9,7 @@
 #ifndef __LINALG_BLAS_GETC2_HH__
 #define __LINALG_BLAS_GETC2_HH__
 
+#include "blas/utils.hh"
 #include "matrix.hh"
 #include "vector.hh"
 
@@ -42,32 +43,24 @@ namespace Lapack {
 void getc2(Matrix<double> &A, Vector<int> &ipiv, Vector<int> &jpiv, size_t &rank)
 {
   // Get A in column-major form:
-  Matrix<double> Acol = A.colMajor();
+  Matrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
 
   // Assert A being a N-by-N matrix:
-  if (Acol.rows() != Acol.cols())
-  {
-    Linalg::IndexError err;
-    err << "A must be a quadratic matrix!";
-    throw err;
-  }
+  LINALG_SHAPE_ASSERT(Acol.rows() == Acol.cols());
+  LINALG_SHAPE_ASSERT(Acol.rows() == ipiv.dim());
+  LINALG_SHAPE_ASSERT(Acol.rows() == jpiv.dim());
 
-  if (Acol.rows() != ipiv.dim() || Acol.rows() != jpiv.dim())
-  {
-    Linalg::IndexError err;
-    err << "rows(A) == cols(A) == dim(ipiv) == dim(jpiv) not satisfied!";
-    throw err;
-  }
-
-  int N   = Acol.rows();
-  int lda = Acol.stride();
+  int N   = BLAS_NUM_ROWS(Acol);
+  int lda = BLAS_LEADING_DIMENSION(Acol);
   int info = 0;
 
   double *ipiv_ptr = *ipiv;
   double *jpiv_ptr = *jpiv;
 
-  if (Acol.isTransposed())
+  if (BLAS_IS_TRANSPOSED(Acol)) {
+    Acol = Acol.t();
     std::swap(ipiv_ptr, jpiv_ptr);
+  }
 
   // Calling fortran:
   dgetc2_(&N, *A, &lda, ipiv_ptr, jpiv_ptr, &info);

@@ -9,6 +9,8 @@
 #ifndef __LINALG_BLAS_GEMM_HH__
 #define __LINALG_BLAS_GEMM_HH__
 
+
+#include "blas/utils.hh"
 #include "matrix.hh"
 
 
@@ -38,9 +40,9 @@ void gemm(double alpha, const Matrix<double> &A, const Matrix<double> &B,
           double beta, Matrix<double> &C)
 {
   // Get matrices in column-major from:
-  Matrix<double> Acol = A.colMajor();
-  Matrix<double> Bcol = B.colMajor();
-  Matrix<double> Ccol = C.colMajor();
+  Matrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
+  Matrix<double> Bcol = BLAS_TO_COLUMN_MAJOR(B);
+  Matrix<double> Ccol = BLAS_TO_COLUMN_MAJOR(C);
 
   // If C is transposed:
   if (Ccol.isTransposed()){
@@ -55,20 +57,14 @@ void gemm(double alpha, const Matrix<double> &A, const Matrix<double> &B,
   LINALG_SHAPE_ASSERT(Acol.rows() == Ccol.rows());
   LINALG_SHAPE_ASSERT(Bcol.cols() == Ccol.cols());
 
-  char transa='N';
-  char transb='N';
-
-  if (Acol.isTransposed())
-    transa = 'T';
-  if (Bcol.isTransposed())
-    transb = 'T';
-
-  int M = Acol.rows();
-  int N = Bcol.cols();
-  int K = Acol.cols();
-  int lda = Acol.stride();
-  int ldb = Bcol.stride();
-  int ldc = Ccol.stride();
+  char transa = BLAS_TRANSPOSED_FLAG(Acol);
+  char transb = BLAS_TRANSPOSED_FLAG(Bcol);
+  int M       = Acol.rows();
+  int N       = Bcol.cols();
+  int K       = Acol.cols();
+  int lda     = BLAS_LEADING_DIMENSION(Acol);
+  int ldb     = BLAS_LEADING_DIMENSION(Bcol);
+  int ldc     = BLAS_LEADING_DIMENSION(Ccol);
 
   // Perform operation:
   dgemm_(&transa, &transb, &M, &N, &K,

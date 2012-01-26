@@ -82,7 +82,7 @@ public:
   /**
    * Retruns true, if the matrix has a unit diagonal.
    */
-  inline bool isUnit() const
+  inline bool hasUnitDiag() const
   {
     return this->_is_unit_triangular;
   }
@@ -97,8 +97,10 @@ public:
     if (! this->_is_rowmajor)
       return *this;
 
-    return TriMatrix<Scalar>(Matrix<Scalar>::colMajor(),
-                             !this->isUpper(), this->isUnit());
+    TriMatrix<Scalar> col(Matrix<Scalar>::colMajor(),
+                          this->isUpper(), this->hasUnitDiag());
+    col._is_rowmajor = ! this->_is_rowmajor;
+    return col;
   }
 
 
@@ -107,7 +109,7 @@ public:
    */
   inline TriMatrix<Scalar> t() const
   {
-    return TriMatrix<Scalar>(Matrix<Scalar>::t(), !this->isUpper(), this->isUnit());
+    return TriMatrix<Scalar>(Matrix<Scalar>::t(), !this->isUpper(), this->hasUnitDiag());
   }
 };
 

@@ -574,6 +574,13 @@ public:
   }
 
 
+  static unowned empty(size_t rows, size_t cols, bool row_major=true)
+  {
+    Matrix<Scalar> m(rows, cols, row_major);
+    return m.takeOwnership();
+  }
+
+
   /**
    * Returns a matrix initialized with all values = 0.
    */

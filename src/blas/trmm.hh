@@ -18,6 +18,7 @@ void dtrmm_(char *side, char *uplo, char *transa, char *diag, int *m, int *n,
 
 
 #include "trimatrix.hh"
+#include "blas/utils.hh"
 
 
 namespace Linalg {
@@ -43,11 +44,11 @@ namespace Blas {
 void trmm(bool left, double alpha, const TriMatrix<double> &A, Matrix<double> &B)
 {
   // Make sure, A & B are in column-major form:
-  TriMatrix<double> Acol = A.colMajor();
-  Matrix<double> Bcol = B.colMajor();
+  TriMatrix<double> Acol(BLAS_TO_COLUMN_MAJOR(A));
+  Matrix<double>    Bcol(BLAS_TO_COLUMN_MAJOR(B));
 
-  // If Bcol is transposed: swap side and transpose Acol:
-  if (Bcol.isTransposed()) {
+  // If Bcol is transposed: swap side and transpose Acol and Bcol:
+  if (BLAS_IS_TRANSPOSED(Bcol)) {
     Acol = Acol.t();
     Bcol = Bcol.t();
     left = !left;
@@ -62,24 +63,15 @@ void trmm(bool left, double alpha, const TriMatrix<double> &A, Matrix<double> &B
     LINALG_SHAPE_ASSERT(Acol.cols() == Bcol.cols());
   }
 
-  char SIDE = 'L';
-  char UPLO = 'U';
-  char TRANSA = 'N';
-  char DIAG = 'N';
-  int  M = Bcol.rows();
-  int  N = Bcol.cols();
+  char SIDE    = left ? 'L' : 'R';
+  char UPLO    = BLAS_UPLO_FLAG(Acol);
+  char TRANSA  = BLAS_TRANSPOSED_FLAG(Acol);
+  char DIAG    = BLAS_UNIT_DIAG_FLAG(Acol);
+  int  M       = BLAS_NUM_ROWS(Bcol);
+  int  N       = BLAS_NUM_COLS(Bcol);
   double ALPHA = alpha;
-  int LDA = A.stride();
-  int LDB = B.stride();
-
-  if (!left)
-    SIDE = 'R';
-  if ((!Acol.isUpper() && !Acol.isTransposed()) || (Acol.isUpper() && Acol.isTransposed()))
-    UPLO = 'L';
-  if (Acol.isTransposed())
-    TRANSA = 'T';
-  if (Acol.isUnit())
-    DIAG = 'U';
+  int LDA      = BLAS_LEADING_DIMENSION(Acol);
+  int LDB      = BLAS_LEADING_DIMENSION(Bcol);
 
   // Call fortran function:
   dtrmm_(&SIDE, &UPLO, &TRANSA, &DIAG, &M, &N, &ALPHA, *Acol, &LDA, *Bcol, &LDB);

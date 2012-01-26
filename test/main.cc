@@ -6,6 +6,7 @@
 #include "nrm2test.hh"
 #include "dottest.hh"
 #include "gemvtest.hh"
+#include "trmvtest.hh"
 #include "gemmtest.hh"
 #include "trmmtest.hh"
 
@@ -23,6 +24,7 @@ int main(void)
   runner.addSuite(NRM2Test::suite());
   runner.addSuite(DOTTest::suite());
   runner.addSuite(GEMVTest::suite());
+  runner.addSuite(TRMVTest::suite());
   runner.addSuite(GEMMTest::suite());
   runner.addSuite(TRMMTest::suite());
 

@@ -149,7 +149,7 @@ public:
   }
 
 
-  inline const ValueRef &vals()
+  inline ValueRef vals()
   {
     return ValueRef(*this);
   }
@@ -178,7 +178,7 @@ public:
   }
 
 
-  inline const Vector<Scalar> operator= (unowned &other)
+  inline const Vector<Scalar> operator= (unowned other)
   {
     if (this->_owns_data && this->_data != other->_data) {
       delete this->_data;
@@ -265,6 +265,14 @@ public:
     return Vector<Scalar>(this->_data,
                           n, this->offset()+this->_increment*i, this->_increment,
                           false);
+  }
+
+
+public:
+  static unowned empty(size_t dim)
+  {
+    Vector<Scalar> v(dim);
+    return v.takeOwnership();
   }
 };
 
