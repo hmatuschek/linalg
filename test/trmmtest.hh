@@ -16,10 +16,13 @@ class TRMMTest : public UnitTest::TestCase
 {
 public:
   void testUpperRowMajor();
-  void testTransposedRowMajor();
+  void testUpperTransRowMajor();
+  void testTransUpperRowMajor();
 
   void testUpperColMajor();
-  void testTransposedColMajor();
+  void testUpperTransColMajor();
+  void testTransUpperColMajor();
+
 
 public:
   static UnitTest::TestSuite *suite();
