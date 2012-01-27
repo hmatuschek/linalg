@@ -9,6 +9,7 @@
 #include "trmvtest.hh"
 #include "gemmtest.hh"
 #include "trmmtest.hh"
+#include "trsmtest.hh"
 
 
 using namespace UnitTest;
@@ -27,6 +28,7 @@ int main(void)
   runner.addSuite(TRMVTest::suite());
   runner.addSuite(GEMMTest::suite());
   runner.addSuite(TRMMTest::suite());
+  runner.addSuite(TRSMTest::suite());
 
   runner();
 

@@ -3,10 +3,10 @@
 
 
 extern "C" {
-void trsm_(const char *SIDE, const char *UPLO, const char *TRANSA, const char *DIAG,
-           const int *M, const int *N,
-           const double *alpha, const double *A, const int *LDA,
-           double *B, const int *LDB);
+void dtrsm_(const char *SIDE, const char *UPLO, const char *TRANSA, const char *DIAG,
+            const int *M, const int *N,
+            const double *alpha, const double *A, const int *LDA,
+            double *B, const int *LDB);
 }
 
 
@@ -23,8 +23,6 @@ namespace Blas{
  *
  * Solves the triangular system \f$ A\cdot X = \alpha B\f$ if @c left=true
  * or \f$X \cdot A = \alpha B\f$ if @c left=false.
- *
- * @todo This function is untested yet.
  *
  * @ingroup blas3
  */

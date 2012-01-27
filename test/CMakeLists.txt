@@ -13,9 +13,9 @@ SET(BLAS2_TEST_HEADERS
     gemvtest.hh trmvtest.hh)
 
 SET(BLAS3_TEST_SOURCES
-    gemmtest.cc trmmtest.cc)
+    gemmtest.cc trmmtest.cc trsmtest.cc)
 SET(BLAS3_TEST_HEADERS
-    gemmtest.hh trmmtest.hh)
+    gemmtest.hh trmmtest.hh trsmtest.hh)
 
 SET(LINALG_TEST_SOURCES main.cc
     unittest.cc cputime.cc matrixtest.cc trimatrixtest.cc
