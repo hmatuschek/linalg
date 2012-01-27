@@ -103,6 +103,72 @@ public:
 
 
 
+class RuntimeError : public Exception
+{
+public:
+  RuntimeError(const std::string &msg = "")
+    : Exception(msg)
+  {
+    // Pass...
+  }
+
+  RuntimeError(const RuntimeError &other)
+    : Exception(other)
+  {
+    // Pass...
+  }
+
+  virtual ~RuntimeError() throw ()
+  {
+  }
+};
+
+
+
+class SingularMatrixError : public RuntimeError
+{
+public:
+  SingularMatrixError(const std::string &msg = "")
+    : RuntimeError(msg)
+  {
+    // Pass...
+  }
+
+  SingularMatrixError(const SingularMatrixError &other)
+    : RuntimeError(other)
+  {
+    // Pass...
+  }
+
+  virtual ~SingularMatrixError() throw ()
+  {
+  }
+};
+
+
+
+class IndefiniteMatrixError : public RuntimeError
+{
+public:
+  IndefiniteMatrixError(const std::string &msg = "")
+    : RuntimeError(msg)
+  {
+    // Pass...
+  }
+
+  IndefiniteMatrixError(const IndefiniteMatrixError &other)
+    : RuntimeError(other)
+  {
+    // Pass...
+  }
+
+  virtual ~IndefiniteMatrixError() throw ()
+  {
+  }
+};
+
+
+
 class LapackError : public Exception
 {
 public:

@@ -44,7 +44,7 @@ void trtri(TriMatrix<double> &A)
     return;
 
   if (0 > INFO) {
-    LapackError err;
+    RuntimeError err;
     err << -INFO <<"-th argument to DTRTRI() has illegal value.";
     throw err;
   } else if (0 < INFO) {
