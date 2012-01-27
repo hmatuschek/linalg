@@ -20,9 +20,11 @@ namespace Lapack {
  *
  * Computes in-place the inverse of the triangular matrix A.
  *
+ * @todo This function is untested yet.
+ *
  * @ingroup lapack
  */
-void trtri(TriMatrix<double> &A)
+inline void trtri(TriMatrix<double> &A)
 {
   TriMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
 

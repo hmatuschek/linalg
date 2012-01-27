@@ -6,10 +6,15 @@
  * (c) 2011, 2012 Hannes Matuschek <hmatuschek at gmail dot com>
  */
 
+/**
+ * @defgroup lapack Interfaces to LAPACK routines.
+ */
+
 #ifndef __LINALG_LAPACK_HH__
 #define __LINALG_LAPACK_HH__
 
 #include "trtrs.hh"
 #include "trtri.hh"
+#include "potrf.hh"
 
 #endif

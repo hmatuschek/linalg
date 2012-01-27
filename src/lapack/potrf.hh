@@ -21,36 +21,43 @@ namespace Lapack {
  *
  * @note On extit, the Cholesky decomposition is stored into A and a @c TriMatrix view is returned,
  *       referring to the upper- or lower-triangular decomposition.
+ *
+ * @todo This function is untested yet.
+ *
  * @ingroup lapack
  */
-TriMatrix<double> potrf(SymMatrix<double> &A)
+inline TriMatrix<double> potrf(SymMatrix<double> &A)
 {
+  // Ensure column major:
   SymMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
 
   // Assert that A is quadratic:
   LINALG_SHAPE_ASSERT(Acol.rows() == Acol.cols());
 
+  // Get flags:
   char UPLO = BLAS_UPLO_FLAG(Acol);
   int  N    = BLAS_NUM_ROWS(Acol);
   int  LDA  = BLAS_LEADING_DIMENSION(Acol);
   int  INFO = 0;
 
+  // Call function
   dpotrf_(&UPLO, &N, *Acol, &LDA, &INFO);
 
-  if (0 == INFO)
-    return;
-
-  if (0 > INFO) {
-    RuntimeError err;
-    err << "Argument error: " << -INFO << "-th argument to DPOTRF() has illegal value.";
-    throw err;
-  } else {
-    IndefiniteMatrixError err;
-    err << "The leading minor of order " << INFO
-        << " is not positive definite, can not compute Cholesky decomposition.";
-    throw err;
+  // Check for errors:
+  if (0 != INFO) {
+    if (0 > INFO) {
+      RuntimeError err;
+      err << "Argument error: " << -INFO << "-th argument to DPOTRF() has illegal value.";
+      throw err;
+    } else {
+      IndefiniteMatrixError err;
+      err << "The leading minor of order " << INFO
+          << " is not positive definite, can not compute Cholesky decomposition.";
+      throw err;
+    }
   }
 
+  // Assemble triangular matrix view
   return TriMatrix<double>(Acol, Acol.isUpper(), false);
 }
 

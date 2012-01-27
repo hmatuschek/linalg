@@ -24,6 +24,8 @@ namespace Blas{
  * Solves the triangular system \f$ A\cdot X = \alpha B\f$ if @c left=true
  * or \f$X \cdot A = \alpha B\f$ if @c left=false.
  *
+ * @todo This function is untested yet.
+ *
  * @ingroup blas3
  */
 void trsm(const TriMatrix<double> &A, double alpha, Matrix<double> &B, bool left=true)

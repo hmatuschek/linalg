@@ -22,10 +22,12 @@ namespace Lapack {
  *
  * See also: @c Blas::trsm
  *
+ * @todo This function is untested yet.
+ *
  * @ingroup lapack
  */
 template <class Scalar>
-void trtrs(const TriMatrix<Scalar> &A, Matrix<Scalar> &B)
+inline void trtrs(const TriMatrix<Scalar> &A, Matrix<Scalar> &B)
 {
   // Ensure column-major representation of matrices:
   TriMatrix<Scalar> Acol = BLAS_TO_COLUMN_MAJOR(A);
