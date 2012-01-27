@@ -16,7 +16,7 @@ static PyObject *linalg_blas_ddot(PyObject *self, PyObject *args);
 static PyObject *linalg_blas_dnrm2(PyObject *self, PyObject *args);
 
 /** Debug output for matrix type. */
-static PyObject *linalg_print_matrix(PyObject *self, PyObject *args);
+static PyObject *linalg_blas_print_matrix(PyObject *self, PyObject *args);
 
 }
 

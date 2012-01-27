@@ -1,4 +1,4 @@
-#include "module.hh"
+#include "blas.hh"
 #include <iostream>
 
 using namespace Linalg;
@@ -86,7 +86,7 @@ linalg_blas_dgemv(PyObject *self, PyObject *args)
 
 
 static PyObject *
-linalg_print_matrix(PyObject *self, PyObject *args)
+linalg_blas_print_matrix(PyObject *self, PyObject *args)
 {
   PyObject *array = 0;
   if (!PyArg_ParseTuple(args, "O", &array)) {
@@ -111,11 +111,11 @@ linalg_print_matrix(PyObject *self, PyObject *args)
 /*
  * List all methods:
  */
-static PyMethodDef LinalgMethods[] = {
+static PyMethodDef LinalgBlasMethods[] = {
   {"ddot", linalg_blas_ddot, METH_VARARGS, "BLAS level-1 DDOT() wrapper."},
   {"dnrm2", linalg_blas_dnrm2, METH_VARARGS, "BLAS level-1 DNRM2() wrapper."},
   {"dgemv", linalg_blas_dgemv, METH_VARARGS, "BLAS level-2 DGEMV() wrapper."},
-  {"print_matrix", linalg_print_matrix, METH_VARARGS, "Just prints the details of a Linalg::Matrix<> instance."},
+  {"print_matrix", linalg_blas_print_matrix, METH_VARARGS, "Just prints the details of a Linalg::Matrix<> instance."},
   {NULL, NULL, 0, NULL}
 };
 
@@ -125,9 +125,9 @@ static PyMethodDef LinalgMethods[] = {
  * Initialize module
  */
 PyMODINIT_FUNC
-initlinalg(void)
+initblas(void)
 {
-  (void) Py_InitModule("linalg", LinalgMethods);
+  (void) Py_InitModule("blas", LinalgBlasMethods);
 
   import_array();
 }

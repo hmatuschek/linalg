@@ -13,22 +13,23 @@
 
 
 /*
- * BLAS LEVEL 1 routoines:
+ * BLAS LEVEL 1 routines
  */
 #include "dot.hh"
 #include "nrm2.hh"
 
 /*
- * BLAS LEVEL 2 routines.
+ * BLAS LEVEL 2 routines
  */
 #include "gemv.hh"
 #include "trmv.hh"
 #include "getc2.hh"
 
 /*
- * BLAS LEVEL 3 routines.
+ * BLAS LEVEL 3 routines
  */
 #include "gemm.hh"
 #include "trmm.hh"
+#include "trsm.hh"
 
 #endif

@@ -1,3 +1,17 @@
+/*
+ * This file is part of the Linalg project, a C++ interface to BLAS and LAPACK.
+ *
+ * The source-code is licensed under the terms of the MIT license, read LICENSE for more details.
+ *
+ * (c) 2011, 2012 Hannes Matuschek <hmatuschek at gmail dot com>
+ */
+
+
+/**
+ * @defgroup python Simple interface to Python/NumPy arrays
+ */
+
+
 #ifndef __LINALG_PYTHON_HH__
 #define __LINALG_PYTHON_HH__
 
@@ -8,6 +22,7 @@ extern "C" {
 #include <Python.h>
 #include <numpy/arrayobject.h>
 }
+
 
 namespace Linalg {
 
@@ -130,6 +145,7 @@ inline Vector<double> doubleVectorFromNumpyArray(PyObject *array)
 
   return Vector<double>(static_cast<double *>(data), dim, 0, stride, false);
 }
+
 
 }
 

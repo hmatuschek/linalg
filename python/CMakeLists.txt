@@ -2,6 +2,6 @@
 
 
 SET(LINALG_PYTHON_SOURCES
-    src/module.hh src/module.cc)
+    src/blas.hh src/blas.cc)
 
 ADD_CUSTOM_TARGET(linalg-python SOURCES ${LINALG_PYTHON_SOURCES})

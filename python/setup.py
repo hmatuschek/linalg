@@ -12,6 +12,6 @@ setup(name="Linalg",
       author="Hannes Matuschek",
       author_email="hmatuschek at gmail dot com",
       url="https://hmatuschek.github.com/linalg",
-      ext_modules=[Extension('linalg', ['src/module.cc'],
+      ext_modules=[Extension('linalg', ['src/blas.cc'],
                              include_dirs=include_dirs,
                              libraries=['blas', 'lapack', 'm'])])

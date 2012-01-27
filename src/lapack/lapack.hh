@@ -9,4 +9,7 @@
 #ifndef __LINALG_LAPACK_HH__
 #define __LINALG_LAPACK_HH__
 
+#include "trtrs.hh"
+#include "trtri.hh"
+
 #endif

@@ -1,0 +1,59 @@
+#ifndef __LINALG_LAPACK_TRTRI_HH__
+#define __LINALG_LAPACK_TRTRI_HH__
+
+extern "C" {
+void dtrtri_(const char *UPLO, const char *DIAG, const int *N,
+             double *A, const int *LDA,
+             int *INFO);
+}
+
+
+#include "blas/utils.hh"
+#include "trimatrix.hh"
+
+namespace Linalg {
+namespace Lapack {
+
+
+/**
+ * Interface to LAPACKs DTRTRI function.
+ *
+ * Computes in-place the inverse of the triangular matrix A.
+ *
+ * @ingroup lapack
+ */
+void trtri(TriMatrix<double> &A)
+{
+  TriMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
+
+  // A must be quadratic:
+  LINALG_SHAPE_ASSERT(Acol.rows() == Acol.cols());
+
+  // Get all the flags:
+  char UPLO = BLAS_UPLO_FLAG(Acol);
+  char DIAG = BLAS_UNIT_DIAG_FLAG(Acol);
+  int  N    = BLAS_NUM_ROWS(Acol);
+  int  LDA  = BLAS_LEADING_DIMENSION(Acol);
+  int  INFO = 0;
+
+  // Call function
+  dtrtri_(&UPLO, &DIAG, &N, *Acol, &LDA, &INFO);
+
+  // Check of errors:
+  if (0 == INFO)
+    return;
+
+  if (0 > INFO) {
+    LapackError err;
+    err << -INFO <<"-th argument to DTRTRI() has illegal value.";
+    throw err;
+  } else if (0 < INFO) {
+    SingularMatrixError err;
+    err << "Signular matrix: " << INFO << "-th diagonal element of A is 0.";
+  }
+}
+
+
+}
+}
+#endif // TRTRI_HH
