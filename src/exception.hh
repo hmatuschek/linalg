@@ -6,6 +6,10 @@
  * (c) 2011, 2012 Hannes Matuschek <hmatuschek at gmail dot com>
  */
 
+/**
+ * @defgroup error Error handling and exceptions
+ */
+
 
 #ifndef __FLUC_LINALG_EXCEPTION_HH__
 #define __FLUC_LINALG_EXCEPTION_HH__
@@ -15,6 +19,11 @@
 #include <sstream>
 
 
+/**
+ * Simple helper macro, that throws an @c IndexError exception if some assertion is not met.
+ *
+ * @ingroup error.
+ */
 #define LINALG_SHAPE_ASSERT(exp) if (!(exp)) { \
   Linalg::IndexError err; \
   err << "ShapeError at " << __FILE__ \
@@ -23,8 +32,20 @@
   throw err; \
   }
 
+
+
 namespace Linalg {
 
+
+/**
+ * Base class of all exceptions.
+ *
+ * This class is derived from @c std::exception, that defines a common interface for all exceptions
+ * thrown in C++. However, this class also derives from @c std::ostringstream, that allows to
+ * assemble an error message using the "streaming operator" <<.
+ *
+ * @ingroup error
+ */
 class Exception : public std::exception, public std::ostringstream
 {
 public:
@@ -59,28 +80,11 @@ public:
 
 
 
-class IndexError: public Exception
-{
-public:
-  IndexError(const std::string &msg = "")
-    : Exception(msg)
-  {
-    // Pass...
-  }
-
-  IndexError(const IndexError &other)
-    : Exception(other)
-  {
-    // Pass...
-  }
-
-  virtual ~IndexError() throw ()
-  {
-  }
-};
-
-
-
+/**
+ * Will be thrown if there is an error in the memory-mangement.
+ *
+ * @ingroup error
+ */
 class MemoryError: public Exception
 {
 public:
@@ -103,6 +107,11 @@ public:
 
 
 
+/**
+ * Base class for all runtime-exceptions.
+ *
+ * @ingroup error
+ */
 class RuntimeError : public Exception
 {
 public:
@@ -125,6 +134,38 @@ public:
 
 
 
+/**
+ * Will be thrown, if an index is out-of-range or some shape-assertion is not met.
+ *
+ * @ingroup error
+ */
+class IndexError: public RuntimeError
+{
+public:
+  IndexError(const std::string &msg = "")
+    : RuntimeError(msg)
+  {
+    // Pass...
+  }
+
+  IndexError(const IndexError &other)
+    : RuntimeError(other)
+  {
+    // Pass...
+  }
+
+  virtual ~IndexError() throw ()
+  {
+  }
+};
+
+
+
+/**
+ * Will be thrown if a matrix is singular.
+ *
+ * @ingroup error
+ */
 class SingularMatrixError : public RuntimeError
 {
 public:
@@ -147,6 +188,11 @@ public:
 
 
 
+/**
+ * Will be thrown, if a matrix is not definite.
+ *
+ * @ingroup error
+ */
 class IndefiniteMatrixError : public RuntimeError
 {
 public:
@@ -169,6 +215,11 @@ public:
 
 
 
+/**
+ * Will be thrown if an argument to a LAPACK function is invalid.
+ *
+ * @ingroup error
+ */
 class LapackError : public Exception
 {
 public:

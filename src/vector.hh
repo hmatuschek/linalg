@@ -10,7 +10,7 @@ namespace Linalg {
 /**
  * Implements a view to an array (vector).
  *
- * @ingroup core
+ * @ingroup matrix
  */
 template <class Scalar>
 class Vector : public DataPtr<Scalar>

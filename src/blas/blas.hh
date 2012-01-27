@@ -6,27 +6,36 @@
  * (c) 2011, 2012 Hannes Matuschek <hmatuschek at gmail dot com>
  */
 
+/**
+ * @defgroup blas Interfaces to the BLAS library
+ */
+
+
 #ifndef __LINALG_BLAS_HH__
 #define __LINALG_BLAS_HH__
 
 #include "utils.hh"
 
 
-/*
- * BLAS LEVEL 1 routines
+/**
+ * @defgroup blas1 BLAS level 1 routines
+ * @ingroup blas
  */
 #include "dot.hh"
 #include "nrm2.hh"
 
-/*
- * BLAS LEVEL 2 routines
+
+/**
+ * @defgroup blas2 BLAS level 2 routines
+ * @ingroup blas
  */
 #include "gemv.hh"
 #include "trmv.hh"
 #include "getc2.hh"
 
-/*
- * BLAS LEVEL 3 routines
+/**
+ * @defgroup blas3 BLAS level 3 routines
+ * @ingroup blas
  */
 #include "gemm.hh"
 #include "trmm.hh"
