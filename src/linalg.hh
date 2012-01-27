@@ -14,6 +14,10 @@
  */
 
 
+/**
+ * @defgroup matrix Matrix and vector types
+ */
+
 #ifndef __LINALG_HH__
 #define __LINALG_HH__
 

@@ -15,6 +15,8 @@ namespace Linalg {
 
 /**
  * Implements a view on @c Matrix as a unit or non-unit upper- or lower-triangular matrix.
+ *
+ * @ingroup matrix
  */
 template <class Scalar>
 class TriMatrix : public Matrix<Scalar>

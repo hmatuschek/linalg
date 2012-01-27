@@ -23,7 +23,7 @@ namespace Linalg {
  *
  * @todo Implement "empty" matrix constructor.
  *
- * @ingroup linalg
+ * @ingroup matrix
  */
 template <class Scalar>
 class Matrix : public DataPtr<Scalar>

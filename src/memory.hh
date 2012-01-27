@@ -6,11 +6,6 @@
  * (c) 2011, 2012 Hannes Matuschek <hmatuschek at gmail dot com>
  */
 
-/**
- * @module mem Memory mangement
- *
- *
- */
 
 #ifndef __LINALG_MEMORY_HH__
 #define __LINALG_MEMORY_HH__
@@ -21,6 +16,9 @@
 
 namespace Linalg {
 
+/**
+ * A simple base class holding a owned or unowned reference to some data.
+ */
 template <class Scalar>
 class DataPtr
 {

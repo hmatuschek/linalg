@@ -20,7 +20,7 @@ namespace Linalg {
  * The structure of this matrix is identical to a @c TriMatrix, but it has some different
  * semantic, therefore there are two classes.
  *
- * @ingroup matrices
+ * @ingroup matrix
  */
 template <class Scalar>
 class SymMatrix : public Matrix<Scalar>
