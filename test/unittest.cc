@@ -257,6 +257,16 @@ TestSuite::TestSuite(const std::string &desc)
 }
 
 
+TestSuite::~TestSuite()
+{
+  // Free callers:
+  for (std::list<TestCallerInterface *>::iterator caller=this->tests.begin();
+       caller != this->tests.end(); caller++) {
+    delete *caller;
+  }
+}
+
+
 void
 TestSuite::addTest(TestCallerInterface *test)
 {
@@ -294,6 +304,17 @@ TestRunner::TestRunner(std::ostream &stream)
   : stream(stream)
 {
   // Pass...
+}
+
+
+TestRunner::~TestRunner()
+{
+  // Free suites:
+  for (std::list<TestSuite *>::iterator suite = this->suites.begin();
+       suite != this->suites.end(); suite++)
+  {
+    delete *suite;
+  }
 }
 
 

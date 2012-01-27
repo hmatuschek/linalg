@@ -177,7 +177,7 @@ public:
       _transposed(other->_transposed), _is_rowmajor(other->_is_rowmajor)
   {
     // explicity take ownership
-    other.release();
+    other->releaseData();
   }
 
   /**

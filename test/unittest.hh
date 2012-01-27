@@ -104,6 +104,9 @@ public:
     instance->setUp();
     (instance->*function)();
     instance->tearDown();
+
+    // free instance:
+    delete instance;
   }
 };
 
@@ -119,6 +122,7 @@ protected:
 
 public:
   TestSuite(const std::string &desc);
+  virtual ~TestSuite();
 
   void addTest(TestCallerInterface *test);
 
@@ -137,6 +141,8 @@ protected:
 
 public:
   TestRunner(std::ostream &stream);
+  virtual ~TestRunner();
+
   void addSuite(TestSuite *suite);
 
   void operator() ();
