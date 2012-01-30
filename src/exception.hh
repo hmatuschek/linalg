@@ -25,7 +25,7 @@
  * @ingroup error.
  */
 #define LINALG_SHAPE_ASSERT(exp) if (!(exp)) { \
-  Linalg::IndexError err; \
+  Linalg::ShapeError err; \
   err << "ShapeError at " << __FILE__ \
   << " (" << __LINE__ << "): " \
   << #exp << " failed."; \
@@ -155,6 +155,33 @@ public:
   }
 
   virtual ~IndexError() throw ()
+  {
+  }
+};
+
+
+
+/**
+ * Will be thrown if some shape-assertion is not met.
+ *
+ * @ingroup error
+ */
+class ShapeError: public RuntimeError
+{
+public:
+  ShapeError(const std::string &msg = "")
+    : RuntimeError(msg)
+  {
+    // Pass...
+  }
+
+  ShapeError(const ShapeError &other)
+    : RuntimeError(other)
+  {
+    // Pass...
+  }
+
+  virtual ~ShapeError() throw ()
   {
   }
 };

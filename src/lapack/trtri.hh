@@ -1,6 +1,16 @@
+/*
+ * This file is part of the Linalg project, a C++ interface to BLAS and LAPACK.
+ *
+ * The source-code is licensed under the terms of the MIT license, read LICENSE for more details.
+ *
+ * (c) 2011, 2012 Hannes Matuschek <hmatuschek at gmail dot com>
+ */
+
 #ifndef __LINALG_LAPACK_TRTRI_HH__
 #define __LINALG_LAPACK_TRTRI_HH__
 
+
+/* Interface to Fortran function. */
 extern "C" {
 void dtrtri_(const char *UPLO, const char *DIAG, const int *N,
              double *A, const int *LDA,
