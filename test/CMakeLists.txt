@@ -18,9 +18,9 @@ SET(BLAS3_TEST_HEADERS
     gemmtest.hh trmmtest.hh trsmtest.hh)
 
 SET(LAPACK_TEST_SOURCES
-    trtrstest.cc)
+    trtrstest.cc trtritest.cc)
 SET(LAPACK_TEST_HEADERS
-    trtrstest.hh)
+    trtrstest.hh trtritest.hh)
 
 
 SET(LINALG_TEST_SOURCES main.cc

@@ -32,10 +32,15 @@ namespace Lapack {
  *
  * @todo This function is untested yet.
  *
+ * @throws Linalg::SingularMatrixError If one of the diagonal elements of A is zero.
+ * @throws Linalg::RuntimeError This should not happen. Thrown if one of the arguments
+ *         to LAPACKs DTRTRI is invalid.
+ *
  * @ingroup lapack
  */
-inline void trtri(TriMatrix<double> &A)
+inline void trtri(TriMatrix<double> A) throw (SingularMatrixError, RuntimeError)
 {
+  // Ensure, Acol is in column-major:
   TriMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
 
   // A must be quadratic:
@@ -55,6 +60,7 @@ inline void trtri(TriMatrix<double> &A)
   if (0 == INFO)
     return;
 
+  // Check for error:
   if (0 > INFO) {
     RuntimeError err;
     err << -INFO <<"-th argument to DTRTRI() has illegal value.";
