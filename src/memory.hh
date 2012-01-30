@@ -23,7 +23,14 @@ template <class Scalar>
 class DataPtr
 {
 protected:
+  /**
+   * Holds the actual data pointer.
+   */
   Scalar *_data;
+
+  /**
+   * If true, this instance owns the data and will free it if the instance gets destroyed.
+   */
   bool   _owns_data;
 
 
@@ -38,6 +45,9 @@ public:
   }
 
 
+  /**
+   * constructor from data.
+   */
   DataPtr(Scalar *data, bool owns_data) throw()
     : _data(data), _owns_data(owns_data)
   {
@@ -45,6 +55,9 @@ public:
   }
 
 
+  /**
+   * Constructs a weak reference to the data...
+   */
   DataPtr(const DataPtr<Scalar> &ptr) throw()
     : _data(ptr._data), _owns_data(false)
   {
@@ -52,7 +65,10 @@ public:
   }
 
 
-  DataPtr(DataPtr<Scalar> &ptr, bool take_ownership) throw()
+  /**
+   * Copy constructor, that tries to take the ownership if @c taks_ownership is true.
+   */
+  DataPtr(DataPtr<Scalar> &ptr, bool take_ownership) throw(MemoryError)
     : _data(ptr._data), _owns_data(false)
   {
     if (take_ownership && ptr.ownsData()) {
@@ -67,6 +83,9 @@ public:
   }
 
 
+  /**
+   * Allocates some new data.
+   */
   explicit DataPtr(size_t size) throw()
     : _data(0), _owns_data(true)
   {
@@ -74,6 +93,9 @@ public:
   }
 
 
+  /**
+   * Frees the data if the instance holds the ownership of the data.
+   */
   ~DataPtr() throw()
   {
     if (this->_owns_data && 0 != this->_data)
@@ -81,12 +103,18 @@ public:
   }
 
 
+  /**
+   * Returns true, if the instance holds the ownership of the data.
+   */
   bool ownsData() const
   {
     return this->_owns_data;
   }
 
 
+  /**
+   * Releases the ownership of the data, does not free it!
+   */
   void releaseData()
   {
     this->_data = 0;
@@ -94,18 +122,15 @@ public:
   }
 
 
+  /**
+   * Returns true if there is no data.
+   */
   bool isEmpty() const
   {
     return 0 == this->_data;
   }
 };
 
-
-template <class MatrixType>
-MatrixType takeOwnership(MatrixType &matrix)
-{
-  return MatrixType::unowned(new MatrixType(matrix, true));
-}
 
 }
 

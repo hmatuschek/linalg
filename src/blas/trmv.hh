@@ -34,7 +34,7 @@ namespace Blas {
  *
  * @ingroup blas2
  */
-void trmv(const TriMatrix<double> &A, Vector<double> &x)
+inline void trmv(const TriMatrix<double> &A, Vector<double> &x)
 {
   // Make A column-major:
   const TriMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);

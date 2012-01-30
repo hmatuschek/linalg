@@ -26,11 +26,11 @@ namespace Blas {
 /**
  * Calculates 2-norm of vector.
  *
- * \f[\text{nrm2}(x) = \sqrt{\text{dot}(x)}
+ * \f[nrm2(x) = \sqrt{dot(x,x)} \f]
  *
  * @ingroup blas1
  */
-double nrm2(const Vector<double> &x)
+inline double nrm2(const Vector<double> &x)
 {
   int N   = BLAS_DIMENSION(x);
   int INC = BLAS_INCREMENT(x);

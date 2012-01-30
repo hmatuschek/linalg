@@ -29,7 +29,7 @@ namespace Blas {
  *
  * @ingroup blas1
  */
-double dot(const Vector<double> &x, const Vector<double> &y)
+inline double dot(const Vector<double> &x, const Vector<double> &y)
 {
   LINALG_SHAPE_ASSERT(x.dim() == y.dim());
 

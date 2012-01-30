@@ -34,13 +34,14 @@ namespace Lapack {
  *
  * @todo This function is untested!
  *
- * @param a Specifies a N-by-N real matrix (in/out).
+ * @param A Specifies a N-by-N real matrix (in/out).
  * @param ipiv N-dim Vector<int> of indices of rows (out).
  * @param jpiv N-dim Vector<int> of indices of columns (out).
+ * @param rank On exit, holds the rank of the L & U matrices.
  *
  * @ingroup blas2
  */
-void getc2(Matrix<double> &A, Vector<int> &ipiv, Vector<int> &jpiv, size_t &rank)
+inline void getc2(Matrix<double> &A, Vector<int> &ipiv, Vector<int> &jpiv, size_t &rank)
 {
   // Get A in column-major form:
   Matrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);

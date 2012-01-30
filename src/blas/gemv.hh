@@ -33,7 +33,7 @@ namespace Blas {
  *
  * @ingroup blas2
  */
-void gemv(const double alpha, const Matrix<double> &A, const Vector<double> &x,
+inline void gemv(const double alpha, const Matrix<double> &A, const Vector<double> &x,
           const double beta, Vector<double> &y)
 {
   // Get matrix in column order (Fortran)

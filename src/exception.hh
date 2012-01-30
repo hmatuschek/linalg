@@ -22,7 +22,7 @@
 /**
  * Simple helper macro, that throws an @c IndexError exception if some assertion is not met.
  *
- * @ingroup error.
+ * @ingroup error
  */
 #define LINALG_SHAPE_ASSERT(exp) if (!(exp)) { \
   Linalg::ShapeError err; \
@@ -49,12 +49,18 @@ namespace Linalg {
 class Exception : public std::exception, public std::ostringstream
 {
 public:
+  /**
+   * Constructs an exception with given matrix.
+   */
   Exception(const std::string &msg = "")
     : std::exception()
   {
     (*this) << msg;
   }
 
+  /**
+   * Copy constructor.
+   */
   Exception(const Exception &other)
     : std::exception()
   {
@@ -88,18 +94,27 @@ public:
 class MemoryError: public Exception
 {
 public:
+  /**
+   * Constructs a MemoryException with given message.
+   */
   MemoryError(const std::string &msg = "")
     : Exception(msg)
   {
     // Pass...
   }
 
+  /**
+   * Copy constructor.
+   */
   MemoryError(const MemoryError &other)
     : Exception(other)
   {
     // Pass...
   }
 
+  /**
+   * Destructor.
+   */
   virtual ~MemoryError() throw ()
   {
   }
@@ -115,18 +130,27 @@ public:
 class RuntimeError : public Exception
 {
 public:
+  /**
+   * Constructs an @c RuntimeError exception from given message.
+   */
   RuntimeError(const std::string &msg = "")
     : Exception(msg)
   {
     // Pass...
   }
 
+  /**
+   * Copy constructor.
+   */
   RuntimeError(const RuntimeError &other)
     : Exception(other)
   {
     // Pass...
   }
 
+  /**
+   * Destructor.
+   */
   virtual ~RuntimeError() throw ()
   {
   }
@@ -142,18 +166,27 @@ public:
 class IndexError: public RuntimeError
 {
 public:
+  /**
+   * Constructs an @c IndexError exception from message.
+   */
   IndexError(const std::string &msg = "")
     : RuntimeError(msg)
   {
     // Pass...
   }
 
+  /**
+   * Copy constructor.
+   */
   IndexError(const IndexError &other)
     : RuntimeError(other)
   {
     // Pass...
   }
 
+  /**
+   * Destructor.
+   */
   virtual ~IndexError() throw ()
   {
   }
@@ -169,18 +202,27 @@ public:
 class ShapeError: public RuntimeError
 {
 public:
+  /**
+   * Constructs a @c ShapeError exception from given message.
+   */
   ShapeError(const std::string &msg = "")
     : RuntimeError(msg)
   {
     // Pass...
   }
 
+  /**
+   * Copy constructor.
+   */
   ShapeError(const ShapeError &other)
     : RuntimeError(other)
   {
     // Pass...
   }
 
+  /**
+   * Destructor.
+   */
   virtual ~ShapeError() throw ()
   {
   }
@@ -196,18 +238,27 @@ public:
 class SingularMatrixError : public RuntimeError
 {
 public:
+  /**
+   * Constructs a @c SingularMatrixError exception from message.
+   */
   SingularMatrixError(const std::string &msg = "")
     : RuntimeError(msg)
   {
     // Pass...
   }
 
+  /**
+   * Copy constructor.
+   */
   SingularMatrixError(const SingularMatrixError &other)
     : RuntimeError(other)
   {
     // Pass...
   }
 
+  /**
+   * Destructor.
+   */
   virtual ~SingularMatrixError() throw ()
   {
   }
@@ -223,18 +274,27 @@ public:
 class IndefiniteMatrixError : public RuntimeError
 {
 public:
+  /**
+   * Constructs a @c IndefiniteMatrixError exception from message.
+   */
   IndefiniteMatrixError(const std::string &msg = "")
     : RuntimeError(msg)
   {
     // Pass...
   }
 
+  /**
+   * Copy constructor.
+   */
   IndefiniteMatrixError(const IndefiniteMatrixError &other)
     : RuntimeError(other)
   {
     // Pass...
   }
 
+  /**
+   * Destructor.
+   */
   virtual ~IndefiniteMatrixError() throw ()
   {
   }
@@ -250,43 +310,64 @@ public:
 class LapackError : public Exception
 {
 public:
+  /**
+   * Constructs a @c LapackError exception from given message.
+   */
   LapackError(const std::string &msg="")
     : Exception(msg)
   {
     // Pass...
   }
 
+  /**
+   * Copy constructor.
+   */
   LapackError(const LapackError &other)
     : Exception(other)
   {
     // Pass...
   }
 
+  /**
+   * Destructor.
+   */
   ~LapackError() throw ()
   {
-
   }
 };
 
 
+
+/**
+ * This is the base class of exceptions thrown by the Python interfaces.
+ */
 class PythonError : public Exception
 {
 public:
+  /**
+   * Constructs a @c PythonError from given message.
+   */
   PythonError(const std::string &msg="")
     : Exception(msg)
   {
     // Pass...
   }
 
+  /**
+   * Copy constructor.
+   */
   PythonError(const PythonError &other)
     : Exception(other)
   {
     // Pass...
   }
 
+  /**
+   * Destructor.
+   */
   ~PythonError() throw ()
   {
-
+    // pass...
   }
 };
 

@@ -36,7 +36,7 @@ namespace Blas {
  *
  * @ingroup blas3
  */
-void gemm(double alpha, const Matrix<double> &A, const Matrix<double> &B,
+inline void gemm(double alpha, const Matrix<double> &A, const Matrix<double> &B,
           double beta, Matrix<double> &C)
 {
   // Get matrices in column-major from:

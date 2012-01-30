@@ -28,9 +28,9 @@ namespace Blas {
  * Implements an interface to the DTRMM function of BLAS.
  *
  * Calculates
- * \f[B = A\cdot B\f]
+ * \f[B \leftarrow \alpha A\cdot B\f]
  * if @c left is true and
- * \f[B = B\cdot A\f]
+ * \f[B \leftarrow \alpha B\cdot A\f]
  * if @c left is false.
  *
  * @todo This function is not tested yet.
@@ -38,10 +38,11 @@ namespace Blas {
  * @param left Specifies if @c A is multiplied from left or right to @c B.
  * @param A Specifies a unit or non-unit, upper- or lower-triangular matrix.
  * @param B Specifies some general matrix.
+ * @param alpha Specifies the factor.
  *
  * @ingroup blas3
  */
-void trmm(bool left, double alpha, const TriMatrix<double> &A, Matrix<double> &B)
+inline void trmm(bool left, double alpha, const TriMatrix<double> &A, Matrix<double> B)
 {
   // Make sure, A & B are in column-major form:
   TriMatrix<double> Acol(BLAS_TO_COLUMN_MAJOR(A));

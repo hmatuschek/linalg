@@ -21,14 +21,15 @@ namespace Linalg {
 /**
  * Defines a matrix.
  *
- * @todo Implement "empty" matrix constructor.
- *
  * @ingroup matrix
  */
 template <class Scalar>
 class Matrix : public DataPtr<Scalar>
 {
 public:
+  /**
+   * Defines the "unowned matrix" type.
+   */
   typedef std::auto_ptr< Matrix<Scalar> > unowned;
 
   /**
@@ -38,21 +39,33 @@ public:
   class ValueRef
   {
   protected:
+    /**
+     * Holds a weak reference to the matrix.
+     */
     Matrix<Scalar> _matrix;
 
   public:
+    /**
+     * Constructs a reference to the values of the given matrix.
+     */
     ValueRef(const Matrix &matrix)
       : _matrix(matrix)
     {
       // Pass...
     }
 
+    /**
+     * Copy constructor.
+     */
     ValueRef(const ValueRef &other)
       : _matrix(other._matrix)
     {
       // Pass...
     }
 
+    /**
+     * Assigns a scalar to all values.
+     */
     const ValueRef &operator= (const Scalar &val)
     {
       for (size_t i=0; i<this->_matrix.rows(); i++) {
@@ -62,6 +75,9 @@ public:
       }
     }
 
+    /**
+     * Copies the values of the given matrix to the referred matrix.
+     */
     const ValueRef &operator= (const Matrix &other)
     {
       // Assert equal shapes:
@@ -276,6 +292,9 @@ public:
   }
 
 
+  /**
+   * Retruns a reference to the values of the matrix.
+   */
   inline ValueRef vals()
   {
     return ValueRef(*this);
@@ -536,6 +555,9 @@ public:
   }
 
 
+  /**
+   * Takes the ownership of this matrix.
+   */
   inline unowned takeOwnership()
   {
     return unowned(new Matrix<Scalar>(*this, true));
@@ -561,6 +583,9 @@ public:
   }
 
 
+  /**
+   * Constructs a matrix from the given data and takes the ownership of the data.
+   */
   static unowned
   fromUnownedData(Scalar *data, size_t rows, size_t cols, size_t stride=0, size_t offset=0,
                   bool transposed=false, bool row_major=true)
@@ -576,6 +601,9 @@ public:
   }
 
 
+  /**
+   * Constructs a matrix with uninitilized values.
+   */
   static unowned empty(size_t rows, size_t cols, bool row_major=true)
   {
     Matrix<Scalar> m(rows, cols, row_major);
@@ -647,6 +675,10 @@ public:
 };
 
 
+
+/**
+ * Dumps the matrix to std::cerr.
+ */
 template <class Scalar>
 void print(const Matrix<Scalar> &matrix)
 {

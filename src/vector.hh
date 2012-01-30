@@ -36,18 +36,27 @@ public:
     Vector<Scalar> _vector;
 
   public:
+    /**
+     * Constructs a @c ValueRef (a reference to the values of a vector) for the given vector.
+     */
     ValueRef(const Vector &vector)
       : _vector(vector)
     {
       // Pass...
     }
 
+    /**
+     * Copy constructor.
+     */
     ValueRef(const ValueRef &other)
       : _vector(other._vector)
     {
       // Pass...
     }
 
+    /**
+     * Assignment operation for a scalar.
+     */
     const ValueRef &operator= (const Scalar &value)
     {
       for (size_t i=0; i<this->_vector.dim(); i++) {
@@ -55,6 +64,10 @@ public:
       }
     }
 
+
+    /**
+     * Assignment operation for an other vector.
+     */
     const ValueRef &operator= (const Vector<Scalar> &other)
     {
       LINALG_SHAPE_ASSERT(this->_vector.dim() == other.dim());
@@ -84,6 +97,9 @@ protected:
 
 
 public:
+  /**
+   * Constructs an empty vector.
+   */
   Vector()
     : DataPtr<Scalar>(), _dimension(0), _offset(0), _increment(0)
   {
@@ -109,6 +125,9 @@ public:
     // Pass...
   }
 
+  /**
+   * Takes the ownership of an unowned vector.
+   */
   explicit Vector(unowned other)
     : DataPtr<Scalar>(*other, true), _dimension(other->_dimension), _offset(other->_offset),
       _increment(other->_increment)
@@ -149,18 +168,29 @@ public:
   }
 
 
+  /**
+   * Returns a reference to the values of this vector.
+   */
   inline ValueRef vals()
   {
     return ValueRef(*this);
   }
 
 
+  /**
+   * Takes the ownership of this vector.
+   *
+   * @throws MemoryError If this vector does not own the data.
+   */
   inline unowned takeOwnership()
   {
     return unowned(new Vector<Scalar>(*this, true));
   }
 
 
+  /**
+   * Assignement of an other vector (weak reference).
+   */
   inline const Vector<Scalar> operator= (const Vector<Scalar> &other)
   {
     if (this->_owns_data && this->_data != other._data) {
@@ -178,6 +208,9 @@ public:
   }
 
 
+  /**
+   * Takes the ownership of the unowned vector.
+   */
   inline const Vector<Scalar> operator= (unowned other)
   {
     if (this->_owns_data && this->_data != other->_data) {
@@ -269,6 +302,9 @@ public:
 
 
 public:
+  /**
+   * Allocates an uninitialized vector of given size.
+   */
   static unowned empty(size_t dim)
   {
     Vector<Scalar> v(dim);
