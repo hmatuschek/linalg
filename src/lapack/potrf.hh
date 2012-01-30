@@ -10,6 +10,7 @@
 #define __LINALG_LAPACK_POTRF_HH__
 
 
+/* Interface to Fortran function. */
 extern "C" {
 void dportf_(const char *UPLO, const int *N, double *A, const int *LDA, int *INFO);
 }
@@ -28,13 +29,14 @@ namespace Lapack {
  * real- symmetric matrix.
  *
  * @note On extit, the Cholesky decomposition is stored into A and a @c TriMatrix view is returned,
- *       referring to the upper- or lower-triangular decomposition.
+ *       referring to the upper- or lower-triangular part of A holding the decomposition.
  *
  * @todo This function is untested yet.
  *
  * @ingroup lapack
  */
-inline TriMatrix<double> potrf(SymMatrix<double> &A)
+inline TriMatrix<double> potrf(SymMatrix<double> A)
+throw (ShapeError, IndefiniteMatrixError, LapackError)
 {
   // Ensure column major:
   SymMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
@@ -54,7 +56,7 @@ inline TriMatrix<double> potrf(SymMatrix<double> &A)
   // Check for errors:
   if (0 != INFO) {
     if (0 > INFO) {
-      RuntimeError err;
+      LapackError err;
       err << "Argument error: " << -INFO << "-th argument to DPOTRF() has illegal value.";
       throw err;
     } else {

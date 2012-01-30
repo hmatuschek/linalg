@@ -30,15 +30,13 @@ namespace Lapack {
  *
  * Computes in-place the inverse of the triangular matrix A.
  *
- * @todo This function is untested yet.
- *
  * @throws Linalg::SingularMatrixError If one of the diagonal elements of A is zero.
- * @throws Linalg::RuntimeError This should not happen. Thrown if one of the arguments
+ * @throws Linalg::LapackError This should not happen. Thrown if one of the arguments
  *         to LAPACKs DTRTRI is invalid.
  *
  * @ingroup lapack
  */
-inline void trtri(TriMatrix<double> A) throw (SingularMatrixError, RuntimeError)
+inline void trtri(TriMatrix<double> A) throw (SingularMatrixError, LapackError)
 {
   // Ensure, Acol is in column-major:
   TriMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
@@ -62,7 +60,7 @@ inline void trtri(TriMatrix<double> A) throw (SingularMatrixError, RuntimeError)
 
   // Check for error:
   if (0 > INFO) {
-    RuntimeError err;
+    LapackError err;
     err << -INFO <<"-th argument to DTRTRI() has illegal value.";
     throw err;
   } else if (0 < INFO) {

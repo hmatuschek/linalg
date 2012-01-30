@@ -18,6 +18,12 @@
  * @defgroup matrix Matrix and vector types
  */
 
+/**
+ * @defgroup operators Matrix and vector operations.
+ * @ingroup matrix
+ */
+
+
 #ifndef __LINALG_HH__
 #define __LINALG_HH__
 
