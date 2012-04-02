@@ -14,7 +14,7 @@ SET(LINALG_LAPACK_HEADERS lapack/lapack.hh
     lapack/trtrs.hh lapack/trtri.hh lapack/potrf.hh)
 
 SET(LINALG_HEADERS
-    linalg.hh memory.hh matrix.hh trimatrix.hh vector.hh exception.hh workspace.hh
+    linalg.hh memory.hh array.hh matrix.hh trimatrix.hh vector.hh exception.hh workspace.hh
     python.hh symmatrix.hh operators.hh)
 
 SET(LINALG_SOURCES ${LINALG_HEADERS} ${LINALG_BLAS_HEADERS} ${LINALG_LAPACK_HEADERS})

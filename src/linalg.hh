@@ -27,6 +27,7 @@
 #ifndef __LINALG_HH__
 #define __LINALG_HH__
 
+#include "array.hh"
 #include "vector.hh"
 #include "matrix.hh"
 #include "trimatrix.hh"

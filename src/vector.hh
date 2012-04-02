@@ -1,7 +1,7 @@
 #ifndef __LINALG_VECTOR_HH__
 #define __LINALG_VECTOR_HH__
 
-#include "memory.hh"
+#include "array.hh"
 #include "exception.hh"
 
 
@@ -13,17 +13,10 @@ namespace Linalg {
  * @ingroup matrix
  */
 template <class Scalar>
-class Vector : public DataPtr<Scalar>
+class Vector
+    : public Array<Scalar>
 {
 public:
-  /**
-   * A temporary vector owning the data-pointer.
-   *
-   * If this temporary vector is not assigned to an other Vector instance, the
-   * data will be freed.
-   */
-  typedef std::auto_ptr< Vector<Scalar> > unowned;
-
   /**
    * Represents a weak reference to the values of the vector.
    */
@@ -71,6 +64,7 @@ public:
     const ValueRef &operator= (const Vector<Scalar> &other)
     {
       LINALG_SHAPE_ASSERT(this->_vector.dim() == other.dim());
+
       for (size_t i=0; i<this->_vector.dim(); i++) {
         this->_vector(i) = other(i);
       }
@@ -80,28 +74,10 @@ public:
 
 protected:
   /**
-   * Holds the dimension (number of elements) of the vector.
+   * Assembles a complete vector from given memory.
    */
-  size_t _dimension;
-
-  /**
-   * Offset in sizeof(T) within the memory.
-   */
-  size_t _offset;
-
-  /**
-   * Increment between two vector elements (in sizeof(T)), allows to address rows within
-   * matrices.
-   */
-  size_t _increment;
-
-
-public:
-  /**
-   * Constructs an empty vector.
-   */
-  Vector()
-    : DataPtr<Scalar>(), _dimension(0), _offset(0), _increment(0)
+  Vector(Scalar *data, size_t offset, size_t dim, size_t incr, bool takes_ownership=true)
+    : Array<Scalar>(data, _offset(offset), _shape(1, dim), _strides(1, incr), takes_ownership)
   {
     // Pass...
   }
@@ -109,8 +85,19 @@ public:
   /**
    * Assembles a complete vector from given memory.
    */
-  Vector(Scalar *data, size_t dim, size_t offset, size_t incr, bool takes_ownership)
-    : DataPtr<Scalar>(data, takes_ownership), _dimension(dim), _offset(offset), _increment(incr)
+  Vector(DataPtr<Scalar> *data, size_t offset, size_t dim, size_t incr)
+    : Array<Scalar>(data, _offset(offset), _shape(1, dim), _strides(1, incr))
+  {
+    // Pass...
+  }
+
+
+public:
+  /**
+   * Constructs an empty vector.
+   */
+  Vector()
+    : Array()
   {
     // Pass...
   }
@@ -118,53 +105,19 @@ public:
   /**
    * Copy constructor, does not copy the memory.
    */
-  explicit Vector(Vector &other, bool take_ownership)
-    : DataPtr<Scalar>(other, take_ownership), _dimension(other._dimension), _offset(other._offset),
-      _increment(other._increment)
-  {
-    // Pass...
-  }
-
-  /**
-   * Takes the ownership of an unowned vector.
-   */
-  explicit Vector(unowned other)
-    : DataPtr<Scalar>(*other, true), _dimension(other->_dimension), _offset(other->_offset),
-      _increment(other->_increment)
-  {
-    // Pass...
-  }
-
-  /**
-   * Const copy constructor.
-   */
   Vector(const Vector &other)
-    : DataPtr<Scalar>(other), _dimension(other._dimension), _offset(other._offset),
-      _increment(other._increment)
+    : Array(other)
   {
     // Pass...
-  }
-
-  /**
-   * Constructs a new vector with the given dimension.
-   */
-  Vector(size_t dim)
-    : DataPtr<Scalar>(dim), _dimension(dim), _offset(0), _increment(1)
-  {
   }
 
 
   /**
    * Copy constructor, also copies the memory.
    */
-  inline unowned copy()
+  inline Vector<Scalar> copy()
   {
-    Vector out(this->dim());
-
-    for (size_t i=0; i<this->dim(); i++)
-      out(i) = (*this)(i);
-
-    return out.takeOwnership();
+    return Vector<Scalar>(Array<Scalar>::copy());
   }
 
 
@@ -178,32 +131,11 @@ public:
 
 
   /**
-   * Takes the ownership of this vector.
-   *
-   * @throws MemoryError If this vector does not own the data.
-   */
-  inline unowned takeOwnership()
-  {
-    return unowned(new Vector<Scalar>(*this, true));
-  }
-
-
-  /**
    * Assignement of an other vector (weak reference).
    */
-  inline const Vector<Scalar> operator= (const Vector<Scalar> &other)
+  inline Vector<Scalar> &operator= (const Vector<Scalar> &other)
   {
-    if (this->_owns_data && this->_data != other._data) {
-      delete this->_data;
-    }
-
-    this->_data = other._data;
-    this->_owns_data = false;
-
-    this->_dimension = other._dimension;
-    this->_offset = other._offset;
-    this->_increment = other._increment;
-
+    Array<Scalar>::operator =(other);
     return *this;
   }
 
@@ -211,18 +143,9 @@ public:
   /**
    * Takes the ownership of the unowned vector.
    */
-  inline const Vector<Scalar> operator= (unowned other)
+  inline const Vector<Scalar> &operator= (unowned other)
   {
-    if (this->_owns_data && this->_data != other->_data) {
-      delete this->_data;
-    }
-
-    this->_data = other->_data; other->releaseData();
-    this->_owns_data = true;
-
-    this->_dimension = other->_dimension;
-    this->_offset = other->_offset;
-    this->_increment = other->_increment;
+    Array<Scalar>::operator =(other);
 
     return *this;
   }
@@ -233,7 +156,7 @@ public:
    */
   inline size_t dim() const
   {
-    return this->_dimension;
+    return _shape[0];
   }
 
 
@@ -242,7 +165,7 @@ public:
    */
   inline size_t offset() const
   {
-    return this->_offset;
+    return _offset;
   }
 
 
@@ -251,7 +174,7 @@ public:
    */
   inline size_t stride() const
   {
-    return this->_increment;
+    return _strides[0];
   }
 
 
@@ -260,7 +183,7 @@ public:
    */
   inline Scalar *operator *()
   {
-    return this->_data + this->offset();
+    return this->_data->ptr() + this->offset();
   }
 
 
@@ -269,7 +192,7 @@ public:
    */
   inline const Scalar *operator *() const
   {
-    return this->_data + this->offset();
+    return this->_data->ptr() + this->offset();
   }
 
 
@@ -278,7 +201,7 @@ public:
    */
   inline Scalar &operator ()(size_t i)
   {
-    return this->_data[this->_offset + i*this->_increment];
+    return this->_data->ptr()[_offset + i*this->stride()];
   }
 
 
@@ -287,17 +210,16 @@ public:
    */
   inline const Scalar &operator ()(size_t i) const
   {
-    return this->_data[this->_offset + i*this->_increment];
+    return this->_data->ptr()[_offset + i*this->stride()];
   }
+
 
   /**
    * Returns a sub-vector of this vector.
    */
   inline Vector<Scalar> sub(size_t i, size_t n)
   {
-    return Vector<Scalar>(this->_data,
-                          n, this->offset()+this->_increment*i, this->_increment,
-                          false);
+    return Vector<Scalar>(_data, offset()+stride()*i, n, stride());
   }
 
 
@@ -305,10 +227,19 @@ public:
   /**
    * Allocates an uninitialized vector of given size.
    */
-  static unowned empty(size_t dim)
+  static Vector<Scalar> empty(size_t dim)
   {
-    Vector<Scalar> v(dim);
-    return v.takeOwnership();
+    Scalar *data = new Scalar[dim];
+    return Vector(data, 0, dim, 1, true);
+  }
+
+
+  static Vector<Scalar> zero(size_t dim)
+  {
+    Vector<Scalar> vec = empty(dim);
+    for (size_t i=0; i<dim; i++)
+      vec(i) = 0;
+    return vec;
   }
 };
 

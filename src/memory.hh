@@ -28,109 +28,52 @@ protected:
    */
   Scalar *_data;
 
-  /**
-   * If true, this instance owns the data and will free it if the instance gets destroyed.
-   */
-  bool   _owns_data;
-
 
 public:
-  /**
-   * Constructs an empty data pointer (null pointer).
-   */
-  DataPtr() throw()
-    : _data(0), _owns_data(false)
-  {
-    // Pass...
-  }
+  virtual DataPtr<Scalar> *ref() = 0;
 
+  virtual void unref() = 0;
 
-  /**
-   * constructor from data.
-   */
-  DataPtr(Scalar *data, bool owns_data) throw()
-    : _data(data), _owns_data(owns_data)
-  {
-    // Pass...
-  }
-
-
-  /**
-   * Constructs a weak reference to the data...
-   */
-  DataPtr(const DataPtr<Scalar> &ptr) throw()
-    : _data(ptr._data), _owns_data(false)
-  {
-    // Pass...
-  }
-
-
-  /**
-   * Copy constructor, that tries to take the ownership if @c taks_ownership is true.
-   */
-  DataPtr(DataPtr<Scalar> &ptr, bool take_ownership) throw(MemoryError)
-    : _data(ptr._data), _owns_data(false)
-  {
-    if (take_ownership && ptr.ownsData()) {
-      this->_owns_data = true;
-      ptr.releaseData();
-    }
-    else if (take_ownership && ! ptr.ownsData()) {
-      MemoryError err;
-      err << "Can not take ownership of data: Source does not own the data.";
-      throw err;
-    }
-  }
-
-
-  /**
-   * Allocates some new data.
-   */
-  explicit DataPtr(size_t size) throw()
-    : _data(0), _owns_data(true)
-  {
-    this->_data = new Scalar[size];
-  }
-
-
-  /**
-   * Frees the data if the instance holds the ownership of the data.
-   */
-  ~DataPtr() throw()
-  {
-    if (this->_owns_data && 0 != this->_data)
-      delete this->_data;
-  }
-
-
-  /**
-   * Returns true, if the instance holds the ownership of the data.
-   */
-  bool ownsData() const
-  {
-    return this->_owns_data;
-  }
-
-
-  /**
-   * Releases the ownership of the data, does not free it!
-   */
-  void releaseData()
-  {
-    this->_data = 0;
-    this->_owns_data = false;
-  }
-
-
-  /**
-   * Returns true if there is no data.
-   */
-  bool isEmpty() const
-  {
-    return 0 == this->_data;
+  inline Scalar *ptr() {
+    return _data;
   }
 };
 
+
+template<class Scalar>
+class SmartPtr : public DataPtr
+{
+protected:
+  bool _owns_data;
+  size_t _refcount;
+
+public:
+  SmartPtr(Scalar *data, bool take_data)
+    : _data(data), _owns_data(take_data), _refcount(1)
+  {
+    // Pass...
+  }
+
+  virtual DataPtr<Scalar> *ref()
+  {
+    this->_refcount++;
+    return this;
+  }
+
+  virtual unref()
+  {
+    if (1 == _refcount) {
+      _refcount=0;
+      if (_owns_data)
+        delete _data;
+      delete this;
+    }
+    else
+    {
+      _refcount--;
+    }
+  }
+};
 
 }
 
