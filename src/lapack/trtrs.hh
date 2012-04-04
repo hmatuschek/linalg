@@ -41,19 +41,20 @@ template <class Scalar>
 inline void trtrs(const TriMatrix<Scalar> &A, Matrix<Scalar> &B)
 throw (SingularMatrixError, ShapeError)
 {
-  // Ensure column-major representation of matrices:
-  TriMatrix<Scalar> Acol = BLAS_TO_COLUMN_MAJOR(A);
-  Matrix<Scalar> Bcol = BLAS_TO_COLUMN_MAJOR(B);
-
   // A must be quadratic:
-  LINALG_SHAPE_ASSERT(Acol.rows() == Acol.cols());
-  LINALG_SHAPE_ASSERT(Acol.cols() == Bcol.rows());
+  LINALG_SHAPE_ASSERT(A.rows() == A.cols());
+  LINALG_SHAPE_ASSERT(A.cols() == B.rows());
+
+  // Ensure column-major representation of matrices:
+  char transa='N', transb='N';
+  TriMatrix<Scalar> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, transa);
+  Matrix<Scalar> Bcol = A; BLAS_ENSURE_COLUMN_MAJOR(Bcol, transb);
 
   bool left = true;
   // If B is transposed, transpose A & B and swap sides:
-  if (Bcol.isTransposed()) {
-    Bcol = Bcol.t();
-    Acol = Acol.t();
+  if ('T' == transb) {
+    transa = BLAS_TRANSPOSE(transa);
+    transb = BLAS_TRANSPOSE(transb);
     left = !left;
   }
 

@@ -12,6 +12,8 @@
 
 #include "matrix.hh"
 #include "blas/gemm.hh"
+#include "array_operators.hh"
+
 
 namespace Linalg {
 
@@ -86,7 +88,6 @@ operator- (const Matrix<double> &lhs, const Matrix<double> &rhs)
   // Pass ownership of result to caller:
   return result.takeOwnership();
 }
-
 
 }
 

@@ -6,14 +6,8 @@ PROJECT(linalg)
 #
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
-
-#
-# MacOS X specific stuff:
-#
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-SET(CMAKE_OSX_DEPLOYMENT_TARGET 10.5)
-#SET(CMAKE_OSX_ARCHITECTURES "i386")
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -frtti -fexceptions -ggdb")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -Wall -frtti -fexceptions")
 
 #
 # Search for libraries

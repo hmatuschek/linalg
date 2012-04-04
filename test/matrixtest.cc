@@ -5,150 +5,23 @@ using namespace Linalg;
 
 
 void
-MatrixTest::testRectRowToColMajor()
-{
-  Matrix<double> A(2, 3);
-  A(0,0) = 1; A(0,1) = 2; A(0,2) = 3;
-  A(1,0) = 4; A(1,1) = 5; A(1,2) = 6;
-
-  Matrix<double> B(A.colMajor());
-
-  for (size_t i=0; i<2; i++)
-  {
-    for (size_t j=0; j<3; j++)
-    {
-      UT_ASSERT_EQUAL(A(i,j), B(i,j));
-      UT_ASSERT_EQUAL(A.t()(j,i), B(i,j));
-      UT_ASSERT_EQUAL(A(i,j), B.t()(j,i));
-      UT_ASSERT_EQUAL(A.t()(j,i), B.t()(j,i));
-    }
-  }
-}
-
-
-void
-MatrixTest::testSquareRowToColMajor()
-{
-  Matrix<double> A(2, 2);
-  A(0,0) = 1; A(0,1) = 2;
-  A(1,0) = 3; A(1,1) = 4;
-
-  Matrix<double> B(A.colMajor());
-
-  for (size_t i=0; i<2; i++)
-  {
-    for (size_t j=0; j<2; j++)
-    {
-      UT_ASSERT_EQUAL(A(i,j), B(i,j));
-      UT_ASSERT_EQUAL(A.t()(j,i), B(i,j));
-      UT_ASSERT_EQUAL(A(i,j), B.t()(j,i));
-      UT_ASSERT_EQUAL(A.t()(j,i), B.t()(j,i));
-    }
-  }
-}
-
-
-void
-MatrixTest::testSubRowToColMajor()
-{
-  Matrix<double> A(4,5);
-  A(0,0) = 1;  A(0,1) = 2;  A(0,2)=3;  A(0,3)=4;  A(0,4)=5;
-  A(1,0) = 6;  A(1,1) = 7;  A(1,2)=8;  A(1,3)=9;  A(1,4)=10;
-  A(2,0) = 11; A(2,1) = 12; A(2,2)=13; A(2,3)=14; A(2,4)=15;
-  A(3,0) = 16; A(3,1) = 17; A(3,2)=18; A(3,3)=19; A(3,4)=20;
-
-  Matrix<double> B(A.sub(1,1, 2,3).colMajor());
-
-  for (size_t i=0; i<2; i++)
-  {
-    for (size_t j=0; j<3; j++)
-    {
-      UT_ASSERT_EQUAL(B(i,j), A(i+1, j+1));
-    }
-  }
-}
-
-
-void
-MatrixTest::testRectColToRowMajor()
-{
-  Matrix<double> A(2, 3, false);
-  A(0,0) = 1; A(0,1) = 2; A(0,2) = 3;
-  A(1,0) = 4; A(1,1) = 5; A(1,2) = 6;
-
-  Matrix<double> B(A.rowMajor());
-
-  for (size_t i=0; i<2; i++)
-  {
-    for (size_t j=0; j<3; j++)
-    {
-      UT_ASSERT_EQUAL(A(i,j), B(i,j));
-      UT_ASSERT_EQUAL(A.t()(j,i), B(i,j));
-      UT_ASSERT_EQUAL(A(i,j), B.t()(j,i));
-      UT_ASSERT_EQUAL(A.t()(j,i), B.t()(j,i));
-    }
-  }
-}
-
-
-void
-MatrixTest::testSquareColToRowMajor()
-{
-  Matrix<double> A(2, 2, false);
-  A(0,0) = 1; A(0,1) = 2;
-  A(1,0) = 3; A(1,1) = 4;
-
-  Matrix<double> B(A.rowMajor());
-
-  for (size_t i=0; i<2; i++)
-  {
-    for (size_t j=0; j<2; j++)
-    {
-      UT_ASSERT_EQUAL(A(i,j), B(i,j));
-      UT_ASSERT_EQUAL(A.t()(j,i), B(i,j));
-      UT_ASSERT_EQUAL(A(i,j), B.t()(j,i));
-      UT_ASSERT_EQUAL(A.t()(j,i), B.t()(j,i));
-    }
-  }
-}
-
-
-void
-MatrixTest::testSubColToRowMajor()
-{
-  Matrix<double> A(4,5, false);
-  A(0,0) = 1;  A(0,1) = 2;  A(0,2)=3;  A(0,3)=4;  A(0,4)=5;
-  A(1,0) = 6;  A(1,1) = 7;  A(1,2)=8;  A(1,3)=9;  A(1,4)=10;
-  A(2,0) = 11; A(2,1) = 12; A(2,2)=13; A(2,3)=14; A(2,4)=15;
-  A(3,0) = 16; A(3,1) = 17; A(3,2)=18; A(3,3)=19; A(3,4)=20;
-
-  Matrix<double> B(A.sub(1,1, 2,3).colMajor());
-
-  for (size_t i=0; i<2; i++)
-  {
-    for (size_t j=0; j<3; j++)
-    {
-      UT_ASSERT_EQUAL(B(i,j), A(i+1, j+1));
-    }
-  }
-}
-
-
-void
 MatrixTest::testFromData()
 {
   double A_data[6] = {1., 2., 3., 4., 5., 6.};
-  Matrix<double> A = Matrix<double>::fromData(A_data, 2, 3);
+  Matrix<double> A = Matrix<double>::fromData(A_data, 2, 3, 3, 1, 0);
 
   double B_data[6] = {1., 4., 2., 5., 3., 6.};
-  Matrix<double> B = Matrix<double>::fromData(B_data, 2, 3, 0, 0, false, false);
+  Matrix<double> B = Matrix<double>::fromData(B_data, 2, 3, 1, 2, 0);
+
+  UT_ASSERT_EQUAL((int)A.rows(), 2); UT_ASSERT_EQUAL((int)A.cols(), 3);
+  UT_ASSERT_EQUAL((int)B.rows(), 2); UT_ASSERT_EQUAL((int)B.cols(), 3);
+  UT_ASSERT_EQUAL((int)A.strides(0), 3); UT_ASSERT_EQUAL((int)A.strides(1), 1);
+  UT_ASSERT_EQUAL((int)B.strides(0), 1); UT_ASSERT_EQUAL((int)B.strides(1), 2);
 
   for (size_t i=0; i<A.rows(); i++) {
     for (size_t j=0; j<A.cols(); j++) {
       UT_ASSERT_EQUAL(A(i,j), B(i,j));
-      UT_ASSERT_EQUAL(A.colMajor()(i,j), B(i,j));
-      UT_ASSERT_EQUAL(A(i,j), B.rowMajor()(i,j));
-      UT_ASSERT_EQUAL(A.colMajor()(i,j), B.rowMajor()(i,j));
+      UT_ASSERT_EQUAL(A.t()(j,i), B(i,j));
     }
   }
 }
@@ -158,57 +31,104 @@ MatrixTest::testFromData()
 void
 MatrixTest::testValueRef()
 {
-  Matrix<double> A; A = Matrix<double>::rand(3,2);
+  Matrix<double> A = Matrix<double>::rand(3,2);
   Matrix<double> B(3,2);
-  UT_ASSERT(A.ownsData()); UT_ASSERT(B.ownsData());
 
   // Assign values:
-  B.vals() = A;
-  UT_ASSERT(A.ownsData()); UT_ASSERT(B.ownsData());
+  B.values() = A;
 
   // compare values:
   for (size_t i=0; i<A.rows(); i++) {
     for (size_t j=0; j<A.cols(); j++) {
-      UT_ASSERT_EQUAL(A(i,j), B(i,j));
+      UT_ASSERT_EQUAL(B(i,j), A(i,j));
     }
   }
 }
 
 
 void
-MatrixTest::testOwnershipTransfer()
+MatrixTest::testRowSelRowMajor()
 {
-  Matrix<double> A(1,1);
-  Matrix<double> B;
-  Matrix<double> C;
+  double data[9] = {1,2,3,4,5,6,7,8,9};
+  Matrix<double> A = Matrix<double>::fromData(data, 3, 3, 3, 1, 0);
+  Vector<double> a;
 
-  // Test initial ownership:
-  UT_ASSERT(A.ownsData());
-  UT_ASSERT(!A.isEmpty());
-  UT_ASSERT(!B.ownsData());
-  UT_ASSERT(B.isEmpty());
-  UT_ASSERT(!C.ownsData());
-  UT_ASSERT(C.isEmpty());
-
-  // Weak assignment:
-  B = A;
-  UT_ASSERT(A.ownsData());
-  UT_ASSERT(!A.isEmpty());
-  UT_ASSERT(!B.ownsData());
-  UT_ASSERT(!B.isEmpty());
-  UT_ASSERT(!C.ownsData());
-  UT_ASSERT(C.isEmpty());
-
-  // Ownership transfer A -> C:
-  C = A.takeOwnership();
-  UT_ASSERT(!A.ownsData());
-  UT_ASSERT(A.isEmpty());
-  UT_ASSERT(!B.ownsData());
-  UT_ASSERT(!B.isEmpty());
-  UT_ASSERT(!C.isEmpty());
-  UT_ASSERT(C.ownsData());
+  a = A.row(0);
+  UT_ASSERT_EQUAL(a(0), 1.); UT_ASSERT_EQUAL(a(1), 2.); UT_ASSERT_EQUAL(a(2), 3.);
+  a = A.row(1);
+  UT_ASSERT_EQUAL(a(0), 4.); UT_ASSERT_EQUAL(a(1), 5.); UT_ASSERT_EQUAL(a(2), 6.);
+  a = A.row(2);
+  UT_ASSERT_EQUAL(a(0), 7.); UT_ASSERT_EQUAL(a(1), 8.); UT_ASSERT_EQUAL(a(2), 9.);
 }
 
+
+void
+MatrixTest::testRowSelColMajor()
+{
+  double data[9] = {1,2,3,4,5,6,7,8,9};
+  Matrix<double> A = Matrix<double>::fromData(data, 3, 3, 1, 3, 0);
+  Vector<double> a;
+
+  a = A.row(0);
+  UT_ASSERT_EQUAL(a(0), 1.); UT_ASSERT_EQUAL(a(1), 4.); UT_ASSERT_EQUAL(a(2), 7.);
+  a = A.row(1);
+  UT_ASSERT_EQUAL(a(0), 2.); UT_ASSERT_EQUAL(a(1), 5.); UT_ASSERT_EQUAL(a(2), 8.);
+  a = A.row(2);
+  UT_ASSERT_EQUAL(a(0), 3.); UT_ASSERT_EQUAL(a(1), 6.); UT_ASSERT_EQUAL(a(2), 9.);
+}
+
+
+void
+MatrixTest::testColSelRowMajor()
+{
+  double data[9] = {1,2,3,4,5,6,7,8,9};
+  Matrix<double> A = Matrix<double>::fromData(data, 3, 3, 3, 1, 0);
+  Vector<double> a;
+
+  a = A.col(0);
+  UT_ASSERT_EQUAL(a(0), 1.); UT_ASSERT_EQUAL(a(1), 4.); UT_ASSERT_EQUAL(a(2), 7.);
+  a = A.col(1);
+  UT_ASSERT_EQUAL(a(0), 2.); UT_ASSERT_EQUAL(a(1), 5.); UT_ASSERT_EQUAL(a(2), 8.);
+  a = A.col(2);
+  UT_ASSERT_EQUAL(a(0), 3.); UT_ASSERT_EQUAL(a(1), 6.); UT_ASSERT_EQUAL(a(2), 9.);
+}
+
+
+void
+MatrixTest::testColSelColMajor()
+{
+  double data[9] = {1,2,3,4,5,6,7,8,9};
+  Matrix<double> A = Matrix<double>::fromData(data, 3, 3, 1, 3, 0);
+  Vector<double> a;
+
+  a = A.col(0);
+  UT_ASSERT_EQUAL(a(0), 1.); UT_ASSERT_EQUAL(a(1), 2.); UT_ASSERT_EQUAL(a(2), 3.);
+  a = A.col(1);
+  UT_ASSERT_EQUAL(a(0), 4.); UT_ASSERT_EQUAL(a(1), 5.); UT_ASSERT_EQUAL(a(2), 6.);
+  a = A.col(2);
+  UT_ASSERT_EQUAL(a(0), 7.); UT_ASSERT_EQUAL(a(1), 8.); UT_ASSERT_EQUAL(a(2), 9.);
+}
+
+
+void
+MatrixTest::testSwap()
+{
+  double a_data[6] = {1,2, 3,4, 5,6};
+  Matrix<double> A = Matrix<double>::fromData(a_data, 3,2, 2, 1, 0);
+  double b_data[6] = {6,5,4, 3,2,1};
+  Matrix<double> B = Matrix<double>::fromData(b_data, 2,3, 3, 1, 0);
+
+  A.swap(B);
+  UT_ASSERT_EQUAL((int)A.rows(), 2); UT_ASSERT_EQUAL((int)A.cols(), 3);
+  UT_ASSERT_EQUAL((int)B.rows(), 3); UT_ASSERT_EQUAL((int)B.cols(), 2);
+
+  UT_ASSERT_EQUAL(A(0,0), 6.); UT_ASSERT_EQUAL(A(0,1), 5.); UT_ASSERT_EQUAL(A(0,2), 4.);
+  UT_ASSERT_EQUAL(A(1,0), 3.); UT_ASSERT_EQUAL(A(1,1), 2.); UT_ASSERT_EQUAL(A(1,2), 1.);
+
+  UT_ASSERT_EQUAL(B(0,0), 1.); UT_ASSERT_EQUAL(B(0,1), 2.);
+  UT_ASSERT_EQUAL(B(1,0), 3.); UT_ASSERT_EQUAL(B(1,1), 4.);
+  UT_ASSERT_EQUAL(B(2,0), 5.); UT_ASSERT_EQUAL(B(2,1), 6.);
+}
 
 
 UnitTest::TestSuite *
@@ -217,31 +137,25 @@ MatrixTest::suite()
   UnitTest::TestSuite *s = new UnitTest::TestSuite("Tests for Matrix class");
 
   s->addTest(new UnitTest::TestCaller<MatrixTest>(
-               "double[m,m]::colMajor() (row-major)", &MatrixTest::testSquareRowToColMajor));
-
-  s->addTest(new UnitTest::TestCaller<MatrixTest>(
-               "double[m,n]::colMajor() (row-major)", &MatrixTest::testRectRowToColMajor));
-
-  s->addTest(new UnitTest::TestCaller<MatrixTest>(
-               "double[m,n]::sub()::colMajor() (row-major)", &MatrixTest::testSubRowToColMajor));
-
-  s->addTest(new UnitTest::TestCaller<MatrixTest>(
-               "double[m,m]::rowMajor() (col-major)", &MatrixTest::testSquareColToRowMajor));
-
-  s->addTest(new UnitTest::TestCaller<MatrixTest>(
-               "double[m,n]::rowMajor() (col-major)", &MatrixTest::testRectColToRowMajor));
-
-  s->addTest(new UnitTest::TestCaller<MatrixTest>(
-               "double[m,n]::sub()::rowMajor() (col-major)", &MatrixTest::testSubColToRowMajor));
-
-  s->addTest(new UnitTest::TestCaller<MatrixTest>(
                "double[m,n] internal data layout", &MatrixTest::testFromData));
 
   s->addTest(new UnitTest::TestCaller<MatrixTest>(
                "double[m,n]::vals() value assignment", &MatrixTest::testValueRef));
 
   s->addTest(new UnitTest::TestCaller<MatrixTest>(
-               "double[m,m] ownership transfer", &MatrixTest::testOwnershipTransfer));
+               "double[m,m]::row() (row-major)", &MatrixTest::testRowSelRowMajor));
+
+  s->addTest(new UnitTest::TestCaller<MatrixTest>(
+               "double[m,m]::row() (col-major)", &MatrixTest::testRowSelColMajor));
+
+  s->addTest(new UnitTest::TestCaller<MatrixTest>(
+               "double[m,m]::col() (row-major)", &MatrixTest::testColSelRowMajor));
+
+  s->addTest(new UnitTest::TestCaller<MatrixTest>(
+               "double[m,m]::col() (col-major)", &MatrixTest::testColSelColMajor));
+
+  s->addTest(new UnitTest::TestCaller<MatrixTest>(
+               "double[m,n]::swap(double[n,m])", &MatrixTest::testSwap));
 
   return s;
 }

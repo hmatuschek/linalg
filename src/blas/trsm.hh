@@ -38,37 +38,37 @@ inline void
 trsm(const TriMatrix<double> &A, double alpha, Matrix<double> &B, bool left=true)
 throw (ShapeError)
 {
-  // Ensure A & B are column-major:
-  TriMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
-  Matrix<double>    Bcol = BLAS_TO_COLUMN_MAJOR(B);
-
-  // If B is transposed -> transpose A & B and swap side:
-  if (Bcol.isTransposed()) {
-    Acol = Acol.t();
-    Bcol = Bcol.t();
-    left = !left;
+  // Check shapes:
+  LINALG_SHAPE_ASSERT(A.rows() == A.cols());
+  if (left) {
+    LINALG_SHAPE_ASSERT(A.cols() == B.rows())
+  } else {
+    LINALG_SHAPE_ASSERT(B.cols() == A.rows());
   }
 
-  // Check shapes:
-  LINALG_SHAPE_ASSERT(Acol.rows() == Acol.cols());
-  if (left) {
-    LINALG_SHAPE_ASSERT(Acol.cols() == Bcol.rows())
-  } else {
-    LINALG_SHAPE_ASSERT(Bcol.cols() == Acol.rows());
+  // Ensure A & B are column-major:
+  char transa='N', transb='N';
+  TriMatrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, transa);
+  Matrix<double>    Bcol = B; BLAS_ENSURE_COLUMN_MAJOR(Bcol, transb);
+
+  // If B is transposed -> transpose A & B and swap side:
+  if ('T'==transb) {
+    transa = BLAS_TRANSPOSE(transa);
+    transb = BLAS_TRANSPOSE(transb);
+    left = !left;
   }
 
   // Get flags:
   char SIDE   = left ? 'L' : 'R';
   char UPLO   = BLAS_UPLO_FLAG(Acol);
-  char TRANSA = BLAS_TRANSPOSED_FLAG(Acol);
   char DIAG   = BLAS_UNIT_DIAG_FLAG(Acol);
-  int  M      = BLAS_NUM_ROWS(Bcol);
-  int  N      = BLAS_NUM_COLS(Bcol);
+  int  M      = BLAS_NUM_ROWS(Bcol, transb);
+  int  N      = BLAS_NUM_COLS(Bcol, transb);
   int  LDA    = BLAS_LEADING_DIMENSION(Acol);
   int  LDB    = BLAS_LEADING_DIMENSION(Bcol);
 
   // Done...
-  dtrsm_(&SIDE, &UPLO, &TRANSA, &DIAG, &M, &N, &alpha, *Acol, &LDA, *Bcol, &LDB);
+  dtrsm_(&SIDE, &UPLO, &transa, &DIAG, &M, &N, &alpha, Acol.ptr(), &LDA, Bcol.ptr(), &LDB);
 }
 
 

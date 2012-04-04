@@ -8,8 +8,6 @@ class TriMatrixTest : public UnitTest::TestCase
 {
 public:
   void testTranspose();
-  void testRowToColMajor();
-  void testColToRowMajor();
 
 public:
   static UnitTest::TestSuite *suite();

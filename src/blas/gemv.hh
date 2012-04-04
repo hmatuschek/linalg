@@ -37,19 +37,19 @@ inline void gemv(const double alpha, const Matrix<double> &A, const Vector<doubl
           const double beta, Vector<double> &y)
 {
   // Get matrix in column order (Fortran)
-  Matrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
+  char trans = 'N';
+  Matrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, trans);
 
-  LINALG_SHAPE_ASSERT(Acol.cols() == x.dim());
-  LINALG_SHAPE_ASSERT(Acol.rows() == y.dim());
+  LINALG_SHAPE_ASSERT(A.cols() == x.dim());
+  LINALG_SHAPE_ASSERT(A.rows() == y.dim());
 
-  char trans = BLAS_TRANSPOSED_FLAG(Acol);
-  int m      = BLAS_NUM_ROWS(Acol);
-  int n      = BLAS_NUM_COLS(Acol);
+  int m      = Acol.rows();
+  int n      = Acol.cols();
   int lda    = BLAS_LEADING_DIMENSION(Acol);
   int incx   = BLAS_INCREMENT(x);
   int incy   = BLAS_INCREMENT(y);
 
-  dgemv_(&trans, &m, &n, &alpha, *Acol, &lda, *x, &incx, &beta, *y, &incy);
+  dgemv_(&trans, &m, &n, &alpha, Acol.ptr(), &lda, x.ptr(), &incx, &beta, y.ptr(), &incy);
 }
 
 

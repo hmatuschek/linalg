@@ -44,38 +44,39 @@ namespace Blas {
  */
 inline void trmm(bool left, double alpha, const TriMatrix<double> &A, Matrix<double> B)
 {
-  // Make sure, A & B are in column-major form:
-  TriMatrix<double> Acol(BLAS_TO_COLUMN_MAJOR(A));
-  Matrix<double>    Bcol(BLAS_TO_COLUMN_MAJOR(B));
-
-  // If Bcol is transposed: swap side and transpose Acol and Bcol:
-  if (BLAS_IS_TRANSPOSED(Bcol)) {
-    Acol = Acol.t();
-    Bcol = Bcol.t();
-    left = !left;
-  }
-
   // Check dimensions:
   if (left) {
-    LINALG_SHAPE_ASSERT(Acol.rows() == Bcol.rows());
-    LINALG_SHAPE_ASSERT(Acol.cols() == Bcol.rows());
+    LINALG_SHAPE_ASSERT(A.rows() == B.rows());
+    LINALG_SHAPE_ASSERT(A.cols() == B.rows());
   } else {
-    LINALG_SHAPE_ASSERT(Acol.rows() == Bcol.cols());
-    LINALG_SHAPE_ASSERT(Acol.cols() == Bcol.cols());
+    LINALG_SHAPE_ASSERT(A.rows() == B.cols());
+    LINALG_SHAPE_ASSERT(A.cols() == B.cols());
+  }
+
+  // Make sure, A & B are in column-major form:
+  char transa = 'N', transb = 'N';
+  TriMatrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, transa);
+  Matrix<double>    Bcol = B; BLAS_ENSURE_COLUMN_MAJOR(Bcol, transb);
+
+  // If Bcol is transposed: swap side and transpose Acol and Bcol:
+  if ('T' == transb) {
+    transa = BLAS_TRANSPOSE(transa);
+    transb = BLAS_TRANSPOSE(transb);
+    left = !left;
   }
 
   char SIDE    = left ? 'L' : 'R';
   char UPLO    = BLAS_UPLO_FLAG(Acol);
-  char TRANSA  = BLAS_TRANSPOSED_FLAG(Acol);
+  char TRANSA  = transa;
   char DIAG    = BLAS_UNIT_DIAG_FLAG(Acol);
-  int  M       = BLAS_NUM_ROWS(Bcol);
-  int  N       = BLAS_NUM_COLS(Bcol);
+  int  M       = BLAS_NUM_ROWS(Bcol, transb);
+  int  N       = BLAS_NUM_COLS(Bcol, transb);
   double ALPHA = alpha;
   int LDA      = BLAS_LEADING_DIMENSION(Acol);
   int LDB      = BLAS_LEADING_DIMENSION(Bcol);
 
   // Call fortran function:
-  dtrmm_(&SIDE, &UPLO, &TRANSA, &DIAG, &M, &N, &ALPHA, *Acol, &LDA, *Bcol, &LDB);
+  dtrmm_(&SIDE, &UPLO, &TRANSA, &DIAG, &M, &N, &ALPHA, Acol.ptr(), &LDA, Bcol.ptr(), &LDB);
 }
 
 }

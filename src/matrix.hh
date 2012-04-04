@@ -9,7 +9,7 @@
 #ifndef __LINALG_MATRIX_HH__
 #define __LINALG_MATRIX_HH__
 
-#include "memory.hh"
+#include "array.hh"
 #include "vector.hh"
 #include "blas/utils.hh"
 #include <iostream>
@@ -24,124 +24,10 @@ namespace Linalg {
  * @ingroup matrix
  */
 template <class Scalar>
-class Matrix : public DataPtr<Scalar>
+class Matrix
+    : public Array<Scalar>
 {
-public:
-  /**
-   * Defines the "unowned matrix" type.
-   */
-  typedef std::auto_ptr< Matrix<Scalar> > unowned;
-
-  /**
-   * Represents a weak reference to the values of a matrix. This can be used to copy values of
-   * one matrix into an other.
-   */
-  class ValueRef
-  {
-  protected:
-    /**
-     * Holds a weak reference to the matrix.
-     */
-    Matrix<Scalar> _matrix;
-
-  public:
-    /**
-     * Constructs a reference to the values of the given matrix.
-     */
-    ValueRef(const Matrix &matrix)
-      : _matrix(matrix)
-    {
-      // Pass...
-    }
-
-    /**
-     * Copy constructor.
-     */
-    ValueRef(const ValueRef &other)
-      : _matrix(other._matrix)
-    {
-      // Pass...
-    }
-
-    /**
-     * Assigns a scalar to all values.
-     */
-    const ValueRef &operator= (const Scalar &val)
-    {
-      for (size_t i=0; i<this->_matrix.rows(); i++) {
-        for (size_t j=0; j<this->_matrix.cols(); j++) {
-          this->_matrix(i,j) = val;
-        }
-      }
-    }
-
-    /**
-     * Copies the values of the given matrix to the referred matrix.
-     */
-    const ValueRef &operator= (const Matrix &other)
-    {
-      // Assert equal shapes:
-      LINALG_SHAPE_ASSERT(this->_matrix.rows() == other.rows());
-      LINALG_SHAPE_ASSERT(this->_matrix.cols() == other.cols());
-
-      for (size_t i=0; i<this->_matrix.rows(); i++) {
-        for (size_t j=0; j<this->_matrix.cols(); j++) {
-          this->_matrix(i,j) = other(i,j);
-        }
-      }
-    }
-  };
-
-
 protected:
-  /**
-   * Holds the number of rows of the matrix.
-   */
-  size_t _rows;
-
-  /**
-   * Holds the number of columns of the matrix.
-   */
-  size_t _cols;
-
-  /**
-   * Number of rows in the outer most matrix if matrix is in column-major form and number of
-   * columns if matrix is in row-major form.
-   */
-  size_t _stride;
-
-  /**
-   * Holds the offset of the first element in the matrix, starting from the first element of the
-   * original memory element.
-   */
-  size_t _offset;
-
-  /**
-   * If true, the matrix is assumed to be transposed.
-   */
-  bool _transposed;
-
-  /**
-   * If true, the matrix is stored in row-major (C) order, if false then it is stored in
-   * column major (Fortran) order.
-   */
-  bool _is_rowmajor;
-
-
-protected:
-  /**
-   * Full constructor. Shall not be used from the outside.
-   */
-  Matrix(Scalar *data, size_t rows, size_t cols,
-         size_t stride, size_t offset,
-         bool transposed, bool rowmajor, bool owns_data)
-    : DataPtr<Scalar>(data, owns_data), _rows(rows), _cols(cols),
-      _stride(stride), _offset(offset),
-      _transposed(transposed), _is_rowmajor(rowmajor)
-  {
-    // Pass...
-  }
-
   /**
    * Calculates the index (in flattened data array) for the given row/col index.
    *
@@ -150,23 +36,36 @@ protected:
    */
   inline size_t _getIndex(size_t i, size_t j) const
   {
-    if (this->_transposed)
-      std::swap(i,j);
-
-    if (this->_is_rowmajor)
-      return this->_offset + this->_stride*i + j;
-    else
-      return this->_offset + this->_stride*j + i;
+    return this->_offset + i*this->_strides[0] + j*this->_strides[1];
   }
 
 
 public:
   /**
+   * Constructor for an empty matrix.
+   */
+  Matrix(size_t rows, size_t cols, bool rowmajor=true)
+    : Array<Scalar>()
+  {
+    this->_data = new SmartPtr<Scalar>((Scalar *)malloc(rows*cols*sizeof(Scalar)), true);
+    this->_offset = 0;
+    this->_shape.resize(2); this->_shape[0] = rows; this->_shape[1] = cols;
+    this->_strides.resize(2);
+    if (rowmajor) {
+      this->_strides[0] = cols;
+      this->_strides[1] = 1;
+    } else {
+      this->_strides[0] = 1;
+      this->_strides[1] = rows;
+    }
+  }
+
+
+  /**
    * Constructs an empty matrix.
    */
   Matrix()
-    : DataPtr<Scalar>(), _rows(0), _cols(0), _stride(0), _offset(0),
-      _transposed(false), _is_rowmajor(true)
+    : Array<Scalar>()
   {
     // Pass...
   }
@@ -175,96 +74,19 @@ public:
   /**
    * Copy constructor with ownership transfer.
    */
-  explicit Matrix(Matrix<Scalar> &other, bool take_ownership)
-    : DataPtr<Scalar>(other, take_ownership), _rows(other._rows), _cols(other._cols),
-      _stride(other._stride), _offset(other._offset),
-      _transposed(other._transposed), _is_rowmajor(other._is_rowmajor)
-  {
-    // Pass...
-  }
-
-
-  /**
-   * Takes the ownership of a matrix that is unowned.
-   */
-  explicit Matrix(unowned other)
-    : DataPtr<Scalar>(*other, true), _rows(other->_rows), _cols(other->_cols),
-      _stride(other->_stride), _offset(other->_offset),
-      _transposed(other->_transposed), _is_rowmajor(other->_is_rowmajor)
-  {
-    // explicity take ownership
-    other->releaseData();
-  }
-
-  /**
-   * Copy constructor with weak reference.
-   */
   Matrix(const Matrix<Scalar> &other)
-    : DataPtr<Scalar>(other), _rows(other._rows), _cols(other._cols),
-      _stride(other._stride), _offset(other._offset),
-      _transposed(other._transposed), _is_rowmajor(other._is_rowmajor)
+    : Array<Scalar>(other._data, other._offset, other._shape, other._strides)
   {
     // Pass...
   }
 
   /**
-   * Constructs a new matrix (allocates new memory) with given rows and columns.
+   * Copy constructor with ownership transfer.
    */
-  Matrix(size_t rows, size_t cols, bool rowmajor=true)
-    : DataPtr<Scalar>(rows*cols), _rows(rows), _cols(cols),
-      _stride(cols), _offset(0), _transposed(false), _is_rowmajor(rowmajor)
+  Matrix(const Array<Scalar> &other)
+    : Array<Scalar>(other.data(), other.offset(), other.shape(), other.strides())
   {
-    if (! this->_is_rowmajor)
-      this->_stride = this->_rows;
-  }
-
-  /**
-   * Assignment operator for an unowned matrix.
-   *
-   * This matrix takes the ownership of the data of the assigned matrix.
-   */
-  inline const Matrix<Scalar> &operator= (Matrix<Scalar>::unowned other)
-  {
-    // Free data if owning it:
-    if(this->_owns_data && this->_data != other->_data)
-    {
-      delete this->_data;
-    }
-
-    // Take ownership of data:
-    this->_data = other->_data; other->releaseData();
-    this->_owns_data = true;
-
-    // Copy meta-data
-    this->_rows = other->_rows;
-    this->_cols = other->_cols;
-    this->_stride = other->_stride;
-    this->_transposed = other->_transposed;
-    this->_is_rowmajor = other->_is_rowmajor;
-
-    return *this;
-  }
-
-
-  /**
-   * Assignment (weak) operator.
-   */
-  inline const Matrix<Scalar> &operator= (const Matrix<Scalar> &other)
-  {
-    if (this->_owns_data && other._data != this->_data) {
-      delete this->_data;
-    }
-
-    this->_data = other._data;
-    this->_owns_data = false;
-
-    this->_rows = other._rows;
-    this->_cols = other._cols;
-    this->_stride = other._stride;
-    this->_transposed = other._transposed;
-    this->_is_rowmajor = other._is_rowmajor;
-
-    return *this;
+    LINALG_SHAPE_ASSERT(2 == other.ndim());
   }
 
 
@@ -273,31 +95,20 @@ public:
    *
    * This method returns a new (unowned) matrix.
    */
-  inline unowned copy()
+  inline Matrix<Scalar> copy()
   {
-    // Construct dense row-major matrix:
-    Matrix ret(this->rows(), this->cols(), this->isRowOrder());
-
-    // copy values:
-    for (size_t i=0; i<this->rows(); i++)
-    {
-      for (size_t j=0; j<this->cols(); j++)
-      {
-        ret(i,j) = (*this)(i,j);
-      }
-    }
-
-    // Done...
-    return ret.takeOwnership();
+    return Matrix<Scalar>(Array<Scalar>::copy());
   }
 
-
-  /**
-   * Retruns a reference to the values of the matrix.
-   */
-  inline ValueRef vals()
+  void swap(Matrix<Scalar> &other)
   {
-    return ValueRef(*this);
+    Matrix<Scalar> tmp = other;
+    other = *this;
+    Array<Scalar>::operator =(tmp);
+  }
+
+  Matrix<Scalar> t() const {
+    return Array<Scalar>::t();
   }
 
 
@@ -308,9 +119,7 @@ public:
    */
   inline size_t rows() const
   {
-    if (this->_transposed)
-      return this->_cols;
-    return this->_rows;
+    return this->_shape[0];
   }
 
 
@@ -321,91 +130,7 @@ public:
    */
   inline size_t cols() const
   {
-    if (this->_transposed)
-      return this->_rows;
-    return this->_cols;
-  }
-
-
-  /**
-   * Returns the number of rows if matrix in in column-major (Fortran) form otherwise
-   * return the number columns of the outer-most matrix.
-   */
-  inline size_t stride() const
-  {
-    return this->_stride;
-  }
-
-
-  /**
-   * Retuns true, if the matrix is transposed.
-   */
-  inline bool isTransposed() const {
-    return this->_transposed;
-  }
-
-
-  /**
-   * Returns true, if the storage-order of the matrix is row-major (C order).
-   */
-  inline bool isRowOrder() const {
-    return this->_is_rowmajor;
-  }
-
-
-  /**
-   * Returns a matrix in column-major order.
-   */
-  inline Matrix<Scalar> colMajor() const
-  {
-    // If this matrix is in row-major:
-    if (this->_is_rowmajor)
-    {
-      return Matrix<Scalar>(this->_data, this->_cols, this->_rows,
-                            this->_stride, this->_offset,
-                            ! this->isTransposed(), false,
-                            false);
-    }
-
-    // If matrix is in column-major:
-    return *this;
-  }
-
-
-  /**
-   * Returns a matrix in column-major order.
-   */
-  inline Matrix<Scalar> rowMajor() const
-  {
-    // If this matrix is in col-major:
-    if (! this->_is_rowmajor)
-    {
-      return Matrix<Scalar>(this->_data,
-                            this->_cols, this->_rows, this->_stride, this->_offset,
-                            ! this->isTransposed(), true,
-                            false);
-    }
-
-    // If matrix is in column-major:
-    return *this;
-  }
-
-
-  /**
-   * Returns the pointer to the first element of the array.
-   */
-  inline Scalar* operator* ()
-  {
-    return this->_data + this->_offset;
-  }
-
-
-  /**
-   * Returns a const pointer to the first element of the array.
-   */
-  inline const Scalar* operator* () const
-  {
-    return this->_data + this->_offset;
+    return this->_shape[1];
   }
 
 
@@ -414,7 +139,7 @@ public:
    */
   inline Scalar &operator() (size_t i, size_t j)
   {
-    return this->_data[this->_getIndex(i, j)];
+    return this->_data->ptr()[this->_getIndex(i, j)];
   }
 
 
@@ -423,7 +148,7 @@ public:
    */
   const Scalar &operator() (size_t i, size_t j) const
   {
-    return this->_data[this->_getIndex(i,j)];
+    return this->_data->ptr()[this->_getIndex(i,j)];
   }
 
 
@@ -446,35 +171,7 @@ public:
    */
   inline Vector<Scalar> row(size_t i)
   {
-    if (this->_transposed)
-    {
-      if (i >= this->_cols)
-      {
-        Linalg::IndexError err;
-        err << "Row-index " << i << " out of range 0-" << this->_cols-1;
-        throw err;
-      }
-
-      size_t stride = this->stride();
-      if (! this->_is_rowmajor)
-        stride = 1;
-
-      return Vector<Scalar>(this->_data, this->_rows, this->_getIndex(i,0), stride, false);
-    }
-
-    if (i >= this->_rows)
-    {
-      Linalg::IndexError err;
-      err << "Row-index " << i << " out of range 0-" << this->_rows-1;
-      throw err;
-    }
-
-    size_t stride = 1;
-    if (! this->_is_rowmajor)
-      stride = this->_stride;
-
-    // Construct vector from matrix
-    return Vector<Scalar>(this->_data, this->_cols, this->_getIndex(i, 0), stride, false);
+    return Vector<Scalar>(this->_data, this->_getIndex(i,0), rows(), Array<Scalar>::strides(1));
   }
 
 
@@ -483,84 +180,34 @@ public:
    */
   inline Vector<Scalar> col(size_t j)
   {
-    if (this->_transposed)
-    {
-      if (j >= this->_rows)
-      {
-        Linalg::IndexError err;
-        err << "Row-index " << j << " out of range 0-" << this->_rows-1;
-        throw err;
-      }
-
-      size_t stride = 1;
-      if (! this->_is_rowmajor)
-        stride = this->_stride;
-
-      // Construct vector from matrix
-      return Vector<Scalar>(this->_data, this->_cols, this->_getIndex(0, j), stride, false);
-    }
-
-    if (j >= this->_cols)
-    {
-      Linalg::IndexError err;
-      err << "Row-index " << j << " out of range 0-" << this->_cols-1;
-      throw err;
-    }
-
-    size_t stride = this->_stride;
-    if (! this->_is_rowmajor)
-      stride = 1;
-
-    return Vector<Scalar>(this->_data, this->_rows, this->_getIndex(0, j), stride, false);
+    return Vector<Scalar>(this->_data, this->_getIndex(0,j), cols(), Array<Scalar>::strides(0));
   }
 
 
   /**
    * Returns a sub-matrix (block) of the matrix.
    */
-  inline Matrix<Scalar> sub(size_t i, size_t j, size_t rows, size_t cols)
+  inline Matrix<Scalar> sub(size_t i, size_t j, size_t nrow, size_t ncol)
   {
     // Test if row-indices match
-    if (i >= this->_rows || i+rows > this->_rows)
+    if (i >= rows() || i+nrow > rows())
     {
       Linalg::IndexError err;
-      err << "Row indices " << i << "-" << i+rows-1 << " not in range 0-" << this->_rows-1;
+      err << "Row indices " << i << "-" << i+nrow-1 << " not in range 0-" << rows()-1;
       throw err;
     }
 
     // Test if column-indices match:
-    if (j >= this->_cols || j+cols > this->_cols)
+    if (j >= cols() || j+ncol > cols())
     {
       Linalg::IndexError err;
-      err << "Column indices " << j << "-" << j+cols-1 << " not in range 0-" << this->_cols-1;
+      err << "Column indices " << j << "-" << j+ncol-1 << " not in range 0-" << cols()-1;
       throw err;
     }
 
-    // Assemble new Matrix<T> view:
-    return Matrix<Scalar>(this->_data,
-                          rows, cols, this->_stride, this->_getIndex(i,j),
-                          this->_transposed, this->_is_rowmajor,
-                          false);
-  }
-
-
-  /**
-   * Returns a transposed view of the matrix.
-   */
-  inline Matrix<Scalar> t() const
-  {
-    return Matrix<Scalar>(this->_data,
-                          this->_rows, this->_cols, this->_stride, this->_offset,
-                          !this->_transposed, this->_is_rowmajor, false);
-  }
-
-
-  /**
-   * Takes the ownership of this matrix.
-   */
-  inline unowned takeOwnership()
-  {
-    return unowned(new Matrix<Scalar>(*this, true));
+    std::vector<size_t> shape(2);
+    shape[0] = nrow; shape[1] = ncol;
+    return Matrix<Scalar>(this->_data, this->getIndex(i,j), shape, this->strides());
   }
 
 
@@ -568,53 +215,62 @@ public:
   /**
    * Constructs a @c Matrix from the given data.
    */
-  static Matrix<Scalar> fromData(Scalar *data, size_t rows, size_t cols,
-                                 size_t stride=0, size_t offset=0,
-                                 bool transposed=false, bool row_major=true)
+  static Matrix<Scalar> fromData(Scalar *data,
+                                 size_t rows, size_t cols, size_t rstride, size_t cstride,
+                                 size_t offset=0)
   {
-    size_t _stride = cols;
-    if (0 != stride) {
-      _stride = stride;
-    } else if (! row_major) {
-      _stride = rows;
-    }
+    DataPtr<Scalar> *data_ptr = new SmartPtr<Scalar>(data, false);
 
-    return Matrix<Scalar>(data, rows, cols, _stride, offset, transposed, row_major, false);
+    std::vector<size_t> dims(2); dims[0]=rows; dims[1]=cols;
+    std::vector<size_t> strd(2); strd[0]=rstride; strd[1]=cstride;
+    Matrix<Scalar> ret(Array<Scalar>(data_ptr, offset, dims, strd));
+
+    data_ptr->unref();
+    return ret;
   }
 
 
   /**
    * Constructs a matrix from the given data and takes the ownership of the data.
    */
-  static unowned
-  fromUnownedData(Scalar *data, size_t rows, size_t cols, size_t stride=0, size_t offset=0,
-                  bool transposed=false, bool row_major=true)
+  static Matrix<Scalar>
+  fromUnownedData(Scalar *data, size_t rows, size_t cols, size_t rstride, size_t cstride,
+                  size_t offset=0)
   {
-    size_t _stride = cols;
-    if (0 != stride) {
-      _stride = stride;
-    } else if (! row_major) {
-      _stride = rows;
-    }
-
-    return Matrix<Scalar>(data, rows, cols, _stride, offset, transposed, row_major, false).takeOwnership();
+    std::vector<size_t> dims(2); dims[0]=rows; dims[1]=cols;
+    std::vector<size_t> strd(2); strd[0]=rstride; strd[1]=cstride;
+    DataPtr<Scalar> *data_ptr(data, true);
+    Matrix<Scalar> ret(Array<Scalar>(data_ptr, offset, dims, strd));
+    data_ptr->unref();
+    return ret;
   }
 
 
   /**
    * Constructs a matrix with uninitilized values.
    */
-  static unowned empty(size_t rows, size_t cols, bool row_major=true)
+  static Matrix<Scalar> empty(size_t rows, size_t cols, bool rowmajor=true)
   {
-    Matrix<Scalar> m(rows, cols, row_major);
-    return m.takeOwnership();
+    DataPtr<Scalar> *data = new SmartPtr<Scalar>((Scalar *)malloc(rows*cols*sizeof(Scalar)), true);
+    std::vector<size_t> shape(2); shape[0] = rows; shape[1] = cols;
+    std::vector<size_t> strides(2);
+
+    if (rowmajor) {
+      strides[0] = cols; strides[1] = 1;
+    } else {
+      strides[0] = 1; strides[1] = rows;
+    }
+
+    Matrix<Scalar> ret(Array<Scalar>(data, 0, shape, strides)); data->unref();
+
+    return ret;
   }
 
 
   /**
    * Returns a matrix initialized with all values = 0.
    */
-  static unowned zeros(size_t rows, size_t cols)
+  static Matrix<Scalar> zeros(size_t rows, size_t cols)
   {
     Matrix<Scalar> m(rows, cols);
 
@@ -626,14 +282,14 @@ public:
       }
     }
 
-    return m.takeOwnership();
+    return m;
   }
 
 
   /**
    * Returns a unit matrix.
    */
-  static unowned unit(size_t rows, size_t cols)
+  static Matrix<Scalar> unit(size_t rows, size_t cols)
   {
     Matrix<Scalar> U = Matrix<Scalar>::zeros(rows, cols);
 
@@ -642,14 +298,14 @@ public:
       U(i,i) = 1;
     }
 
-    return U.takeOwnership();
+    return U;
   }
 
 
   /**
    * Returns a squere-unit matrix.
    */
-  static unowned unit(size_t N)
+  static Matrix<Scalar> unit(size_t N)
   {
     return Matrix<Scalar>::unit(N,N);
   }
@@ -658,7 +314,7 @@ public:
   /**
    * Constructs a new matrix initialized with [0,1] uniform distributed random-numbers.
    */
-  static unowned rand(size_t rows, size_t cols)
+  static Matrix<Scalar> rand(size_t rows, size_t cols)
   {
     Matrix<Scalar> m(rows, cols);
 
@@ -670,40 +326,9 @@ public:
       }
     }
 
-    return m.takeOwnership();
+    return m;
   }
 };
-
-
-
-/**
- * Dumps the matrix to std::cerr.
- */
-template <class Scalar>
-void print(const Matrix<Scalar> &matrix)
-{
-  std::cerr << "matrix(rows=" << BLAS_NUM_ROWS(matrix)
-            << ", cols=" << BLAS_NUM_COLS(matrix)
-            << ", stride=" << BLAS_LEADING_DIMENSION(matrix)
-            << ", row_major=" << matrix.isRowOrder()
-            << ", transposed=" << matrix.isTransposed()
-            << ", data=" << *matrix
-            << ", owns_data=" << matrix.ownsData()
-            << ", values=" << std::endl;
-  std::cerr << "[";
-  for (size_t i=0; i<matrix.rows(); i++) {
-    if (0 != i) std::cerr << " ";
-    std::cerr << "[";
-    for (size_t j=0; j<matrix.cols(); j++) {
-      std::cerr << matrix(i,j);
-      if (j != (matrix.cols()-1))
-        std::cerr << ", ";
-    }
-    std::cerr << "]";
-    if (i != (matrix.rows()-1)) std::cerr << std::endl;
-  }
-  std::cerr << "]);" << std::endl;
-}
 
 }
 

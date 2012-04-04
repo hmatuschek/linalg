@@ -39,38 +39,37 @@ namespace Blas {
 inline void gemm(double alpha, const Matrix<double> &A, const Matrix<double> &B,
           double beta, Matrix<double> &C)
 {
-  // Get matrices in column-major from:
-  Matrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
-  Matrix<double> Bcol = BLAS_TO_COLUMN_MAJOR(B);
-  Matrix<double> Ccol = BLAS_TO_COLUMN_MAJOR(C);
+  // Check matrix shape:
+  LINALG_SHAPE_ASSERT(A.cols() == B.rows());
+  LINALG_SHAPE_ASSERT(A.rows() == C.rows());
+  LINALG_SHAPE_ASSERT(B.cols() == C.cols());
 
-  // If C is transposed:
-  if (Ccol.isTransposed()){
-    // Swap A & B
-    Matrix<double> tmp(Acol.t());
-    Acol = Bcol.t(); Bcol = tmp;
-    // Transpose C:
-    Ccol = Ccol.t();
+  // Get matrices in column-major from:
+  char transa='N', transb='N', transc = 'N';
+  Matrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, transa);
+  Matrix<double> Bcol = B; BLAS_ENSURE_COLUMN_MAJOR(Bcol, transb);
+  Matrix<double> Ccol = C; BLAS_ENSURE_COLUMN_MAJOR(Ccol, transc);
+
+  if ('T' == transc) {
+    std::swap(Acol, Bcol);
+    std::swap<>(transa, transb);
+    transa = BLAS_TRANSPOSE(transa);
+    transb = BLAS_TRANSPOSE(transb);
+    transc = BLAS_TRANSPOSE(transc);
   }
 
-  LINALG_SHAPE_ASSERT(Acol.cols() == Bcol.rows());
-  LINALG_SHAPE_ASSERT(Acol.rows() == Ccol.rows());
-  LINALG_SHAPE_ASSERT(Bcol.cols() == Ccol.cols());
-
-  char transa = BLAS_TRANSPOSED_FLAG(Acol);
-  char transb = BLAS_TRANSPOSED_FLAG(Bcol);
-  int M       = Acol.rows();
-  int N       = Bcol.cols();
-  int K       = Acol.cols();
+  int M       = BLAS_NUM_ROWS(Acol, transa);
+  int N       = BLAS_NUM_COLS(Bcol, transb);
+  int K       = BLAS_NUM_COLS(Acol, transa);
   int lda     = BLAS_LEADING_DIMENSION(Acol);
   int ldb     = BLAS_LEADING_DIMENSION(Bcol);
   int ldc     = BLAS_LEADING_DIMENSION(Ccol);
 
   // Perform operation:
   dgemm_(&transa, &transb, &M, &N, &K,
-         &alpha, *Acol, &lda,
-         *Bcol, &ldb,
-         &beta, *Ccol, &ldc);
+         &alpha, Acol.ptr(), &lda,
+         Bcol.ptr(), &ldb,
+         &beta, Ccol.ptr(), &ldc);
 
   // Done.
 }

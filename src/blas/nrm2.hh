@@ -34,7 +34,7 @@ inline double nrm2(const Vector<double> &x)
 {
   int N   = BLAS_DIMENSION(x);
   int INC = BLAS_INCREMENT(x);
-  return dnrm2_(&N, *x, &INC);
+  return dnrm2_(&N, x.ptr(), &INC);
 }
 
 

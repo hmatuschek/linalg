@@ -13,7 +13,7 @@ void
 NRM2Test::testVector()
 {
   // Simple direct vector test:
-  Vector<double> vec(5);
+  Vector<double> vec = Vector<double>::empty(5);
   vec(0) = 1; vec(1) = 2; vec(2) = 3; vec(3) = 4; vec(4) = 5;
 
   // Test full vector:
@@ -92,7 +92,7 @@ NRM2Test::testMatrixRowRowMajor()
 void
 NRM2Test::testMatrixColumnColMajor()
 {
-  Matrix<double> A(5,5, false);
+  Matrix<double> A(5,5);
 
   A(0,0) =  1, A(0, 1) =  2; A(0, 2) =  3; A(0, 3) =  4; A(0, 4) =  5;
   A(1,0) =  6, A(1, 1) =  7; A(1, 2) =  8; A(1, 3) =  9; A(1, 4) = 10;
@@ -123,7 +123,7 @@ NRM2Test::testMatrixColumnColMajor()
 void
 NRM2Test::testMatrixRowColMajor()
 {
-  Matrix<double> A(5,5, false);
+  Matrix<double> A(5,5);
 
   A(0,0) =  1, A(0, 1) =  2; A(0, 2) =  3; A(0, 3) =  4; A(0, 4) =  5;
   A(1,0) =  6, A(1, 1) =  7; A(1, 2) =  8; A(1, 3) =  9; A(1, 4) = 10;

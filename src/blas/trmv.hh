@@ -36,23 +36,23 @@ namespace Blas {
  */
 inline void trmv(const TriMatrix<double> &A, Vector<double> &x)
 {
-  // Make A column-major:
-  const TriMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
-
   // Assert Acol is square:
-  LINALG_SHAPE_ASSERT(Acol.rows() == Acol.cols());
-  LINALG_SHAPE_ASSERT(Acol.rows() == x.dim());
+  LINALG_SHAPE_ASSERT(A.rows() == A.cols());
+  LINALG_SHAPE_ASSERT(A.rows() == x.dim());
+
+  // Make A column-major:
+  char transa = 'N';
+  TriMatrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, transa);
 
   // Get flags and dimensions:
-  char UPLO  = BLAS_UPLO_FLAG(Acol);
-  char TRANS = BLAS_TRANSPOSED_FLAG(Acol);
-  char DIAG  = BLAS_UNIT_DIAG_FLAG(Acol);
-  int  N     = BLAS_NUM_COLS(Acol);
-  int  LDA   = BLAS_LEADING_DIMENSION(Acol);
-  int  INCX  = BLAS_INCREMENT(x);
+  char uplo  = BLAS_UPLO_FLAG(Acol);
+  char diag  = BLAS_UNIT_DIAG_FLAG(Acol);
+  int  N     = BLAS_NUM_COLS(Acol, transa);
+  int  lda   = BLAS_LEADING_DIMENSION(Acol);
+  int  incx  = BLAS_INCREMENT(x);
 
   // Call Fortran function
-  dtrmv_(&UPLO, &TRANS, &DIAG, &N, *Acol, &LDA, *x, &INCX);
+  dtrmv_(&uplo, &transa, &diag, &N, Acol.ptr(), &lda, x.ptr(), &incx);
 }
 
 

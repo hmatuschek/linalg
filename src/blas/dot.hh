@@ -37,7 +37,7 @@ inline double dot(const Vector<double> &x, const Vector<double> &y)
   int INCX = BLAS_INCREMENT(x);
   int INCY = BLAS_INCREMENT(y);
 
-  return ddot_(&N, *x, &INCX, *y, &INCY);
+  return ddot_(&N, x.ptr(), &INCX, y.ptr(), &INCY);
 }
 
 

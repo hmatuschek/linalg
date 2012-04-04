@@ -15,19 +15,13 @@
 class MatrixTest : public UnitTest::TestCase
 {
 public:
-  void testRectRowToColMajor();
-  void testSquareRowToColMajor();
-  void testSubRowToColMajor();
-
-  void testRectColToRowMajor();
-  void testSquareColToRowMajor();
-  void testSubColToRowMajor();
-
   void testFromData();
   void testValueRef();
-
-  void testOwnershipTransfer();
-
+  void testRowSelRowMajor();
+  void testRowSelColMajor();
+  void testColSelRowMajor();
+  void testColSelColMajor();
+  void testSwap();
 
 public:
   static UnitTest::TestSuite *suite();

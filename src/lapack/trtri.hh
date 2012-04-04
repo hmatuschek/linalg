@@ -38,21 +38,22 @@ namespace Lapack {
  */
 inline void trtri(TriMatrix<double> A) throw (SingularMatrixError, LapackError)
 {
-  // Ensure, Acol is in column-major:
-  TriMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
-
   // A must be quadratic:
-  LINALG_SHAPE_ASSERT(Acol.rows() == Acol.cols());
+  LINALG_SHAPE_ASSERT(A.rows() == A.cols());
+
+  // Ensure, Acol is in column-major:
+  char transa='N';
+  TriMatrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(A, transa);
 
   // Get all the flags:
   char UPLO = BLAS_UPLO_FLAG(Acol);
   char DIAG = BLAS_UNIT_DIAG_FLAG(Acol);
-  int  N    = BLAS_NUM_ROWS(Acol);
+  int  N    = BLAS_NUM_ROWS(Acol, transa);
   int  LDA  = BLAS_LEADING_DIMENSION(Acol);
   int  INFO = 0;
 
   // Call function
-  dtrtri_(&UPLO, &DIAG, &N, *Acol, &LDA, &INFO);
+  dtrtri_(&UPLO, &DIAG, &N, Acol.ptr(), &LDA, &INFO);
 
   // Check of errors:
   if (0 == INFO)

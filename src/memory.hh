@@ -30,6 +30,12 @@ protected:
 
 
 public:
+  DataPtr(Scalar *ptr)
+    : _data(ptr)
+  {
+    // Pass...
+  }
+
   virtual DataPtr<Scalar> *ref() = 0;
 
   virtual void unref() = 0;
@@ -40,8 +46,9 @@ public:
 };
 
 
+
 template<class Scalar>
-class SmartPtr : public DataPtr
+class SmartPtr : public DataPtr<Scalar>
 {
 protected:
   bool _owns_data;
@@ -49,23 +56,23 @@ protected:
 
 public:
   SmartPtr(Scalar *data, bool take_data)
-    : _data(data), _owns_data(take_data), _refcount(1)
+    : DataPtr<Scalar>(data), _owns_data(take_data), _refcount(1)
   {
     // Pass...
   }
 
   virtual DataPtr<Scalar> *ref()
   {
-    this->_refcount++;
+    _refcount++;
     return this;
   }
 
-  virtual unref()
+  virtual void unref()
   {
     if (1 == _refcount) {
       _refcount=0;
       if (_owns_data)
-        delete _data;
+        delete this->ptr();
       delete this;
     }
     else

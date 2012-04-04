@@ -22,16 +22,16 @@ TRMVTest::setUp()
   Vector<double> x(3);
   x(0) = 10; x(1) = 11; x(2) = 12;
 
-  this->Arow.vals() = A;
-  this->Acol.vals() = A;
-  this->x.vals()    = x;
+  this->Arow.values() = A;
+  this->Acol.values() = A;
+  this->x.values()    = x;
 }
 
 
 void
 TRMVTest::testUpperRowMajor()
 {
-  Vector<double> x(3); x.vals() = this->x;
+  Vector<double> x(3); x.values() = this->x;
 
   Blas::trmv(triu(this->Arow), x);
   UT_ASSERT_EQUAL(x(0), 1*10+2*11+3*12.);
@@ -43,7 +43,7 @@ TRMVTest::testUpperRowMajor()
 void
 TRMVTest::testUpperTransRowMajor()
 {
-  Vector<double> x(3); x.vals() = this->x;
+  Vector<double> x(3); x.values() = this->x;
 
   Blas::trmv(triu(this->Arow).t(), x);
   UT_ASSERT_EQUAL(x(0), 1*10+0*11+0*12.);
@@ -55,7 +55,7 @@ TRMVTest::testUpperTransRowMajor()
 void
 TRMVTest::testTransUpperRowMajor()
 {
-  Vector<double> x(3); x.vals() = this->x;
+  Vector<double> x(3); x.values() = this->x;
 
   Blas::trmv(triu(this->Arow.t()), x);
   UT_ASSERT_EQUAL(x(0), 1*10+4*11+7*12.);
@@ -67,7 +67,7 @@ TRMVTest::testTransUpperRowMajor()
 void
 TRMVTest::testUpperColMajor()
 {
-  Vector<double> x(3); x.vals() = this->x;
+  Vector<double> x(3); x.values() = this->x;
 
   Blas::trmv(triu(this->Acol), x);
   UT_ASSERT_EQUAL(x(0), 1*10+2*11+3*12.);
@@ -79,7 +79,7 @@ TRMVTest::testUpperColMajor()
 void
 TRMVTest::testUpperTransColMajor()
 {
-  Vector<double> x(3); x.vals() = this->x;
+  Vector<double> x(3); x.values() = this->x;
 
   Blas::trmv(triu(this->Acol).t(), x);
   UT_ASSERT_EQUAL(x(0), 1*10+0*11+0*12.);
@@ -91,7 +91,7 @@ TRMVTest::testUpperTransColMajor()
 void
 TRMVTest::testTransUpperColMajor()
 {
-  Vector<double> x(3); x.vals() = this->x;
+  Vector<double> x(3); x.values() = this->x;
 
   Blas::trmv(triu(this->Acol.t()), x);
   UT_ASSERT_EQUAL(x(0), 1*10+4*11+7*12.);

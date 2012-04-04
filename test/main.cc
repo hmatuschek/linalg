@@ -1,6 +1,7 @@
 #include "unittest.hh"
 #include <iostream>
 
+#include "arraytest.hh"
 #include "matrixtest.hh"
 #include "trimatrixtest.hh"
 #include "nrm2test.hh"
@@ -23,6 +24,7 @@ int main(void)
   // Construct test-runner
   TestRunner runner(std::cout);
 
+  runner.addSuite(ArrayTest::suite());
   runner.addSuite(MatrixTest::suite());
   runner.addSuite(TriMatrixTest::suite());
   runner.addSuite(NRM2Test::suite());

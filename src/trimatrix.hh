@@ -40,8 +40,7 @@ public:
   TriMatrix(const Matrix<Scalar> &matrix, bool upper, bool unit)
     : Matrix<Scalar>(matrix), _is_upper(upper), _is_unit_triangular(unit)
   {
-    if (matrix.isTransposed())
-      this->_is_upper = ! this->_is_upper;
+    // Pass...
   }
 
 
@@ -75,8 +74,6 @@ public:
    */
   inline bool isUpper() const
   {
-    if (this->_transposed)
-      return ! this->_is_upper;
     return this->_is_upper;
   }
 
@@ -91,27 +88,11 @@ public:
 
 
   /**
-   * Constructs a weak view of this matrix in column-major storage order.
-   */
-  inline TriMatrix<Scalar> colMajor() const
-  {
-    // If storage order is column-major:
-    if (! this->_is_rowmajor)
-      return *this;
-
-    TriMatrix<Scalar> col(Matrix<Scalar>::colMajor(),
-                          this->isUpper(), this->hasUnitDiag());
-    col._is_upper = ! this->_is_upper;
-    return col;
-  }
-
-
-  /**
    * Creates a @c TriMatrix view of this TriMatrix as a transposed.
    */
   inline TriMatrix<Scalar> t() const
   {
-    TriMatrix<Scalar> trans(*this); trans._transposed = !trans._transposed;
+    TriMatrix<Scalar> trans(Matrix<Scalar>::t(), !_is_upper, _is_unit_triangular);
     return trans;
   }
 };

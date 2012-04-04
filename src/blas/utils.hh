@@ -14,26 +14,12 @@
  */
 
 /**
- * In-place convertion to column-major (Fortran) form.
- *
- * @ingroup blas
- */
-#define BLAS_TO_COLUMN_MAJOR(A)     A.colMajor()
-
-/**
  * Creates an new view to the same array, but ensures that the new view is in column-major
  * (Fortran) from.
  *
  * @ingroup blas
  */
-#define BLAS_ENSURE_COLUMN_MAJOR(A) (A = A.colMajor())
-
-/**
- * Is true, if the matrix is transposed.
- *
- * @ingroup blas
- */
-#define BLAS_IS_TRANSPOSED(A)       (A.isTransposed())
+#define BLAS_ENSURE_COLUMN_MAJOR(A, trans) ({ if(A.isRowMajor()) {A = A.t(); trans=BLAS_TRANSPOSE(trans);} else {} A;})
 
 /**
  * Is true, (for a @c TriMatrix) if the matrix is stored in the upper-triangular part of the matrix.
@@ -42,7 +28,7 @@
  *
  * @ingroup blas
  */
-#define BLAS_IS_UPPER(T)            ((T.isUpper() && !T.isTransposed()) || (!T.isUpper() && T.isTransposed()))
+#define BLAS_IS_UPPER(T)            (T.isUpper())
 
 /**
  * Is true, (for a @c TriMatrix) if the matrix is stored in the lower-triangular part of the matrix.
@@ -51,7 +37,7 @@
  *
  * @ingroup blas
  */
-#define BLAS_IS_LOWER(T)            ((!T.isUpper() && !T.isTransposed()) || (T.isUpper() && T.isTransposed()))
+#define BLAS_IS_LOWER(T)            (!T.isUpper())
 
 /**
  * Returns true if the @c TriMatrix has a unit diagonal.
@@ -60,16 +46,15 @@
  */
 #define BLAS_HAS_UNIT_DIAG(T)       (T.hasUnitDiag())
 
-#define BLAS_TRANSPOSED_FLAG(A)     BLAS_IS_TRANSPOSED(A) ? 'T' : 'N'
 #define BLAS_UPLO_FLAG(T)           BLAS_IS_UPPER(T) ? 'U' : 'L'
 #define BLAS_UNIT_DIAG_FLAG(T)      BLAS_HAS_UNIT_DIAG(T) ? 'U' : 'N'
 
-#define BLAS_NUM_COLS(A)            (BLAS_IS_TRANSPOSED(A) ? A.rows() : A.cols())
-#define BLAS_NUM_ROWS(A)            (BLAS_IS_TRANSPOSED(A) ? A.cols() : A.rows())
-#define BLAS_LEADING_DIMENSION(A)   (A.stride())
-
+#define BLAS_NUM_COLS(A, trans)     ('N'==trans ? A.cols() : A.rows())
+#define BLAS_NUM_ROWS(A, trans)     ('N'==trans ? A.rows() : A.cols())
+#define BLAS_LEADING_DIMENSION(A)   (A.isRowMajor() ? A.strides(0) : A.strides(1))
+#define BLAS_TRANSPOSE(trans)       ('N' == trans ? 'T' : 'N')
 #define BLAS_DIMENSION(x)           (x.dim())
-#define BLAS_INCREMENT(x)           (x.stride())
+#define BLAS_INCREMENT(x)           (x.strides(0))
 
 
 #endif // __LINALG_BLAS_UTILS_HH__

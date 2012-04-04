@@ -49,7 +49,7 @@ GEMVTest::testSquareTransposedRowMajor()
 void
 GEMVTest::testSquareColMajor()
 {
-  Matrix<double> A(3,3, false);
+  Matrix<double> A(3,3);
   Vector<double> x(3), y(3);
 
   A(0,0) = 1; A(0, 1) = 2; A(0, 2) = 3;
@@ -69,7 +69,7 @@ GEMVTest::testSquareColMajor()
 void
 GEMVTest::testSquareTransposedColMajor()
 {
-  Matrix<double> A(3,3, false);
+  Matrix<double> A(3,3);
   Vector<double> x(3), y(3);
 
   A(0,0) = 1; A(0, 1) = 2; A(0, 2) = 3;
@@ -127,7 +127,7 @@ GEMVTest::testRectTransposedRowMajor()
 void
 GEMVTest::testRectColMajor()
 {
-  Matrix<double> A(2,3, false);
+  Matrix<double> A(2,3);
   Vector<double> x(3), y(2);
 
   A(0,0) = 1; A(0, 1) = 2; A(0, 2) = 3;
@@ -145,7 +145,7 @@ GEMVTest::testRectColMajor()
 void
 GEMVTest::testRectTransposedColMajor()
 {
-  Matrix<double> A(2,3, false);
+  Matrix<double> A(2,3);
   Vector<double> x(2), y(3);
 
   A(0,0) = 1; A(0, 1) = 2; A(0, 2) = 3;
