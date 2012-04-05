@@ -10,6 +10,8 @@
 #define __LINALG_SYMMATRIX_HH__
 
 #include "matrix.hh"
+#include "trimatrix.hh"
+
 
 namespace Linalg {
 
@@ -23,84 +25,29 @@ namespace Linalg {
  * @ingroup matrix
  */
 template <class Scalar>
-class SymMatrix : public Matrix<Scalar>
+class SymMatrix : public TriMatrix<Scalar>
 {
-protected:
-  /**
-   * Specifies if 1/2 of the matrix is storred in the upper or lower half.
-   */
-  bool _is_upper;
-
-
 public:
   /**
    * Constructs a triangular matrix-view from the given marix.
    */
-  SymMatrix(const Matrix<Scalar> &matrix, bool upper)
-    : Matrix<Scalar>(matrix), _is_upper(upper)
-  {
-    if (matrix.isTransposed())
-      this->_is_upper = ! this->_is_upper;
-  }
+  SymMatrix(const Matrix<Scalar> &matrix, bool upper) : TriMatrix<Scalar>(matrix, upper, false) { }
 
+  SymMatrix(const TriMatrix<Scalar> &other) : TriMatrix<Scalar>(other) { }
 
   /**
    * Copy constructor.
    */
-  SymMatrix(const SymMatrix<Scalar> &other)
-    : Matrix<Scalar>(other), _is_upper(other._is_upper)
+  SymMatrix(const SymMatrix<Scalar> &other) : TriMatrix<Scalar>(other) { }
+
+  inline SymMatrix<Scalar> &operator= (const SymMatrix &other)
   {
-    // Pass...
-  }
-
-
-  /**
-   * Assignment operation.
-   */
-  SymMatrix<Scalar> &operator= (const SymMatrix<Scalar> &other)
-  {
-    // Assign Matrix:
-    static_cast< Matrix<Scalar> &>(*this) = other;
-    this->_is_upper = other._is_upper;
-
+    TriMatrix<Scalar>::operator =(other);
     return *this;
   }
 
-
-  /**
-   * Returns true if 1/2 of the matrix is stored as a upper or lower triangular matrix.
-   */
-  inline bool isUpper() const
-  {
-    if (this->_transposed)
-      return ! this->_is_upper;
-    return this->_is_upper;
-  }
-
-
-  /**
-   * Constructs a weak view of this matrix in column-major storage order.
-   */
-  inline SymMatrix<Scalar> colMajor() const
-  {
-    // If storage order is column-major:
-    if (! this->_is_rowmajor)
-      return *this;
-
-    SymMatrix<Scalar> col(Matrix<Scalar>::colMajor(),
-                          this->isUpper());
-    col._is_upper = ! this->_is_upper;
-    return col;
-  }
-
-
-  /**
-   * Creates a @c SymMatrix view of this SymMatrix as a transposed.
-   */
-  inline TriMatrix<Scalar> t() const
-  {
-    SymMatrix<Scalar> trans(*this); trans._transposed = !trans._transposed;
-    return trans;
+  inline SymMatrix<Scalar> t() const {
+    return TriMatrix<Scalar>::t();
   }
 };
 

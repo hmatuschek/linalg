@@ -7,6 +7,8 @@ namespace Linalg {
 
 /**
  * Simple, element wise comparison.
+ *
+ * @bug Does not work properly.
  */
 template <class Scalar>
 Matrix<bool> operator== (const TriMatrix<Scalar> &lhs, const TriMatrix<Scalar> &rhs)

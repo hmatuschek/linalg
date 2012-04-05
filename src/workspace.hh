@@ -20,7 +20,6 @@ namespace Linalg {
  *
  * @ingroup linalg
  */
-template<class Scalar>
 class Workspace
 {
 protected:
@@ -32,12 +31,12 @@ protected:
   /**
    * Holds a pointer to the allocated workspace memory.
    */
-  Scalar *data;
+  void *data;
 
 
 public:
   /**
-   * Creates a workspace with the given size.
+   * Creates a workspace with the given size (in bytes).
    */
   Workspace(size_t size=0)
     : size(size), data(0)
@@ -45,7 +44,7 @@ public:
     // Preallocate some space:
     if (0 < size)
     {
-      this->data = new Scalar[size];
+      this->data = new char[size];
     }
   }
 
@@ -57,34 +56,29 @@ public:
     // Free workspace if allocated:
     if (0 != this->data)
     {
-      delete this->data;
+      delete[] this->data;
     }
   }
 
   /**
    * Ensures that at least @c size elements are allocated for the working-memory.
    */
-  void ensure(size_t size)
+  template <class Scalar>
+  Scalar *ensure(size_t size)
   {
     // If more space is requested than allocated -> allocate more
     if (this->size < size)
     {
       if (0 != this->data)
       {
-        delete this->data;
+        delete[] this->data;
       }
 
-      this->data = new Scalar[size];
+      this->data = (void *)new Scalar[size];
       this->size = size;
     }
-  }
 
-  /**
-   * Returns a pointer to the allocated working memory.
-   */
-  Scalar* operator *()
-  {
-    return this->data;
+    return (Scalar *)data;
   }
 };
 

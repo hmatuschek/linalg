@@ -12,7 +12,7 @@
 
 /* Interface to Fortran function. */
 extern "C" {
-void dportf_(const char *UPLO, const int *N, double *A, const int *LDA, int *INFO);
+void dpotrf_(const char *UPLO, const int *N, double *A, const int *LDA, int *INFO);
 }
 
 
@@ -38,30 +38,31 @@ namespace Lapack {
 inline TriMatrix<double> potrf(SymMatrix<double> A)
 throw (ShapeError, IndefiniteMatrixError, LapackError)
 {
-  // Ensure column major:
-  SymMatrix<double> Acol = BLAS_TO_COLUMN_MAJOR(A);
-
   // Assert that A is quadratic:
-  LINALG_SHAPE_ASSERT(Acol.rows() == Acol.cols());
+  LINALG_SHAPE_ASSERT(A.rows() == A.cols());
+
+  // Ensure column major:
+  char transa='N';
+  SymMatrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, transa);
 
   // Get flags:
-  char UPLO = BLAS_UPLO_FLAG(Acol);
-  int  N    = BLAS_NUM_ROWS(Acol);
-  int  LDA  = BLAS_LEADING_DIMENSION(Acol);
-  int  INFO = 0;
+  char uplo = BLAS_UPLO_FLAG(Acol);
+  int  N    = BLAS_NUM_ROWS(Acol, transa);
+  int  lda  = BLAS_LEADING_DIMENSION(Acol);
+  int  info = 0;
 
   // Call function
-  dpotrf_(&UPLO, &N, *Acol, &LDA, &INFO);
+  dpotrf_(&uplo, &N, Acol.ptr(), &lda, &info);
 
   // Check for errors:
-  if (0 != INFO) {
-    if (0 > INFO) {
+  if (0 != info) {
+    if (0 > info) {
       LapackError err;
-      err << "Argument error: " << -INFO << "-th argument to DPOTRF() has illegal value.";
+      err << "Argument error: " << -info << "-th argument to DPOTRF() has illegal value.";
       throw err;
     } else {
       IndefiniteMatrixError err;
-      err << "The leading minor of order " << INFO
+      err << "The leading minor of order " << info
           << " is not positive definite, can not compute Cholesky decomposition.";
       throw err;
     }

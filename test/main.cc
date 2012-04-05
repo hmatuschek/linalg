@@ -14,6 +14,7 @@
 
 #include "trtrstest.hh"
 #include "trtritest.hh"
+#include "potrftest.hh"
 
 
 using namespace UnitTest;
@@ -37,6 +38,7 @@ int main(void)
 
   runner.addSuite(TRTRSTest::suite());
   runner.addSuite(TRTRITest::suite());
+  runner.addSuite(POTRFTest::suite());
 
   runner();
 
