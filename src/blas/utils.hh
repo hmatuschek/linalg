@@ -53,6 +53,7 @@
 #define BLAS_NUM_ROWS(A, trans)     ('N'==trans ? A.rows() : A.cols())
 #define BLAS_LEADING_DIMENSION(A)   (A.isRowMajor() ? A.strides(0) : A.strides(1))
 #define BLAS_TRANSPOSE(trans)       ('N' == trans ? 'T' : 'N')
+#define BLAS_TRANSPOSE_UPLO(trans, uplo) ('T' == uplo ? ('U'==uplo ? 'L' : 'U') : uplo)
 #define BLAS_DIMENSION(x)           (x.dim())
 #define BLAS_INCREMENT(x)           (x.strides(0))
 

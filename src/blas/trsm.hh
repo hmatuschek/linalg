@@ -52,23 +52,24 @@ throw (ShapeError)
   Matrix<double>    Bcol = B; BLAS_ENSURE_COLUMN_MAJOR(Bcol, transb);
 
   // If B is transposed -> transpose A & B and swap side:
+  char uplo = BLAS_UPLO_FLAG(Acol);
   if ('T'==transb) {
     transa = BLAS_TRANSPOSE(transa);
     transb = BLAS_TRANSPOSE(transb);
+    uplo   = BLAS_TRANSPOSE_UPLO(transa, uplo);
     left = !left;
   }
 
   // Get flags:
-  char SIDE   = left ? 'L' : 'R';
-  char UPLO   = BLAS_UPLO_FLAG(Acol);
-  char DIAG   = BLAS_UNIT_DIAG_FLAG(Acol);
+  char side   = left ? 'L' : 'R';
+  char diag   = BLAS_UNIT_DIAG_FLAG(Acol);
   int  M      = BLAS_NUM_ROWS(Bcol, transb);
   int  N      = BLAS_NUM_COLS(Bcol, transb);
-  int  LDA    = BLAS_LEADING_DIMENSION(Acol);
-  int  LDB    = BLAS_LEADING_DIMENSION(Bcol);
+  int  lda    = BLAS_LEADING_DIMENSION(Acol);
+  int  ldb    = BLAS_LEADING_DIMENSION(Bcol);
 
   // Done...
-  dtrsm_(&SIDE, &UPLO, &transa, &DIAG, &M, &N, &alpha, Acol.ptr(), &LDA, Bcol.ptr(), &LDB);
+  dtrsm_(&side, &uplo, &transa, &diag, &M, &N, &alpha, Acol.ptr(), &lda, Bcol.ptr(), &ldb);
 }
 
 

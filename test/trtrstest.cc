@@ -16,20 +16,20 @@ TRTRSTest::testUpperRowMajor()
   A(1,0)=4; A(1,1)=5; A(1,2)=6;
   A(2,0)=7; A(2,1)=8; A(2,2)=9;
 
-  B(0,0)=10; B(0,1)=11;
-  B(1,0)=12; B(1,1)=13;
-  B(2,0)=14; B(2,1)=15;
+  B(0,0)=1; B(0,1)=2;
+  B(1,0)=3; B(1,1)=4;
+  B(2,0)=5; B(2,1)=6;
 
   TriMatrix<double> Au(triu(A));
   Matrix<double> Bc(B.copy());
   Lapack::trtrs<>(Au, Bc);
 
-  UT_ASSERT_NEAR(Bc(0,0), 42./10 + 2./30);
-  UT_ASSERT_NEAR(Bc(0,1), 48./10);
-  UT_ASSERT_NEAR(Bc(1,0), 5./10 + 1./30);
-  UT_ASSERT_NEAR(Bc(1,1), 6./10);
-  UT_ASSERT_NEAR(Bc(2,0), 1. + 5./9);
-  UT_ASSERT_NEAR(Bc(2,1), 1. + 2./3);
+  UT_ASSERT_NEAR(Bc(0,0), -8./15);
+  UT_ASSERT_NEAR(Bc(0,1), 0.);
+  UT_ASSERT_NEAR(Bc(1,0), -1./15);
+  UT_ASSERT_NEAR(Bc(1,1), 0.);
+  UT_ASSERT_NEAR(Bc(2,0), 5./9);
+  UT_ASSERT_NEAR(Bc(2,1), 2./3);
 }
 
 

@@ -2,11 +2,17 @@
 #define TRTRITEST_HH
 
 #include "unittest.hh"
+#include "matrix.hh"
 
 
 class TRTRITest : public UnitTest::TestCase
 {
+protected:
+  Linalg::Matrix<double> A, Bu, Bl;
+
 public:
+  void setUp();
+
   void testUpperRowMajor();
   void testUpperTransRowMajor();
   void testTransLowerRowMajor();

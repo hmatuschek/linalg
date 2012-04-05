@@ -45,23 +45,10 @@ throw (SingularMatrixError, ShapeError)
   LINALG_SHAPE_ASSERT(A.rows() == A.cols());
   LINALG_SHAPE_ASSERT(A.cols() == B.rows());
 
-  // Ensure column-major representation of matrices:
-  char transa='N', transb='N';
-  TriMatrix<Scalar> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, transa);
-  Matrix<Scalar> Bcol = A; BLAS_ENSURE_COLUMN_MAJOR(Bcol, transb);
-
-  bool left = true;
-  // If B is transposed, transpose A & B and swap sides:
-  if ('T' == transb) {
-    transa = BLAS_TRANSPOSE(transa);
-    transb = BLAS_TRANSPOSE(transb);
-    left = !left;
-  }
-
   // Check if A has zero on diagonal:
   if (! A.hasUnitDiag()) {
-    for (size_t i=0; i<Acol.rows(); i++) {
-      if (0 == Acol(i,i)) {
+    for (size_t i=0; i<A.rows(); i++) {
+      if (0 == A(i,i)) {
         SingularMatrixError err;
         err << "Signular matrix: " << i << "-th diagonal element of A is 0!";
         throw err;
@@ -70,7 +57,7 @@ throw (SingularMatrixError, ShapeError)
   }
 
   // Just call trsm() ...
-  Blas::trsm(Acol, 1.0, Bcol, left);
+  Blas::trsm(A, 1.0, B, true);
 }
 
 
