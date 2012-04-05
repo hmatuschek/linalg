@@ -43,30 +43,30 @@ inline void trtri(TriMatrix<double> A) throw (SingularMatrixError, LapackError)
 
   // Ensure, Acol is in column-major:
   char transa='N';
-  TriMatrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(A, transa);
+  TriMatrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, transa);
 
   // Get all the flags:
-  char UPLO = BLAS_UPLO_FLAG(Acol);
-  char DIAG = BLAS_UNIT_DIAG_FLAG(Acol);
+  char uplo = BLAS_UPLO_FLAG(Acol);
+  char diag = BLAS_UNIT_DIAG_FLAG(Acol);
   int  N    = BLAS_NUM_ROWS(Acol, transa);
-  int  LDA  = BLAS_LEADING_DIMENSION(Acol);
-  int  INFO = 0;
+  int  lda  = BLAS_LEADING_DIMENSION(Acol);
+  int  info = 0;
 
   // Call function
-  dtrtri_(&UPLO, &DIAG, &N, Acol.ptr(), &LDA, &INFO);
+  dtrtri_(&uplo, &diag, &N, Acol.ptr(), &lda, &info);
 
   // Check of errors:
-  if (0 == INFO)
+  if (0 == info)
     return;
 
   // Check for error:
-  if (0 > INFO) {
+  if (0 > info) {
     LapackError err;
-    err << -INFO <<"-th argument to DTRTRI() has illegal value.";
+    err << -info <<"-th argument to DTRTRI() has illegal value.";
     throw err;
-  } else if (0 < INFO) {
+  } else if (0 < info) {
     SingularMatrixError err;
-    err << "Signular matrix: " << INFO << "-th diagonal element of A is 0.";
+    err << "Signular matrix: " << info << "-th diagonal element of A is 0.";
   }
 }
 

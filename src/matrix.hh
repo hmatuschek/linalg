@@ -95,9 +95,9 @@ public:
    *
    * This method returns a new (unowned) matrix.
    */
-  inline Matrix<Scalar> copy()
+  inline Matrix<Scalar> copy(bool rowmajor=true)
   {
-    return Matrix<Scalar>(Array<Scalar>::copy());
+    return Matrix<Scalar>(Array<Scalar>::copy(rowmajor));
   }
 
   void swap(Matrix<Scalar> &other)

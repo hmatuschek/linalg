@@ -8,7 +8,8 @@
 class TRTRITest : public UnitTest::TestCase
 {
 protected:
-  Linalg::Matrix<double> A, Bu, Bl;
+  Linalg::Matrix<double> cA, cBu, cBl;
+  Linalg::Matrix<double> fA, fBu, fBl;
 
 public:
   void setUp();

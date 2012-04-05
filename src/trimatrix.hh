@@ -116,8 +116,7 @@ public:
    */
   inline TriMatrix<Scalar> t() const
   {
-    TriMatrix<Scalar> trans(Matrix<Scalar>::t(), !_is_upper, _is_unit_triangular);
-    return trans;
+    return TriMatrix(Matrix<Scalar>::t(), !_is_upper, _is_unit_triangular);
   }
 };
 

@@ -90,6 +90,34 @@ operator- (const Matrix<double> &lhs, const Matrix<double> &rhs)
   return result;
 }
 
+
+template <class Scalar>
+std::ostream &operator<< (std::ostream &stream, Vector<Scalar> &vector)
+{
+  stream << "[";
+  for (size_t i=0; i<vector.dim()-1; i++) {
+    stream << vector(i) << ", ";
+  }
+  stream << vector(vector.dim()-1) << "]";
+
+  return stream;
+}
+
+
+template <class Scalar>
+std::ostream &operator<< (std::ostream &stream, Matrix<Scalar> &matrix)
+{
+  stream << "[";
+  for (size_t i=0; i<matrix.rows()-1; i++) {
+    Vector<Scalar> vec = matrix.row(i);
+    stream << vec << ", ";
+  }
+  Vector<Scalar> vec = matrix.row(matrix.rows()-1);
+  stream << vec << "]";
+
+  return stream;
+}
+
 }
 
 #endif // __LINALG_OPERATORS_HH__
