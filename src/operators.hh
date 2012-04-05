@@ -13,6 +13,7 @@
 #include "matrix.hh"
 #include "blas/gemm.hh"
 #include "array_operators.hh"
+#include "trimatrix_operators.hh"
 
 
 namespace Linalg {
@@ -23,16 +24,16 @@ namespace Linalg {
  *
  * @ingroup operators
  */
-inline Matrix<double>::unowned
+inline Matrix<double>
 operator* (const Matrix<double> &lhs, const Matrix<double> &rhs)
 throw (ShapeError)
 {
   // Allocate matrix for result:
   Matrix<double> result(lhs.rows(), rhs.cols());
   // Use Blas::gemm() to compute product
-  Blas::gemm(1., A, B, 0.0, result);
+  Blas::gemm(1., lhs, rhs, 0.0, result);
   // Pass ownership of result-matrix to caller...
-  return result.takeOwnership();
+  return result;
 }
 
 
@@ -41,7 +42,7 @@ throw (ShapeError)
  *
  * @ingroup operators
  */
-inline Matrix<double>::unowned
+inline Matrix<double>
 operator+ (const Matrix<double> &lhs, const Matrix<double> &rhs)
 {
   // Check shape:
@@ -59,7 +60,7 @@ operator+ (const Matrix<double> &lhs, const Matrix<double> &rhs)
   }
 
   // Pass ownership of result to caller:
-  return result.takeOwnership();
+  return result;
 }
 
 
@@ -68,7 +69,7 @@ operator+ (const Matrix<double> &lhs, const Matrix<double> &rhs)
  *
  * @ingroup operators
  */
-inline Matrix<double>::unowned
+inline Matrix<double>
 operator- (const Matrix<double> &lhs, const Matrix<double> &rhs)
 {
   // Check shape:
@@ -86,7 +87,7 @@ operator- (const Matrix<double> &lhs, const Matrix<double> &rhs)
   }
 
   // Pass ownership of result to caller:
-  return result.takeOwnership();
+  return result;
 }
 
 }

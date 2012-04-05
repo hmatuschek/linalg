@@ -17,7 +17,7 @@
 namespace Linalg {
 
 /**
- * A simple base class holding a owned or unowned reference to some data.
+ * A simple base class holding an owned or unowned reference to some data.
  */
 template <class Scalar>
 class DataPtr
@@ -36,6 +36,8 @@ public:
     // Pass...
   }
 
+  virtual ~DataPtr() { /* pass... */ }
+
   virtual DataPtr<Scalar> *ref() = 0;
 
   virtual void unref() = 0;
@@ -47,32 +49,49 @@ public:
 
 
 
+/**
+ * Simple reference counting data pointer.
+ */
 template<class Scalar>
 class SmartPtr : public DataPtr<Scalar>
 {
 protected:
+  /** If true, the data will be freed if the reference count gets 0. */
   bool _owns_data;
+  /** The reference counter. */
   size_t _refcount;
 
 public:
+  /**
+   * Constructor.
+   *
+   * @param data Specifies the managed data pointer.
+   * @param take_data Specifies if the data should be freed if not used anymore.
+   */
   SmartPtr(Scalar *data, bool take_data)
     : DataPtr<Scalar>(data), _owns_data(take_data), _refcount(1)
   {
     // Pass...
   }
 
+  /**
+   * Creates a "new" reference to the data.
+   */
   virtual DataPtr<Scalar> *ref()
   {
     _refcount++;
     return this;
   }
 
+  /**
+   * Dereferences the data.
+   */
   virtual void unref()
   {
     if (1 == _refcount) {
       _refcount=0;
       if (_owns_data)
-        delete this->ptr();
+        delete[] this->ptr();
       delete this;
     }
     else

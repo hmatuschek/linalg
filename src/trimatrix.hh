@@ -69,6 +69,30 @@ public:
   }
 
 
+  Scalar operator() (size_t i, size_t j)
+  {
+    return Matrix<Scalar>::operator ()(i,j);
+  }
+
+
+  Scalar operator() (size_t i, size_t j) const
+  {
+    if (this->isUpper() && i <= j) {
+      if (this->hasUnitDiag() && i==j) {
+        return 1.0;
+      }
+      return Matrix<Scalar>::operator ()(i,j);
+    } else if (!this->isUpper() && i >= j) {
+      if (this->hasUnitDiag() && i==j) {
+        return 1.0;
+      }
+      return Matrix<Scalar>::operator ()(i,j);
+    }
+
+    return 0.0;
+  }
+
+
   /**
    * Returns true if the matrix is a upper or lower triangular matrix.
    */

@@ -3,6 +3,7 @@
 
 #include "array.hh"
 
+
 namespace Linalg {
 
 /**
@@ -10,27 +11,27 @@ namespace Linalg {
  *
  * @ingroup operators
  */
-template <class Scalar>
-inline Array<bool> operator== (const Array<Scalar> &lhs, const Array<Scalar> &rhs)
+template <class T>
+Array<bool> operator== (const Array<T> &lhs, const Array<T> &rhs)
 {
   // Check dims:
-  LINALG_SHAPE_ASSERT(lhs.ndims() == rhs.ndims());
+  LINALG_SHAPE_ASSERT(lhs.ndim() == rhs.ndim());
 
   // Check shape:
-  for (size_t i=0; i<lhs.ndims(); i++) {
-    LINALG_SHAPE_ASSERT(lhs.dim(i) == rhs.dim(i));
+  for (size_t i=0; i<lhs.ndim(); i++) {
+    LINALG_SHAPE_ASSERT(lhs.shape(i) == rhs.shape(i));
   }
 
   // Allocate result array:
-  Array<bool> res = res.empty(lhs.shape());
+  Array<bool> res(lhs.shape());
 
   // perform operation, element-wise:
-  Array<Scalar>::iterator lhs_iter = lhs.begin();
-  Array<Scalar>::iterator rhs_iter = rhs.begin();
+  ArrayConstIterator<T> lhs_iter = lhs.const_begin();
+  ArrayConstIterator<T> rhs_iter = rhs.const_begin();
   Array<bool>::iterator res_iter = res.begin();
 
-  for (;! lhs_iter.atEnd(); lhs_iter++, rhs_iter++, res_iter++) {
-    *res_iter = *lhs_iter == *rhs_iter;
+  for (; lhs_iter != lhs.const_end(); lhs_iter++, rhs_iter++, res_iter++) {
+    *res_iter = (*lhs_iter == *rhs_iter);
   }
 
   return res;
@@ -39,21 +40,25 @@ inline Array<bool> operator== (const Array<Scalar> &lhs, const Array<Scalar> &rh
 
 bool any(const Array<bool> &array)
 {
-  Array<bool>::iterator iter = array.begin();
-  for (; iter != array.end(); iter++) {
+  Array<bool>::const_iterator iter = array.const_begin();
+  for (; iter != array.const_end(); iter++) {
     if (*iter)
       return true;
   }
+
+  return false;
 }
 
 
 bool all(const Array<bool> &array)
 {
-  Array<bool>::iterator iter = array.begin();
-  for (; iter != array.end(); iter++) {
+  Array<bool>::const_iterator iter = array.const_begin();
+  for (; iter != array.const_end(); iter++) {
     if (! *iter)
       return false;
   }
+
+  return true;
 }
 
 
@@ -74,12 +79,12 @@ inline Array<Scalar> operator+ (const Array<Scalar> &lhs, const Array<Scalar> &r
   }
 
   // Allocate result array:
-  Array<Scalar> res = res.empty(lhs.shape());
+  Array<Scalar> res(lhs.shape());
 
   // perform operation, element-wise:
-  Array<Scalar>::iterator lhs_iter = lhs.begin();
-  Array<Scalar>::iterator rhs_iter = rhs.begin();
-  Array<Scalar>::iterator res_iter = res.begin();
+  ArrayConstIterator<Scalar> lhs_iter = lhs.const_begin();
+  ArrayConstIterator<Scalar> rhs_iter = rhs.const_begin();
+  ArrayIterator<Scalar> res_iter = res.begin();
 
   for (;! lhs_iter.atEnd(); lhs_iter++, rhs_iter++, res_iter++) {
     *res_iter = *lhs_iter + *rhs_iter;
@@ -94,8 +99,8 @@ inline Array<Scalar> operator+ (const Array<Scalar> &lhs, const Array<Scalar> &r
  *
  * @ingroup operators
  */
-template <class Scalar>
-inline Array<Scalar> &operator+= (Array<Scalar> &lhs, const Array<Scalar> &rhs)
+template <class T>
+inline Array<T> &operator+= (Array<T> &lhs, const Array<T> &rhs)
 {
   // Check dims:
   LINALG_SHAPE_ASSERT(lhs.ndims() == rhs.ndims());
@@ -106,14 +111,14 @@ inline Array<Scalar> &operator+= (Array<Scalar> &lhs, const Array<Scalar> &rhs)
   }
 
   // perform operation, element-wise:
-  Array<Scalar>::iterator lhs_iter = lhs.begin();
-  Array<Scalar>::iterator rhs_iter = rhs.begin();
+  ArrayIterator<T> lhs_iter = lhs.begin();
+  ArrayConstIterator<T> rhs_iter = rhs.const_begin();
 
   for (;! lhs_iter.atEnd(); lhs_iter++, rhs_iter++) {
     *lhs_iter += *rhs_iter;
   }
 
-  return res;
+  return lhs;
 }
 
 }

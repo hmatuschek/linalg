@@ -14,6 +14,8 @@ public:
   void setUp();
 
   void testUpperRowMajor();
+  void testLowerRowMajor();
+
   void testUpperTransRowMajor();
   void testTransLowerRowMajor();
 

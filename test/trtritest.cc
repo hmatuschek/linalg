@@ -3,6 +3,8 @@
 #include "matrix.hh"
 #include "trimatrix.hh"
 #include "lapack/trtri.hh"
+#include "operators.hh"
+
 
 
 using namespace Linalg;
@@ -18,8 +20,13 @@ TRTRITest::setUp()
                         0,  1./5, -2./15,
                         0,     0,  1./9   };
 
-  this->A  = Matrix<double>::fromData(a_data, 3, 3, 3, 1, 0);
-  this->Bu = Matrix<double>::fromData(bu_data, 3, 3, 3, 1, 0);
+  double bl_data[9] = {     1.,      0,    0,
+                         -4./5,  -1./5,    0,
+                        -1./15, -8./45, 1./9 };
+
+  this->A  = Matrix<double>::fromData(a_data, 3,3, 3,1, 0);
+  this->Bu = Matrix<double>::fromData(bu_data, 3,3, 3,1, 0);
+  this->Bl = Matrix<double>::fromData(bl_data, 3,3, 3,1, 0);
 }
 
 
@@ -29,18 +36,18 @@ TRTRITest::testUpperRowMajor()
   Matrix<double> tmp(A.copy());
   Lapack::trtri(triu(tmp));
 
-  // Check upper triangular part for inverse:
-  UT_ASSERT_NEAR(tmp(0,0), Bu(0,0));
-  UT_ASSERT_NEAR(tmp(0,1), Bu(0,1));
-  UT_ASSERT_NEAR(tmp(0,2), Bu(0,2));
-  UT_ASSERT_NEAR(tmp(1,0), Bu(1,0));
-  UT_ASSERT_NEAR(tmp(1,1), Bu(1,1));
-  UT_ASSERT_NEAR(tmp(1,2), Bu(1,2));
-  UT_ASSERT_NEAR(tmp(2,0), Bu(2,0));
-  UT_ASSERT_NEAR(tmp(2,1), Bu(2,1));
-  UT_ASSERT_NEAR(tmp(2,2), Bu(2,2));
+  UT_ASSERT(all(triu(tmp)==triu(Bu)));
 }
 
+
+void
+TRTRITest::testLowerRowMajor()
+{
+  Matrix<double> tmp(A.copy());
+  Lapack::trtri(tril(tmp));
+
+  //UT_ASSERT(all(tril(tmp)==tril(Bl)));
+}
 
 
 void

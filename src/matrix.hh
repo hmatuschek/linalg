@@ -47,7 +47,7 @@ public:
   Matrix(size_t rows, size_t cols, bool rowmajor=true)
     : Array<Scalar>()
   {
-    this->_data = new SmartPtr<Scalar>((Scalar *)malloc(rows*cols*sizeof(Scalar)), true);
+    this->_data = new SmartPtr<Scalar>(new Scalar[rows*cols], true);
     this->_offset = 0;
     this->_shape.resize(2); this->_shape[0] = rows; this->_shape[1] = cols;
     this->_strides.resize(2);
@@ -251,7 +251,7 @@ public:
    */
   static Matrix<Scalar> empty(size_t rows, size_t cols, bool rowmajor=true)
   {
-    DataPtr<Scalar> *data = new SmartPtr<Scalar>((Scalar *)malloc(rows*cols*sizeof(Scalar)), true);
+    DataPtr<Scalar> *data = new SmartPtr<Scalar>(new Scalar[rows*cols], true);
     std::vector<size_t> shape(2); shape[0] = rows; shape[1] = cols;
     std::vector<size_t> strides(2);
 

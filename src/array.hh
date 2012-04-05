@@ -3,6 +3,7 @@
 
 #include "memory.hh"
 #include "exception.hh"
+#include "array_iterator.hh"
 #include <vector>
 
 #include <iostream>
@@ -24,180 +25,12 @@ public:
   /**
    * Iterator class, to iterate over all elements of an array.
    */
-  class iterator {
-  private:
-    /** Holds the current index. */
-    std::vector<size_t> _current_idx;
-
-    /** Holds a reference to the array. */
-    Array<Scalar> &_array;
-
-  public:
-    /**
-     * Constructor.
-     */
-    iterator(Array<Scalar> &array, const std::vector<size_t> &idx)
-      : _current_idx(idx), _array(array)
-    {
-      // Pass...
-    }
-
-    /**
-     * Assignment operator.
-     */
-    iterator &operator= (iterator &other)
-    {
-      _current_idx     = other._current_idx;
-      _array           = other._array;
-
-      return *this;
-    }
-
-    /**
-     * Increment operator, to shif the iterator to the next element.
-     */
-    iterator &operator++ (int)
-    {
-      // Check if iterator is at the end:
-      if(_current_idx.back() == _array.shape().back())
-        return *this;
-
-      // Otherwise:
-      _current_idx[0]++;
-      for(size_t i=0; i<_array.ndim()-1; i++) {
-        if (_current_idx[i]==_array.shape(i)) {
-          _current_idx[i] = 0;
-          _current_idx[i+1]++;
-        }
-      }
-
-      // Done.
-      return *this;
-    }
-
-    /**
-     * Iterator comparison.
-     */
-    inline bool operator==(const iterator &other)
-    {
-      if (_current_idx.size() != other._current_idx.size())
-        return false;
-      for (size_t i=0; i<_current_idx.size(); i++) {
-        if (_current_idx[i] != other._current_idx[i])
-          return false;
-      }
-
-      return true;
-    }
-
-    /**
-     * Iterator comparison.
-     */
-    bool operator!= (const iterator &other)
-    {
-      return ! (*this == other);
-    }
-
-    /**
-     * Dereferencing the element addressed by the iterator.
-     */
-    Scalar &operator*()
-    {
-      size_t offset = 0;
-      for (size_t i=0; i<_array.ndim(); i++) {
-        offset += _current_idx[i]*_array.strides(i);
-      }
-
-      return *(_array.ptr() + offset);
-    }
-  };
+  typedef ArrayIterator<Scalar> iterator;
 
   /**
    * Const iterator class, to iterate over all elements of an array.
    */
-  class const_iterator {
-  private:
-    /** Holds the current index. */
-    std::vector<size_t> _current_idx;
-
-    /** Holds a reference to the array. */
-    const Array<Scalar> &_array;
-
-  public:
-    /**
-     * Constructor.
-     */
-    const_iterator(const Array<Scalar> &array, const std::vector<size_t> &idx)
-      : _current_idx(idx), _array(array)
-    {
-      // Pass...
-    }
-
-    /**
-     * Assignment operator.
-     */
-    const_iterator &operator= (const const_iterator &other)
-    {
-      _current_idx     = other._current_idx;
-      _array           = other._array;
-
-      return *this;
-    }
-
-    /**
-     * Increment operator, to shif the iterator to the next element.
-     */
-    const_iterator &operator++ (int)
-    {
-      // Check if iterator is at the end:
-      if(_current_idx.back() == _array.shape().back())
-        return *this;
-
-      // Otherwise:
-      _current_idx[0]++;
-      for(size_t i=0; i<_array.ndim()-1; i++) {
-        if (_current_idx[i]==_array.shape(i)) {
-          _current_idx[i] = 0;
-          _current_idx[i+1]++;
-        }
-      }
-
-      // Done.
-      return *this;
-    }
-
-    /**
-     * Iterator comparison.
-     */
-    inline bool operator==(const const_iterator &other)
-    {
-      return _current_idx == other._current_idx
-          && _array.data()->ptr() == other._array.data()->ptr()
-          && _array.offset() == other._array.offset()
-          && _array.shape() == other._array.shape()
-          && _array.strides() == other._array.strides();
-    }
-
-    /**
-     * Iterator comparison.
-     */
-    bool operator!= (const const_iterator &other)
-    {
-      return ! (*this == other);
-    }
-
-    /**
-     * Dereferencing the element addressed by the iterator.
-     */
-    const Scalar &operator*() const
-    {
-      size_t offset = 0;
-      for (size_t i=0; i<_array.ndim(); i++) {
-        offset += _current_idx[i]*_array.strides(i);
-      }
-      return *(_array.ptr() + offset);
-    }
-  };
+  typedef ArrayConstIterator<Scalar> const_iterator;
 
   /**
    * This class represents the values of the array.
@@ -259,7 +92,7 @@ protected:
   std::vector<size_t> _strides;
 
   /**
-   * Holds and value-reference instance to the data.
+   * Holds a value-reference instance to the data.
    */
   Values _values;
 
@@ -300,6 +133,9 @@ public:
   }
 
 
+  /**
+   * Allocates a new (empty) array of the given shape.
+   */
   Array(const std::vector<size_t> &shape, bool rowmajor=true)
     : _data(0), _offset(0), _shape(shape), _strides(shape.size()), _values(*this)
   {
@@ -331,6 +167,7 @@ public:
     // Done...
   }
 
+
   /** Copy constructor. */
   Array(const Array<Scalar> &other)
     : _data(other._data->ref()), _offset(other._offset), _shape(other._shape), _strides(other._strides),
@@ -343,14 +180,26 @@ public:
   /** Destructor. */
   virtual ~Array()
   {
+    // If there is some data, deref it.
     if (0 != _data) {
       _data->unref();
-      this->_data=0;
+      this->_data = 0;
     }
   }
 
 
-  /** Assignment operator. */
+  /**
+   * Assignment operator.
+   *
+   * This operator does not copy any values from the given array into this array. Arrays are
+   * containers holding the elements and some meta-data about the shape and storage of the elements.
+   *
+   * Therefore, after assignment, both array share the same elements and have identical shape. This
+   * is a array view assignment.
+   *
+   * To copy values, use either @c copy to create a new copy of the array, or @c values to
+   * set all values of this array at once.
+   */
   Array<Scalar> &operator= (const Array<Scalar> &other)
   {
     // Get reference to the data of other:
@@ -371,9 +220,12 @@ public:
   }
 
 
-  Array<Scalar> copy()
+  /**
+   * Creates a copy of this array.
+   */
+  Array<Scalar> copy(bool rowmajor=true)
   {
-    Array cp(_shape);
+    Array cp(_shape, rowmajor);
     cp.values() = *this;
     return cp;
   }
@@ -450,7 +302,9 @@ public:
   }
 
 
-  /** Returns the element at the given index. */
+  /**
+   * Returns the element at the given index.
+   */
   Scalar &at(const std::vector<size_t> &idxs)
   {
     LINALG_SHAPE_ASSERT(idxs.size() == _strides.size());
@@ -464,7 +318,9 @@ public:
   }
 
 
-  /** Returns the element at the given index. */
+  /**
+   * Returns the element at the given index-vector.
+   */
   const Scalar &at(const std::vector<size_t> &idxs) const
   {
     LINALG_SHAPE_ASSERT(idxs.size() == _strides.size());
@@ -478,7 +334,9 @@ public:
   }
 
 
-  /** Returns the transpose of the array. */
+  /**
+   * Returns the transposed of the array.
+   */
   inline Array<Scalar> t() const
   {
     return Array<Scalar>(this->_data, this->_offset,
@@ -496,6 +354,8 @@ public:
 
   /**
    * Returns a reference to the values of the array.
+   *
+   * Equivalent to call @c values.
    */
   inline Values &operator* () {
     return _values;
@@ -516,26 +376,40 @@ public:
     return this->_data->ptr() + this->_offset;
   }
 
+
+  /**
+   * Returns an iterator over all elements of the array, pointing to the first element (0,0,...).
+   */
   inline iterator begin() {
     std::vector<size_t> idxs(this->_shape.size(), 0);
-    return iterator(*this, idxs);
+    return iterator(this, idxs);
   }
 
+  /**
+   * Returns an iterator over all elements of the array, pointing right after the last element
+   * of the array.
+   */
   inline iterator end() {
     std::vector<size_t> idxs(this->_shape.size(), 0);
     idxs.back() = this->shape().back();
-    return iterator(*this, idxs);
+    return iterator(this, idxs);
   }
 
+  /**
+   * Returns a const iterator over all elements pointing to the first element (0,0,...).
+   */
   inline const_iterator const_begin() const {
     std::vector<size_t> idxs(this->_shape.size(), 0);
-    return const_iterator(*this, idxs);
+    return const_iterator(this, idxs);
   }
 
+  /**
+   * Returns a const iterator over all elements of the array pointing right after the last element.
+   */
   inline const_iterator const_end() const {
     std::vector<size_t> idxs(this->_shape.size(), 0);
     idxs.back() = this->shape().back();
-    return const_iterator(*this, idxs);
+    return const_iterator(this, idxs);
   }
 };
 
