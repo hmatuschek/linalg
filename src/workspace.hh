@@ -24,14 +24,14 @@ class Workspace
 {
 protected:
   /**
-   * Holds the size of the allocated memory.
+   * Holds the size of the allocated memory (in bytes).
    */
-  size_t size;
+  size_t _size;
 
   /**
    * Holds a pointer to the allocated workspace memory.
    */
-  void *data;
+  void *_data;
 
 
 public:
@@ -39,12 +39,12 @@ public:
    * Creates a workspace with the given size (in bytes).
    */
   Workspace(size_t size=0)
-    : size(size), data(0)
+    : _size(size), _data(0)
   {
     // Preallocate some space:
     if (0 < size)
     {
-      this->data = new char[size];
+      this->_data = new char[size];
     }
   }
 
@@ -54,9 +54,9 @@ public:
   ~Workspace()
   {
     // Free workspace if allocated:
-    if (0 != this->data)
+    if (0 != this->_data)
     {
-      delete[] this->data;
+      delete[] this->_data;
     }
   }
 
@@ -67,18 +67,23 @@ public:
   Scalar *ensure(size_t size)
   {
     // If more space is requested than allocated -> allocate more
-    if (this->size < size)
+    if (this->_size < size*sizeof(Scalar))
     {
-      if (0 != this->data)
+      if (0 != this->_data)
       {
-        delete[] this->data;
+        delete[] this->_data;
       }
 
-      this->data = (void *)new Scalar[size];
-      this->size = size;
+      this->_data = (void *)new Scalar[size];
+      this->_size = size*sizeof(Scalar);
     }
 
-    return (Scalar *)data;
+    return (Scalar *)_data;
+  }
+
+  template <class Scalar>
+  size_t size() {
+    return _size/sizeof(Scalar);
   }
 };
 

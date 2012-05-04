@@ -11,12 +11,12 @@ SET(LINALG_BLAS_HEADERS blas/blas.hh blas/utils.hh
     ${LINALG_BLAS_LEVEL3_HEADERS})
 
 SET(LINALG_LAPACK_HEADERS lapack/lapack.hh
-    lapack/trtrs.hh lapack/trtri.hh lapack/potrf.hh)
+    lapack/trtrs.hh lapack/trtri.hh lapack/potrf.hh lapack/geqrf.hh)
 
 SET(LINALG_HEADERS
     linalg.hh memory.hh array.hh matrix.hh trimatrix.hh vector.hh exception.hh workspace.hh
     python.hh symmatrix.hh operators.hh array_iterator.hh array_operators.hh trimatrix_operators.hh
-    openmp.hh)
+    openmp.hh qr.hh cholesky.hh utils.hh)
 
 SET(LINALG_SOURCES ${LINALG_HEADERS} ${LINALG_BLAS_HEADERS} ${LINALG_LAPACK_HEADERS})
 

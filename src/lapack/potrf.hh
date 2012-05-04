@@ -31,8 +31,6 @@ namespace Lapack {
  * @note On extit, the Cholesky decomposition is stored into A and a @c TriMatrix view is returned,
  *       referring to the upper- or lower-triangular part of A holding the decomposition.
  *
- * @todo This function is untested yet.
- *
  * @ingroup lapack
  */
 inline TriMatrix<double> potrf(SymMatrix<double> A)

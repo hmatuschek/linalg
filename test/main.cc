@@ -4,6 +4,9 @@
 #include "arraytest.hh"
 #include "matrixtest.hh"
 #include "trimatrixtest.hh"
+
+#include "choleskytest.hh"
+
 #include "nrm2test.hh"
 #include "dottest.hh"
 #include "gemvtest.hh"
@@ -28,6 +31,9 @@ int main(void)
   runner.addSuite(ArrayTest::suite());
   runner.addSuite(MatrixTest::suite());
   runner.addSuite(TriMatrixTest::suite());
+
+  runner.addSuite(CholeskyTest::suite());
+
   runner.addSuite(NRM2Test::suite());
   runner.addSuite(DOTTest::suite());
   runner.addSuite(GEMVTest::suite());
