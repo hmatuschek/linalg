@@ -1,6 +1,4 @@
 
-
-
 SET(LINALG_PYTHON_SOURCES
     src/blas.hh src/blas.cc)
 
