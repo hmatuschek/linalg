@@ -21,6 +21,7 @@
  * @defgroup blas1 BLAS level 1 routines
  * @ingroup blas
  */
+#include "scal.hh"
 #include "dot.hh"
 #include "nrm2.hh"
 

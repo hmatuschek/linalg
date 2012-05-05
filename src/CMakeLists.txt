@@ -2,7 +2,7 @@
 # Collection of C++ templates to access Fortran functions.
 #
 
-SET(LINALG_BLAS_LEVEL1_HEADERS blas/dot.hh blas/nrm2.hh)
+SET(LINALG_BLAS_LEVEL1_HEADERS blas/scal.hh blas/dot.hh blas/nrm2.hh)
 SET(LINALG_BLAS_LEVEL2_HEADERS blas/gemv.hh blas/getc2.hh blas/trmv.hh)
 SET(LINALG_BLAS_LEVEL3_HEADERS blas/gemm.hh blas/trmm.hh blas/trsm.hh)
 SET(LINALG_BLAS_HEADERS blas/blas.hh blas/utils.hh

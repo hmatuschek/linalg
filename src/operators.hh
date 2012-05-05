@@ -11,6 +11,7 @@
 #define __LINALG_OPERATORS_HH__
 
 #include "matrix.hh"
+#include "blas/scal.hh"
 #include "blas/gemm.hh"
 #include "array_operators.hh"
 #include "trimatrix_operators.hh"
@@ -94,9 +95,7 @@ operator- (const Matrix<double> &lhs, const Matrix<double> &rhs)
 
 template <class Scalar>
 inline Vector<Scalar> & operator /= (Vector<Scalar> &V, const Scalar &alpha) {
-  for (size_t i=0; i<V.dim(); i++) {
-    V(i) /= alpha;
-  }
+  Blas::scal(Scalar(1)/alpha, V);
 
   return V;
 }
