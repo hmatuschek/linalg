@@ -169,18 +169,18 @@ public:
   /**
    * Returns the i-th row as a vector.
    */
-  inline Vector<Scalar> row(size_t i)
+  inline Vector<Scalar> row(size_t i) const
   {
-    return Vector<Scalar>(this->_data, this->_getIndex(i,0), rows(), Array<Scalar>::strides(1));
+    return Vector<Scalar>(this->_data, this->_getIndex(i,0), cols(), Array<Scalar>::strides(1));
   }
 
 
   /**
    * Returns the j-th column as a vector.
    */
-  inline Vector<Scalar> col(size_t j)
+  inline Vector<Scalar> col(size_t j) const
   {
-    return Vector<Scalar>(this->_data, this->_getIndex(0,j), cols(), Array<Scalar>::strides(0));
+    return Vector<Scalar>(this->_data, this->_getIndex(0,j), rows(), Array<Scalar>::strides(0));
   }
 
 
@@ -207,7 +207,7 @@ public:
 
     std::vector<size_t> shape(2);
     shape[0] = nrow; shape[1] = ncol;
-    return Matrix<Scalar>(this->_data, this->getIndex(i,j), shape, this->strides());
+    return Matrix<Scalar>(Array<Scalar>(this->_data, this->_getIndex(i,j), shape, this->strides()));
   }
 
 

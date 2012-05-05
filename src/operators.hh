@@ -14,6 +14,7 @@
 #include "blas/gemm.hh"
 #include "array_operators.hh"
 #include "trimatrix_operators.hh"
+#include <cmath>
 
 
 namespace Linalg {
@@ -92,6 +93,16 @@ operator- (const Matrix<double> &lhs, const Matrix<double> &rhs)
 
 
 template <class Scalar>
+inline Vector<Scalar> & operator /= (Vector<Scalar> &V, const Scalar &alpha) {
+  for (size_t i=0; i<V.dim(); i++) {
+    V(i) /= alpha;
+  }
+
+  return V;
+}
+
+
+template <class Scalar>
 std::ostream &operator<< (std::ostream &stream, Vector<Scalar> &vector)
 {
   stream << "[";
@@ -120,4 +131,29 @@ std::ostream &operator<< (std::ostream &stream, Matrix<Scalar> &matrix)
 
 }
 
+
+namespace std {
+
+/**
+ * Extends the @c std::abs2 function to hanlde vectors as \f$abs2(v) = v^Tv\f$
+ */
+inline double abs2(const Linalg::Vector<double> &v)
+{
+  double a = 0.0;
+  for (size_t i=0; i<v.dim(); i++) {
+    a += v(i)*v(i);
+  }
+
+  return a;
+}
+
+
+/**
+ * Extends the @c std::abs2 function to hanlde vectors as \f$abs(v) = \sqrt(v^Tv)\f$
+ */
+inline double abs(const Linalg::Vector<double> &v) {
+  return sqrt(abs2(v));
+}
+
+}
 #endif // __LINALG_OPERATORS_HH__

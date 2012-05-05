@@ -38,7 +38,10 @@ Array<bool> operator== (const Array<T> &lhs, const Array<T> &rhs)
 }
 
 
-bool any(const Array<bool> &array)
+/**
+ * This function returns true if at least one elements of the given array of booleans is true.
+ */
+inline bool any(const Array<bool> &array)
 {
   Array<bool>::const_iterator iter = array.const_begin();
   for (; iter != array.const_end(); iter++) {
@@ -50,7 +53,10 @@ bool any(const Array<bool> &array)
 }
 
 
-bool all(const Array<bool> &array)
+/**
+ * This function retunrs true if all elements of the given array of booleans are true.
+ */
+inline bool all(const Array<bool> &array)
 {
   Array<bool>::const_iterator iter = array.const_begin();
   for (; iter != array.const_end(); iter++) {

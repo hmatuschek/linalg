@@ -15,7 +15,15 @@
 class DOTTest : public UnitTest::TestCase
 {
 public:
-  void testVectorVector();
+  void testIncrFloat();
+  void testIncrDouble();
+
+  void testDenseFloat();
+  void testDenseDouble();
+
+  void testHugeIncr();
+  void testHugeDense();
+
 
 public:
   static UnitTest::TestSuite *suite();

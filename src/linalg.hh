@@ -31,11 +31,15 @@
 #include "vector.hh"
 #include "matrix.hh"
 #include "trimatrix.hh"
+#include "symmatrix.hh"
 
 #include "workspace.hh"
 #include "exception.hh"
 
 #include "blas/blas.hh"
 #include "lapack/lapack.hh"
+
+#include "cholesky.hh"
+#include "qr.hh"
 
 #endif

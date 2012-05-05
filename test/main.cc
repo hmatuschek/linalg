@@ -6,6 +6,7 @@
 #include "trimatrixtest.hh"
 
 #include "choleskytest.hh"
+#include "qrtest.hh"
 
 #include "nrm2test.hh"
 #include "dottest.hh"
@@ -32,8 +33,6 @@ int main(void)
   runner.addSuite(MatrixTest::suite());
   runner.addSuite(TriMatrixTest::suite());
 
-  runner.addSuite(CholeskyTest::suite());
-
   runner.addSuite(NRM2Test::suite());
   runner.addSuite(DOTTest::suite());
   runner.addSuite(GEMVTest::suite());
@@ -41,6 +40,9 @@ int main(void)
   runner.addSuite(GEMMTest::suite());
   runner.addSuite(TRMMTest::suite());
   runner.addSuite(TRSMTest::suite());
+
+  runner.addSuite(CholeskyTest::suite());
+  runner.addSuite(QRTest::suite());
 
   runner.addSuite(TRTRSTest::suite());
   runner.addSuite(TRTRITest::suite());
