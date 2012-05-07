@@ -39,7 +39,5 @@
 #include "blas/blas.hh"
 #include "lapack/lapack.hh"
 
-#include "cholesky.hh"
-
 
 #endif

@@ -16,9 +16,12 @@ namespace Lapack {
  *
  * @ingroup lapack_internal
  */
-inline void __prod_householder(const Vector<double> &v, Vector<double> &a) throw (ShapeError)
+inline void
+__prod_householder(const Vector<double> &v, Vector<double> &a)
+throw (ShapeError)
 {
   double scale = 2*Blas::dot(v,a);
+  /// \todo Implement this using @c Blas::axpby function.
   for (size_t i=0; i<v.dim(); i++)
     a(i) -= scale*v(i);
 }
@@ -29,14 +32,14 @@ inline void __prod_householder(const Vector<double> &v, Vector<double> &a) throw
  *
  * @ingroup lapack_internal
  */
-inline void __prod_householder(const Vector<double> &v, Matrix<double> &A) throw (ShapeError)
+inline void
+__prod_householder(const Vector<double> &v, Matrix<double> &A)
+throw (ShapeError)
 {
+  Vector<double> a;
   for(size_t j=0; j<A.cols(); j++) {
-    Vector<double> a = A.col(j);
-
-    double scale = 2*Blas::dot(v,a);
-    for (size_t i=0; i<v.dim(); i++)
-      a(i) -= scale*v(i);
+    a = A.col(j);
+    __prod_householder(v, a);
   }
 }
 
@@ -47,16 +50,19 @@ inline void __prod_householder(const Vector<double> &v, Matrix<double> &A) throw
  * geqrf, this variant uses Householder projectors and performs the decomposition on matrices in
  * any order (C or Fortran) while geqrf requires Fortran order.
  *
- * @todo This method is untested.
+ * @param A Specifies a n-by-m matrix to be decomposed, with m <= n.
+ * @param tau On exit, the upper triangular part of A will hold R and Q is encodes as elementary
+ *        reflectors in the stricly lower-triangular part of A and in tau. dim(tau) >= m.
+ *
+ * @throws ShapeError If m > n, n==0 or dim(tau) < m;
  *
  * @ingroup lapack
  */
-void geqrf(Matrix<double> &A, Vector<double> &tau, Vector<double> &v) throw (ShapeError)
+void geqrf(Matrix<double> &A, Vector<double> &tau) throw (ShapeError)
 {
   LINALG_SHAPE_ASSERT(A.rows()  >  0);
   LINALG_SHAPE_ASSERT(A.cols()  <= A.rows());
   LINALG_SHAPE_ASSERT(tau.dim() >= A.cols());
-  LINALG_SHAPE_ASSERT(v.dim()   >= A.rows());
 
   size_t M = A.rows();
   size_t N = A.cols();
@@ -64,35 +70,23 @@ void geqrf(Matrix<double> &A, Vector<double> &tau, Vector<double> &v) throw (Sha
   // Iterate over all columns of A
   for (size_t i=0; i<N; i++) {
     // Create view on sub-matrix of A as Asub = A[i:,i:]
-    // and sub-vector of v as vsub = v[:-i]
+    // and sub-vector vsub = A[i:,i] = Asub[:,0];
     Matrix<double> Asub = A.sub(i,i, M-i,N-i);
-    Vector<double> vsub = v.sub(0, M-i);
+    Vector<double> vsub = Asub.col(0);
 
-    // Copy values if the i-th column as A[i:,i] into v
-    vsub.values() = Asub.col(i);
     // Now, calculate Householder projector H = 1-2*vsub*vsub^T
-    double alpha = vsub(0) < 0 ? -std::abs(vsub) : std::abs(vsub);
+    /// @todo Double check Householder implementation.
+    double alpha = vsub(0) < 0 ? std::abs(vsub) : -std::abs(vsub);
     vsub(0) += alpha; vsub /= std::abs(vsub);
 
-    // Store v(0) in tau(i), alpha in A(i,i) and v[1:] in A[i+1:,i]
-    tau(i) = vsub(0); Asub.col(0).values() = vsub; Asub(0,0) = alpha;
     // Now, project all remaining columns of A[i:,i+1:], if some columns left
     for (size_t j=1; j<Asub.cols(); j++) {
       Vector<double> tmp = Asub.col(j);
       __prod_householder(vsub, tmp);
     }
+    // Store v(0) in tau(i), alpha in A(i,i) and v[1:] in A[i+1:,i]
+    tau(i) = vsub(0); vsub(0) = -alpha;
   }
-}
-
-
-/**
- * Simpler interface to @c geqrf that allocates a temporary working array.
- */
-void geqrf(Matrix<double> &A, Vector<double> &tau) throw (ShapeError)
-{
-  // allocate some working memory...
-  Vector<double> v(A.rows());
-  geqrf(A, tau, v);
 }
 
 

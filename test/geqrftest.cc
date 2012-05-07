@@ -23,17 +23,27 @@ GEQRFTest::setUp()
 void
 GEQRFTest::testRealNN()
 {
-  Matrix<double> B = A.copy();
-  Vector<double> v(B.rows());
+  Vector<double> tmp(this->A.rows());
+  Matrix<double> A = this->A.copy();
   Lapack::geqrf(A, tau);
 
-  std::cerr << A << std::endl;
-  Lapack::ormqr(A, tau, B, v, true, true);
-  std::cerr << B << std::endl;
+  {
+    Matrix<double> B = this->A.copy();
+    Lapack::ormqr(A, tau, B, tmp, true, true);
+    for (size_t i=0; i<3; i++) {
+      for (size_t j=i; j<3; j++) {
+        UT_ASSERT_NEAR(B(i,j), A(i,j));
+      }
+    }
+  }
 
-  for (size_t i=0; i<3; i++) {
-    for (size_t j=i; j<3; j++) {
-      UT_ASSERT_NEAR(B(i,j), A(i,j));
+  {
+    Matrix<double> B = this->A.copy().t();
+    Lapack::ormqr(A, tau, B, tmp, false, false);
+    for (size_t i=0; i<3; i++) {
+      for (size_t j=i; j<3; j++) {
+        UT_ASSERT_NEAR(B(j,i), A(i,j));
+      }
     }
   }
 }

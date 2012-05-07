@@ -33,7 +33,8 @@ namespace Lapack {
  *
  * @ingroup lapack
  */
-inline void dpotrf(Matrix<double> &A, bool upper)
+inline void
+dpotrf(Matrix<double> &A, bool upper)
 throw (ShapeError, IndefiniteMatrixError, LapackError)
 {
   // Assert that A is quadratic:
@@ -88,7 +89,9 @@ throw (ShapeError, IndefiniteMatrixError, LapackError)
  * @ingroup lapack_internal
  */
 template <class Scalar>
-void __potrf_crout(Matrix<Scalar> &A) throw (SingularMatrixError)
+void
+__potrf_crout(Matrix<Scalar> &A)
+throw (IndefiniteMatrixError)
 {
   size_t i,j;
   for (j=0; j<A.cols(); j++)
@@ -99,8 +102,8 @@ void __potrf_crout(Matrix<Scalar> &A) throw (SingularMatrixError)
     // Check if the j-th diagonal is positve and real:
     if (! __is_real_pos(A(j,j)) )
     {
-      SingularMatrixError err; err << "Can not compute Cholesky dec. of A, "
-                                   << j << "-th diagonal element is < 0!";
+      IndefiniteMatrixError err; err << "Can not compute Cholesky dec. of A, "
+                                     << j << "-th diagonal element is <= 0!";
       throw err;
     }
     A(j,j) = std::sqrt(__get_real(A(j,j)));
@@ -127,7 +130,9 @@ void __potrf_crout(Matrix<Scalar> &A) throw (SingularMatrixError)
  * @ingroup lapack_internal
  */
 template <class Scalar>
-void __potrf_banachiewicz(Matrix<Scalar> &A) throw (SingularMatrixError)
+void
+__potrf_banachiewicz(Matrix<Scalar> &A)
+throw (IndefiniteMatrixError)
 {
   size_t i,j, N=A.cols();
   for (i=0; i<N; i++)
@@ -138,8 +143,8 @@ void __potrf_banachiewicz(Matrix<Scalar> &A) throw (SingularMatrixError)
     // Check if the j-th diagonal is positve and real:
     if (! __is_real_pos(A(i,i)) )
     {
-      SingularMatrixError err; err << "Can not compute Cholesky dec. of A, "
-                                   << i << "-th diagonal element is < 0!";
+      IndefiniteMatrixError err; err << "Can not compute Cholesky dec. of A, "
+                                     << i << "-th diagonal element is <= 0!";
       throw err;
     }
     A(i,i) = std::sqrt(__get_real(A(i,i)));
@@ -164,12 +169,14 @@ void __potrf_banachiewicz(Matrix<Scalar> &A) throw (SingularMatrixError)
  * @param A Holds the upper or lower part of the real-symmetric or complex-hermitic matrix.
  * @param upper If true, the upper triangular part of A is given.
  *
- * @throws SingularMatrixError If one of the diagonal elements are 0.
+ * @throws IndefiniteMatrixError If one of the diagonal elements are <= 0.
  *
  * @ingroup lapack
  */
 template <class Scalar>
-inline void potrf(Matrix<Scalar> &A, bool upper) throw (SingularMatrixError)
+inline void
+potrf(Matrix<Scalar> &A, bool upper)
+throw (IndefiniteMatrixError)
 {
   // Check if A is square:
   LINALG_SHAPE_ASSERT(A.rows() == A.cols());
