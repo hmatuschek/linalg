@@ -16,6 +16,7 @@ public:
   virtual void setUp();
 
   void testRealNN();
+  void testRealMN();
 
 public:
   static UnitTest::TestSuite *suite();

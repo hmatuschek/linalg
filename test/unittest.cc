@@ -235,7 +235,7 @@ TestCase::assertNear(float t, float e, const std::string &file, size_t line)
 void
 TestCase::assertNear(double t, double e, const std::string &file, size_t line)
 {
-  if (std::abs(e-t) > std::numeric_limits<double>::epsilon())
+  if (std::abs(e-t) > 10*std::max(std::abs(e),std::abs(t))*std::numeric_limits<double>::epsilon())
   {
     std::stringstream str;
     str << "Expected: " << e << " but got: " << t
