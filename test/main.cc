@@ -5,8 +5,6 @@
 #include "matrixtest.hh"
 #include "trimatrixtest.hh"
 
-#include "choleskytest.hh"
-
 #include "nrm2test.hh"
 #include "dottest.hh"
 #include "gemvtest.hh"
@@ -41,8 +39,6 @@ int main(void)
   runner.addSuite(TRMMTest::suite());
   runner.addSuite(TRSMTest::suite());
 
-  runner.addSuite(CholeskyTest::suite());
-
   runner.addSuite(TRTRSTest::suite());
   runner.addSuite(TRTRITest::suite());
   runner.addSuite(POTRFTest::suite());
@@ -51,4 +47,4 @@ int main(void)
   runner();
 
   return 0;
-};
+}

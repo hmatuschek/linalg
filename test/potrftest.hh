@@ -1,6 +1,7 @@
 #ifndef POTRFTEST_HH
 #define POTRFTEST_HH
 
+#include <complex>
 #include "unittest.hh"
 #include "matrix.hh"
 #include "symmatrix.hh"
@@ -14,11 +15,20 @@ private:
   Linalg::Matrix<double> fA;
   Linalg::Matrix<double> cACholU;
 
+  Linalg::Matrix<double> A, Acu, Acl;
+  Linalg::Matrix< std::complex<double> > B, Bcu, Bcl;
+
 public:
   virtual void setUp();
 
-  void testRowMajor();
-  void testColMajor();
+  void testDPOTRFRowMajor();
+  void testDPOTRFColMajor();
+
+  void testPOTRFRealLower();
+  void testPOTRFRealUpper();
+
+  void testPOTRFCmplxLower();
+  void testPOTRFCmplxUpper();
 
 public:
   static UnitTest::TestSuite *suite();

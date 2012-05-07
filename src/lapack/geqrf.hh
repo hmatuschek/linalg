@@ -10,6 +10,7 @@
 namespace Linalg {
 namespace Lapack {
 
+
 /**
  * Internal function to calculate the matrix-vector product \f$a' = (I-2vv^T)a\f$.
  *
@@ -60,6 +61,7 @@ void geqrf(Matrix<double> &A, Vector<double> &tau, Vector<double> &v) throw (Sha
   size_t M = A.rows();
   size_t N = A.cols();
 
+  // Iterate over all columns of A
   for (size_t i=0; i<N; i++) {
     // Create view on sub-matrix of A as Asub = A[i:,i:]
     // and sub-vector of v as vsub = v[:-i]
