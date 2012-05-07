@@ -24,28 +24,32 @@ void dpotrf_(const char *UPLO, const int *N, double *A, const int *LDA, int *INF
 namespace Linalg {
 namespace Lapack {
 
+
 /**
  * Interface to LAPACKs DPOTRF function, computing the Cholesky decomposition of a
- * real- symmetric matrix.
+ * real symmetric matrix.
  *
- * @note On extit, the Cholesky decomposition is stored into A and a @c TriMatrix view is returned,
- *       referring to the upper- or lower-triangular part of A holding the decomposition.
+ * @param A Specifies the symetric matrix, only the upper or lower part is used.
+ * @param upper If true, the upper-triangular part of the symmetric matrix is stored in A.
  *
  * @ingroup lapack
  */
-inline TriMatrix<double> potrf(SymMatrix<double> A)
+inline void dpotrf(Matrix<double> &A, bool upper)
 throw (ShapeError, IndefiniteMatrixError, LapackError)
 {
   // Assert that A is quadratic:
   LINALG_SHAPE_ASSERT(A.rows() == A.cols());
 
   // Ensure column major:
-  char transa='N';
-  SymMatrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, transa);
+  char uplo = upper ? 'U' : 'L';
+  Matrix<double> Acol(A);
+  if (1 == Acol.strides()[0]) {
+    uplo = uplo == 'U' ? 'L' : 'U';
+    Acol = Acol.t();
+  }
 
   // Get flags:
-  char uplo = BLAS_UPLO_FLAG(Acol);
-  int  N    = BLAS_NUM_ROWS(Acol, transa);
+  int  N    = Acol.rows();
   int  lda  = BLAS_LEADING_DIMENSION(Acol);
   int  info = 0;
 
@@ -65,9 +69,6 @@ throw (ShapeError, IndefiniteMatrixError, LapackError)
       throw err;
     }
   }
-
-  // Assemble triangular matrix view
-  return TriMatrix<double>(Acol, Acol.isUpper(), false);
 }
 
 

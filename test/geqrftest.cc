@@ -1,11 +1,12 @@
-#include "qrtest.hh"
-#include <qr.hh>
+#include "geqrftest.hh"
+#include <lapack/geqrf.hh>
+#include <lapack/ormqr.hh>
 
 using namespace Linalg;
 
 
 void
-QRTest::setUp()
+GEQRFTest::setUp()
 {
   // Allocate some space;
   tau = Vector<double>(3);
@@ -20,14 +21,14 @@ QRTest::setUp()
 
 
 void
-QRTest::testRealNN()
+GEQRFTest::testRealNN()
 {
   Matrix<double> B = A.copy();
   Vector<double> v(B.rows());
-  geqrf(A, tau);
+  Lapack::geqrf(A, tau);
 
   std::cerr << A << std::endl;
-  ormqr(A, tau, B, v, true, true);
+  Lapack::ormqr(A, tau, B, v, true, true);
   std::cerr << B << std::endl;
 
   for (size_t i=0; i<3; i++) {
@@ -40,12 +41,12 @@ QRTest::testRealNN()
 
 
 UnitTest::TestSuite *
-QRTest::suite()
+GEQRFTest::suite()
 {
-  UnitTest::TestSuite *s = new UnitTest::TestSuite("Tests for QR decomposition:");
+  UnitTest::TestSuite *s = new UnitTest::TestSuite("Tests for geqrf :");
 
-  s->addTest(new UnitTest::TestCaller<QRTest>(
-               "qr(double[n,n])", &QRTest::testRealNN));
+  s->addTest(new UnitTest::TestCaller<GEQRFTest>(
+               "Lapack::geqrf(double[n,n])", &GEQRFTest::testRealNN));
 
   return s;
 }

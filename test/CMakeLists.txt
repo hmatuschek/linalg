@@ -18,17 +18,17 @@ SET(BLAS3_TEST_HEADERS
     gemmtest.hh trmmtest.hh trsmtest.hh)
 
 SET(LAPACK_TEST_SOURCES
-    trtrstest.cc trtritest.cc potrftest.cc)
+    trtrstest.cc trtritest.cc potrftest.cc geqrftest.cc)
 SET(LAPACK_TEST_HEADERS
-    trtrstest.hh trtritest.hh potrftest.hh)
+    trtrstest.hh trtritest.hh potrftest.hh geqrftest.hh)
 
 
 SET(LINALG_TEST_SOURCES main.cc
-    unittest.cc cputime.cc matrixtest.cc arraytest.cc trimatrixtest.cc choleskytest.cc qrtest.cc
+    unittest.cc cputime.cc matrixtest.cc arraytest.cc trimatrixtest.cc choleskytest.cc
     ${BLAS1_TEST_SOURCES} ${BLAS2_TEST_SOURCES} ${BLAS3_TEST_SOURCES}
     ${LAPACK_TEST_SOURCES})
 SET(LINALG_TEST_HEADERS
-    unittest.hh cputime.hh matrixtext.hh arraytest.cc trimatrixtest.hh choleskytest.hh qrtest.hh
+    unittest.hh cputime.hh matrixtext.hh arraytest.cc trimatrixtest.hh choleskytest.hh
     ${BLAS1_TEST_HEADERS} ${BLAS2_TEST_HEADERS} ${BLAS3_TEST_HEADERS}
     ${LAPACK_TEST_HEADERS})
 

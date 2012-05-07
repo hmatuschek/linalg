@@ -6,7 +6,6 @@
 #include "trimatrixtest.hh"
 
 #include "choleskytest.hh"
-#include "qrtest.hh"
 
 #include "nrm2test.hh"
 #include "dottest.hh"
@@ -19,6 +18,7 @@
 #include "trtrstest.hh"
 #include "trtritest.hh"
 #include "potrftest.hh"
+#include "geqrftest.hh"
 
 
 using namespace UnitTest;
@@ -42,11 +42,11 @@ int main(void)
   runner.addSuite(TRSMTest::suite());
 
   runner.addSuite(CholeskyTest::suite());
-  runner.addSuite(QRTest::suite());
 
   runner.addSuite(TRTRSTest::suite());
   runner.addSuite(TRTRITest::suite());
   runner.addSuite(POTRFTest::suite());
+  runner.addSuite(GEQRFTest::suite());
 
   runner();
 

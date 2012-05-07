@@ -40,6 +40,6 @@
 #include "lapack/lapack.hh"
 
 #include "cholesky.hh"
-#include "qr.hh"
+
 
 #endif

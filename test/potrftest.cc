@@ -27,7 +27,7 @@ void
 POTRFTest::testRowMajor()
 {
   SymMatrix<double> tmp(cA.copy(true), true);
-  Lapack::potrf(tmp);
+  Lapack::dpotrf(tmp, true);
 
   for(size_t i=0; i<3; i++) {
     for (size_t j=i; j<3; j++) {
@@ -41,7 +41,7 @@ void
 POTRFTest::testColMajor()
 {
   SymMatrix<double> tmp(fA.copy(false), true);
-  Lapack::potrf(tmp);
+  Lapack::dpotrf(tmp, true);
 
   for(size_t i=0; i<3; i++) {
     for (size_t j=i; j<3; j++) {

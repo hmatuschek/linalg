@@ -24,7 +24,7 @@ namespace Blas {
  *
  * @note This function does no dimension checks on x and y.
  *
- * @ingroup blas1_internal
+ * @ingroup blas_internal
  */
 inline double __dot_dense(size_t N, const double *x, const double *y)
 {
@@ -60,7 +60,7 @@ inline double __dot_dense(size_t N, const double *x, const double *y)
  *
  * @note This function does no dimension checks on x and y.
  *
- * @ingroup blas1_internal
+ * @ingroup blas_internal
  */
 inline float __dot_dense(size_t N, const float *x, const float *y)
 {
@@ -95,7 +95,7 @@ inline float __dot_dense(size_t N, const float *x, const float *y)
  *
  * @note This function does no dimension check on x & y.
  *
- * @ingroup blas1_internal
+ * @ingroup blas_internal
  */
 inline double __dot_incremental(size_t N, const double *x, size_t inc_x, const double *y, size_t inc_y)
 {
@@ -113,7 +113,7 @@ inline double __dot_incremental(size_t N, const double *x, size_t inc_x, const d
  *
  * @note This function does no dimension check on x & y.
  *
- * @ingroup blas1_internal
+ * @ingroup blas_internal
  */
 inline float __dot_incremental(size_t N, const float *x, size_t inc_x, const float *y, size_t inc_y)
 {

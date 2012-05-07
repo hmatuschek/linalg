@@ -12,7 +12,9 @@
 
 #include "matrix.hh"
 #include "blas/scal.hh"
+#include "blas/nrm2.hh"
 #include "blas/gemm.hh"
+#include "blas/gemv.hh"
 #include "array_operators.hh"
 #include "trimatrix_operators.hh"
 #include <cmath>
@@ -22,19 +24,37 @@ namespace Linalg {
 
 
 /**
- * Implements the common matrix product.
+ * Implements the common matrix-matrix product.
  *
  * @ingroup operators
  */
-inline Matrix<double>
-operator* (const Matrix<double> &lhs, const Matrix<double> &rhs)
-throw (ShapeError)
+template <class Scalar>
+inline Matrix<Scalar>
+operator* (const Matrix<Scalar> &lhs, const Matrix<Scalar> &rhs) throw (ShapeError)
 {
   // Allocate matrix for result:
-  Matrix<double> result(lhs.rows(), rhs.cols());
+  Matrix<Scalar> result(lhs.rows(), rhs.cols());
   // Use Blas::gemm() to compute product
-  Blas::gemm(1., lhs, rhs, 0.0, result);
+  Blas::gemm(Scalar(1), lhs, rhs, Scalar(0), result);
   // Pass ownership of result-matrix to caller...
+  return result;
+}
+
+
+/**
+ * Implements the common matrix-vector product.
+ *
+ * @ingroup operators
+ */
+template <class Scalar>
+inline Vector<Scalar>
+operator* (const Matrix<Scalar> &lhs, const Vector<Scalar> &rhs) throw (ShapeError)
+{
+  // Allocate vector for result:
+  Vector<Scalar> result(rhs.dim());
+  // Use Blas::gemv() to compute product
+  Blas::gemv(Scalar(1), lhs, rhs, Scalar(0), result);
+  // Pass ownership of result vector to caller...
   return result;
 }
 
@@ -93,11 +113,74 @@ operator- (const Matrix<double> &lhs, const Matrix<double> &rhs)
 }
 
 
+/**
+ * Implements the in-place vector-scalar product.
+ *
+ * @ingroup operators
+ */
+template <class Scalar>
+inline Vector<Scalar> & operator *= (Vector<Scalar> &V, const Scalar &alpha) {
+  Blas::scal(alpha, V);
+
+  return V;
+}
+
+
+/**
+ * Implements the in-place matrix-scalar product.
+ *
+ * @ingroup operators
+ */
+template <class Scalar>
+inline Matrix<Scalar> & operator *= (Matrix<Scalar> &A, const Scalar &alpha) {
+  // If column-major, work column by column:
+  if (1 == A.strides()[0]) {
+    for (size_t i=0; i<A.cols(); i++) {
+      Vector<Scalar> col = A.col(i);
+      Blas::scal(alpha, col);
+    }
+  } else {
+    // Otherwise, row by row
+    for (size_t i=0; i<A.rows(); i++) {
+      Vector<Scalar> row = A.row(i);
+      Blas::scal(alpha, row);
+    }
+  }
+
+  return A;
+}
+
+
+/**
+ * Implements vector-scalar product \f$y' = \frac{1}{\alpha}y$.
+ *
+ * @ingroup operators
+ */
 template <class Scalar>
 inline Vector<Scalar> & operator /= (Vector<Scalar> &V, const Scalar &alpha) {
   Blas::scal(Scalar(1)/alpha, V);
 
   return V;
+}
+
+
+template <class Scalar>
+inline Matrix<Scalar> & operator /= (Matrix<Scalar> &A, const Scalar &alpha) {
+  // If column-major, work column by column:
+  if (1 == A.strides()[0]) {
+    for (size_t i=0; i<A.cols(); i++) {
+      Vector<Scalar> col = A.col(i);
+      Blas::scal(Scalar(1)/alpha, col);
+    }
+  } else {
+    // Otherwise, row by row
+    for (size_t i=0; i<A.rows(); i++) {
+      Vector<Scalar> row = A.row(i);
+      Blas::scal(Scalar(1)/alpha, row);
+    }
+  }
+
+  return A;
 }
 
 
@@ -131,6 +214,7 @@ std::ostream &operator<< (std::ostream &stream, Matrix<Scalar> &matrix)
 }
 
 
+
 namespace std {
 
 /**
@@ -151,7 +235,7 @@ inline double abs2(const Linalg::Vector<double> &v)
  * Extends the @c std::abs2 function to hanlde vectors as \f$abs(v) = \sqrt(v^Tv)\f$
  */
 inline double abs(const Linalg::Vector<double> &v) {
-  return sqrt(abs2(v));
+  return Linalg::Blas::nrm2(v);
 }
 
 }

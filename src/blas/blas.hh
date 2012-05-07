@@ -25,7 +25,6 @@
 #include "dot.hh"
 #include "nrm2.hh"
 
-
 /**
  * @defgroup blas2 BLAS level 2 routines
  * @ingroup blas
@@ -41,5 +40,11 @@
 #include "gemm.hh"
 #include "trmm.hh"
 #include "trsm.hh"
+
+
+/**
+ * @defgroup blas_internal Internal used functions for BLAS routines.
+ * @ingroup blas
+ */
 
 #endif

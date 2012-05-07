@@ -1,3 +1,11 @@
+/*
+ * This file is part of the Linalg project, a C++ interface to BLAS and LAPACK.
+ *
+ * The source-code is licensed under the terms of the MIT license, read LICENSE for more details.
+ *
+ * (c) 2011, 2012 Hannes Matuschek <hmatuschek at gmail dot com>
+ */
+
 #ifndef __LINALG_BLAS_SCAL_HH__
 #define __LINALG_BLAS_SCAL_HH__
 
@@ -14,7 +22,7 @@ namespace Blas {
  * Optimized internal function to scale a vector using SIMD instructions if the vector is dense
  * (increment 1).
  *
- * @ingroup blas1_internal
+ * @ingroup blas_internal
  */
 inline void __scal_dense(size_t N, double a, double *x) {
   __vec2df *x_ptr = (__vec2df *)x;
@@ -36,7 +44,7 @@ inline void __scal_dense(size_t N, double a, double *x) {
 /**
  * Internal function to scale a vector.
  *
- * @ingroup blas1_internal
+ * @ingroup blas_internal
  */
 inline void __scal_incremental(size_t N, const double &a, double *x, size_t xinc) {
   for (size_t i=0; i<N; i++, x += xinc) {

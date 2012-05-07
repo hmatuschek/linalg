@@ -23,7 +23,7 @@ namespace Blas {
 /**
  * Internal function to perform @c nrm2 using SIMD instructions.
  *
- * @ingroup blas1_internal
+ * @ingroup blas_internal
  */
 inline double __nrm2_dense(size_t N, const double *x) {
   __vec2df res; res.v = (__v2df){0.0, 0.0};
@@ -48,7 +48,7 @@ inline double __nrm2_dense(size_t N, const double *x) {
 /**
  * Internal function to perform @c nrm2 for non-dense vectors.
  *
- * @ingroup blas1_internal
+ * @ingroup blas_internal
  */
 inline double __nrm2_incremental(size_t N, const double *x, size_t incx) {
   double res = 0.0;

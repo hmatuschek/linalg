@@ -86,7 +86,6 @@ CholeskyTest::testCmplxUpper()
   // compare complex-tri matrix:
   for (size_t i=0; i<3; i++) {
     for (size_t j=i; j<3; j++) {
-      std::cerr << B(i,j) << "==" << Bcu(i,j) << std::endl;
       UT_ASSERT(B(i,j) == Bcu(i,j));
     }
   }

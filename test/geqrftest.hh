@@ -1,12 +1,12 @@
-#ifndef QRTEST_HH
-#define QRTEST_HH
+#ifndef GEQRFTEST_HH
+#define GEQRFTEST_HH
 
 #include "unittest.hh"
 #include <matrix.hh>
 #include <vector.hh>
 
 
-class QRTest : public UnitTest::TestCase
+class GEQRFTest : public UnitTest::TestCase
 {
 private:
   Linalg::Matrix<double> A;

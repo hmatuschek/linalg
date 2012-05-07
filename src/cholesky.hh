@@ -1,3 +1,11 @@
+/*
+ * This file is part of the Linalg project, a C++ interface to BLAS and LAPACK.
+ *
+ * The source-code is licensed under the terms of the MIT license, read LICENSE for more details.
+ *
+ * (c) 2011, 2012 Hannes Matuschek <hmatuschek at gmail dot com>
+ */
+
 #ifndef __LINALG_CHOLESKY_HH__
 #define __LINALG_CHOLESKY_HH__
 
@@ -78,7 +86,7 @@ void __cholesky_banachiewicz(Matrix<Scalar> &A) throw (SingularMatrixError)
     // calculate off-diagonal elements
     for (j=i+1; j<N; j++) {
       for (size_t k=0; k<i; k++)
-        A(i,j) -= __prod_abcc(A(k,i), A(k,j));
+        A(i,j) -= __prod_abcc(A(k,j), A(k,i));
 
       A(i,j) /= A(i,i);
     }

@@ -6,8 +6,14 @@
  * (c) 2011, 2012 Hannes Matuschek <hmatuschek at gmail dot com>
  */
 
+
 /**
  * @defgroup lapack Interfaces to LAPACK routines.
+ */
+
+/**
+ * @defgroup lapack_internal Internal used function for LAPACK routines.
+ * @ingroup lapack
  */
 
 #ifndef __LINALG_LAPACK_HH__
@@ -16,5 +22,7 @@
 #include "trtrs.hh"
 #include "trtri.hh"
 #include "potrf.hh"
+#include "geqrf.hh"
+#include "ormqr.hh"
 
 #endif
