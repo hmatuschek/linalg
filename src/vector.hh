@@ -21,7 +21,8 @@ protected:
    * Assembles a complete vector from given memory.
    */
   Vector(Scalar *data, size_t offset, size_t dim, size_t incr, bool takes_ownership=true)
-    : Array<Scalar>(data, offset, std::vector<size_t>(1, dim), std::vector<size_t>(1, incr), takes_ownership)
+    : Array<Scalar>(DataPtr<Scalar>(new DataMngr<Scalar>(data, takes_ownership)),
+        offset, std::vector<size_t>(1, dim), std::vector<size_t>(1, incr))
   {
     // Pass...
   }
@@ -31,7 +32,7 @@ public:
   /**
    * Assembles a complete vector from given memory.
    */
-  Vector(DataPtr<Scalar> *data, size_t offset, size_t dim, size_t incr)
+  Vector(const DataPtr<Scalar> &data, size_t offset, size_t dim, size_t incr)
     : Array<Scalar>(data, offset, std::vector<size_t>(1, dim), std::vector<size_t>(1, incr))
   {
     // Pass...
@@ -125,7 +126,7 @@ public:
    */
   inline Scalar &operator ()(size_t i)
   {
-    return this->_data->ptr()[offset() + i*this->stride()];
+    return this->_data[offset() + i*this->stride()];
   }
 
 
@@ -134,7 +135,7 @@ public:
    */
   inline const Scalar &operator ()(size_t i) const
   {
-    return this->_data->ptr()[offset() + i*this->stride()];
+    return this->_data[offset() + i*this->stride()];
   }
 
 
@@ -143,7 +144,7 @@ public:
    */
   inline Vector<Scalar> sub(size_t i, size_t n)
   {
-    return Vector<Scalar>(this->_data, offset()+stride()*i, n, stride());
+    return Vector<Scalar>(*this, offset()+stride()*i, n, stride());
   }
 
 

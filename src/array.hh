@@ -27,7 +27,7 @@ namespace Linalg {
  * easy encapsulation of NumPy array in this template library.
  */
 template <class Scalar>
-class Array
+class Array : public DataPtr<Scalar>
 {
 public:
   /**
@@ -87,9 +87,6 @@ public:
 
 
 protected:
-  /** Manages the data. */
-  DataPtr<Scalar> *_data;
-
   /** Offset of first element form _data ptr. */
   size_t _offset;
 
@@ -111,7 +108,7 @@ protected:
    */
   Array(Scalar *data, size_t offset, const std::vector<size_t> &shape,
         const std::vector<size_t> &strides, bool take_data)
-    : _data(new SmartPtr<Scalar>(data, take_data)), _offset(offset),
+    : DataPtr<Scalar>(new DataMngr<Scalar>(data, take_data)), _offset(offset),
       _shape(shape), _strides(strides), _values(*this)
   {
     LINALG_SHAPE_ASSERT(shape.size() == strides.size());
@@ -122,9 +119,9 @@ public:
   /**
    * Full constructor from data.
    */
-  Array(DataPtr<Scalar> *data, size_t offset, const std::vector<size_t> &shape,
+  Array(const DataPtr<Scalar> &data, size_t offset, const std::vector<size_t> &shape,
         const std::vector<size_t> &strides)
-    : _data(data->ref()), _offset(offset), _shape(shape), _strides(strides),
+    : DataPtr<Scalar>(data), _offset(offset), _shape(shape), _strides(strides),
       _values(*this)
   {
     LINALG_SHAPE_ASSERT(shape.size() == strides.size());
@@ -135,7 +132,7 @@ public:
    * Constructs uninitialized/empty array.
    */
   Array()
-    : _data(0), _offset(0), _shape(0), _strides(0), _values(*this)
+    : DataPtr<Scalar>(), _offset(0), _shape(0), _strides(0), _values(*this)
   {
     // Done..
   }
@@ -145,7 +142,7 @@ public:
    * Allocates a new (empty) array of the given shape.
    */
   Array(const std::vector<size_t> &shape, bool rowmajor=true)
-    : _data(0), _offset(0), _shape(shape), _strides(shape.size()), _values(*this)
+    : DataPtr<Scalar>(), _offset(0), _shape(shape), _strides(shape.size()), _values(*this)
   {
     // Check if dimension
     if (0 == _shape.size())
@@ -169,8 +166,8 @@ public:
       }
     }
 
-    // Allocate some data:
-    _data = new SmartPtr<Scalar>(new Scalar[size], true);
+    // Allocate some data and assign it to this:
+    DataPtr<Scalar>::operator =(DataPtr<Scalar>(new DataMngr<Scalar>(size)));
 
     // Done...
   }
@@ -178,21 +175,10 @@ public:
 
   /** Copy constructor. */
   Array(const Array<Scalar> &other)
-    : _data(other._data->ref()), _offset(other._offset), _shape(other._shape), _strides(other._strides),
+    : DataPtr<Scalar>(other), _offset(other._offset), _shape(other._shape), _strides(other._strides),
       _values(*this)
   {
     // Pass...
-  }
-
-
-  /** Destructor. */
-  virtual ~Array()
-  {
-    // If there is some data, deref it.
-    if (0 != _data) {
-      _data->unref();
-      this->_data = 0;
-    }
   }
 
 
@@ -211,15 +197,9 @@ public:
   Array<Scalar> &operator= (const Array<Scalar> &other)
   {
     // Get reference to the data of other:
-    DataPtr<Scalar> *_new_data = other._data->ref();
-
-    // Unref "old" data, if there was some...
-    if (0 != _data) {
-      _data->unref();
-    }
+    DataPtr<Scalar>::operator =(other);
 
     // Copy ref and shape of other data...
-    this->_data    = _new_data;
     this->_shape   = other._shape;
     this->_strides = other._strides;
     this->_offset  = other._offset;
@@ -322,7 +302,7 @@ public:
       offset += idxs[i]*_strides[i];
     }
 
-    return _data->ptr()[offset];
+    return this->_data[offset];
   }
 
 
@@ -338,7 +318,7 @@ public:
       offset += idxs[i]*_strides[i];
     }
 
-    return _data->prt()[offset];
+    return this->_data->prt()[offset];
   }
 
 
@@ -347,7 +327,7 @@ public:
    */
   inline Array<Scalar> t() const
   {
-    return Array<Scalar>(this->_data, this->_offset,
+    return Array<Scalar>(*this, this->_offset,
                          std::vector<size_t>(_shape.rbegin(), _shape.rend()),
                          std::vector<size_t>(_strides.rbegin(), _strides.rend()));
   }
@@ -374,14 +354,14 @@ public:
    * Returns the pointer to the first element.
    */
   inline const Scalar *ptr() const {
-    return this->_data->ptr() + this->_offset;
+    return this->_data + this->_offset;
   }
 
   /**
    * Returns the pointer to the first element.
    */
   inline Scalar *ptr() {
-    return this->_data->ptr() + this->_offset;
+    return this->_data + this->_offset;
   }
 
 

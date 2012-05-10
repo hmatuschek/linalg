@@ -17,6 +17,46 @@
 namespace Linalg {
 
 /**
+ * Template prototype for manager classes.
+ */
+template <class Scalar>
+class DataMngr
+{
+private:
+  Scalar *_data;
+  bool _owned;
+
+public:
+  DataMngr(Scalar *data, bool owned)
+    : _data(data), _owned(owned)
+  {
+    // Pass...
+  }
+
+  explicit DataMngr(size_t size)
+  {
+    _data = new Scalar[size];
+    _owned = true;
+  }
+
+  virtual ~DataMngr() {
+    if (_owned) {
+      delete _data;
+    }
+  }
+
+  virtual Scalar *ptr() const {
+    return _data;
+  }
+
+  virtual bool ownsData() const {
+    return _owned;
+  }
+};
+
+
+
+/**
  * A simple base class holding an owned or unowned reference to some data.
  */
 template <class Scalar>
@@ -24,80 +64,91 @@ class DataPtr
 {
 protected:
   /**
+   * Holds a reference to the data.
+   */
+  DataMngr<Scalar> *_mngr;
+
+  /**
    * Holds the actual data pointer.
    */
   Scalar *_data;
 
+  /**
+   * Holds a reference to the reference counter.
+   */
+  size_t *_refcount;
+
 
 public:
-  DataPtr(Scalar *ptr)
-    : _data(ptr)
+  /**
+   * Empty constructor.
+   */
+  DataPtr()
+    : _mngr(0), _data(0), _refcount(0)
   {
     // Pass...
   }
 
-  virtual ~DataPtr() { /* pass... */ }
-
-  virtual DataPtr<Scalar> *ref() = 0;
-
-  virtual void unref() = 0;
-
-  inline Scalar *ptr() {
-    return _data;
-  }
-};
-
-
-
-/**
- * Simple reference counting data pointer.
- */
-template<class Scalar>
-class SmartPtr : public DataPtr<Scalar>
-{
-protected:
-  /** If true, the data will be freed if the reference count gets 0. */
-  bool _owns_data;
-  /** The reference counter. */
-  size_t _refcount;
-
-public:
   /**
    * Constructor.
-   *
-   * @param data Specifies the managed data pointer.
-   * @param take_data Specifies if the data should be freed if not used anymore.
    */
-  SmartPtr(Scalar *data, bool take_data)
-    : DataPtr<Scalar>(data), _owns_data(take_data), _refcount(1)
+  DataPtr(DataMngr<Scalar> *mngr)
+    : _mngr(mngr), _data(mngr->ptr())
   {
-    // Pass...
+    _refcount = new size_t(1);
   }
 
   /**
-   * Creates a "new" reference to the data.
+   * Copy constructor.
    */
-  virtual DataPtr<Scalar> *ref()
+  DataPtr(const DataPtr<Scalar> &other)
+    : _mngr(other._mngr), _data(other._data), _refcount(other._refcount)
   {
-    _refcount++;
-    return this;
+    if (0 != _refcount)
+      (*_refcount)++;
   }
 
   /**
-   * Dereferences the data.
+   * Destructor.
    */
-  virtual void unref()
+  ~DataPtr()
   {
-    if (1 == _refcount) {
-      _refcount=0;
-      if (_owns_data)
-        delete[] this->ptr();
-      delete this;
+    if (0 != _refcount) {
+      (*_refcount)--;
+      if (0 == *_refcount) {
+        delete _mngr;
+        delete _refcount;
+        _mngr = 0;
+        _refcount = 0;
+        _data = 0;
+      }
     }
-    else
-    {
-      _refcount--;
+  }
+
+
+  /**
+   * Assignment operator.
+   */
+  DataPtr<Scalar> &operator =(const DataPtr<Scalar> &other)
+  {
+    if (0 != _refcount) {
+      (*_refcount)--;
+      if (0 == *_refcount) {
+        delete _mngr;
+        delete _refcount;
+        _mngr = 0;
+        _refcount = 0;
+        _data = 0;
+      }
     }
+
+    _mngr = other._mngr;
+    _data = other._data;
+    _refcount = other._refcount;
+    if (0 != _refcount)
+      (*_refcount)++;
+
+    return *this;
   }
 };
 

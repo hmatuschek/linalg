@@ -26,6 +26,70 @@ extern "C" {
 
 namespace Linalg {
 
+template<>
+class NumpyArrayMngr<double> : public DataMngr<double>
+{
+private:
+  /**
+   * Holds a reference to the numpy array object.
+   */
+  PyObject *_array;
+
+public:
+  NumpyArrayMngr(PyObject *array)
+  throw (PythonError)
+    : DataMngr((double *) PyArray_DATA(array), false), _array(array)
+  {
+    // Check if array is a NumPy array:
+    if (0 == PyArray_Check(array)) {
+      PythonError err;
+      err << "Can not convert to Matrix<double>: Object is not a PyArray instance!";
+      throw err;
+    }
+
+    // Check if data type is double:
+    if (NPY_DOUBLE != PyArray_TYPE(array)) {
+      PythonError err;
+      err << "Can not convert NumPy array to Matrix<double>: Elements are not of type double.";
+      throw err;
+    }
+
+    // Check if data is aligned:
+    if (0 == PyArray_ISALIGNED(array)) {
+      PythonError err;
+      err << "Can not convert NumPy array to Matrix<double>: Memory is not aligned!";
+      throw err;
+    }
+
+    // Check if data is writable:
+    if (0 == PyArray_ISWRITEABLE(array))
+    {
+      PythonError err;
+      err << "Can not convert NumPy array to Matrix<double>: Memory is not writable!";
+      throw err;
+    }
+
+    // Increment reference counter of NumPy array:
+    Py_INCREF(_array);
+    // Get pointer to data:
+    _data = (double *) PyArray_DATA(array);
+  }
+
+  /**
+   * Destructor. Simply dereferences the array.
+   */
+  virtual ~PythonError() {
+    Py_DECREF(_array);
+  }
+
+  /**
+   * Retunrs the pointer to the numpy array.
+   */
+  PyObject *obj() {
+    return _array;
+  }
+};
+
 
 /**
  * Creates a weak @c Matrix reference from the given NumPy array.
@@ -36,34 +100,7 @@ namespace Linalg {
  */
 inline Matrix<double> doubleMatrixFromNumpyArray(PyObject *array)
 {
-  // Check if array is a NumPy array:
-  if (0 == PyArray_Check(array)) {
-    PythonError err;
-    err << "Can not convert to Matrix<double>: Object is not a PyArray instance!";
-    throw err;
-  }
-
-  // Check if data type is double:
-  if (NPY_DOUBLE != PyArray_TYPE(array)) {
-    PythonError err;
-    err << "Can not convert NumPy array to Matrix<double>: Elements are not of type double.";
-    throw err;
-  }
-
-  // Check if data is aligned:
-  if (0 == PyArray_ISALIGNED(array)) {
-    PythonError err;
-    err << "Can not convert NumPy array to Matrix<double>: Memory is not aligned!";
-    throw err;
-  }
-
-  // Check if data is writable:
-  if (0 == PyArray_ISWRITEABLE(array))
-  {
-    PythonError err;
-    err << "Can not convert NumPy array to Matrix<double>: Memory is not writable!";
-    throw err;
-  }
+  NumpyArrayMngr<double> *mngr = new NumpyArrayMngr<double>(array);
 
   // Check if array is a matrix (2D):
   if (2 != PyArray_NDIM(array)) {

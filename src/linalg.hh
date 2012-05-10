@@ -19,7 +19,7 @@
  * The most basic data type in this library is the @c Linalg::Array type, which represents a
  * multi-dimensional array of values. It is implemented as a class template to be able to deal with
  * any scalar value type. Note, that not all operations are implemented for all scalar types. There
- * are two linear algebra types derived from this array class, (a) the @c Linlag::Matrix class
+ * are two linear algebra types derived from this array class, (a) the @c Linalg::Matrix class
  * representing a 2 dimensional array of scalars and (b) the @c Linalg::Vector type, representing
  * a column vector of scalars.
  *
@@ -31,10 +31,6 @@
  * @defgroup matrix Matrix and vector types
  */
 
-/**
- * @defgroup operators Matrix and vector operations.
- * @ingroup matrix
- */
 
 
 #ifndef __LINALG_HH__

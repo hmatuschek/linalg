@@ -41,13 +41,24 @@ protected:
 
 
 public:
+  Matrix(const DataPtr<Scalar> &data, size_t offset, size_t rows, size_t cols,
+         size_t row_stride, size_t col_stride)
+    : Array<Scalar>(data, offset, std::vector<size_t>(1, rows*cols), std::vector<size_t>(1, 1))
+  {
+    this->_shape.resize(2); this->_shape[0] = rows; this->_shape[1] = cols;
+    this->_strides.resize(2); this->_strides[0] = row_stride; this->_strides[1] = col_stride;
+  }
+
+
   /**
    * Constructor for an empty matrix.
    */
   Matrix(size_t rows, size_t cols, bool rowmajor=true)
     : Array<Scalar>()
   {
-    this->_data = new SmartPtr<Scalar>(new Scalar[rows*cols], true);
+    // Allocate some data and assign it to this:
+    DataPtr<Scalar>::operator =(DataPtr<Scalar>(new DataMngr<Scalar>(rows*cols)));
+
     this->_offset = 0;
     this->_shape.resize(2); this->_shape[0] = rows; this->_shape[1] = cols;
     this->_strides.resize(2);
@@ -75,7 +86,7 @@ public:
    * Copy constructor with ownership transfer.
    */
   Matrix(const Matrix<Scalar> &other)
-    : Array<Scalar>(other._data, other._offset, other._shape, other._strides)
+    : Array<Scalar>(other)
   {
     // Pass...
   }
@@ -84,7 +95,7 @@ public:
    * Copy constructor with ownership transfer.
    */
   Matrix(const Array<Scalar> &other)
-    : Array<Scalar>(other.data(), other.offset(), other.shape(), other.strides())
+    : Array<Scalar>(other, other.offset(), other.shape(), other.strides())
   {
     LINALG_SHAPE_ASSERT(2 == other.ndim());
   }
@@ -139,7 +150,7 @@ public:
    */
   inline Scalar &operator() (size_t i, size_t j)
   {
-    return this->_data->ptr()[this->_getIndex(i, j)];
+    return this->_data[this->_getIndex(i, j)];
   }
 
 
@@ -148,7 +159,7 @@ public:
    */
   const Scalar &operator() (size_t i, size_t j) const
   {
-    return this->_data->ptr()[this->_getIndex(i,j)];
+    return this->_data[this->_getIndex(i,j)];
   }
 
 
@@ -171,7 +182,7 @@ public:
    */
   inline Vector<Scalar> row(size_t i) const
   {
-    return Vector<Scalar>(this->_data, this->_getIndex(i,0), cols(), Array<Scalar>::strides(1));
+    return Vector<Scalar>(*this, this->_getIndex(i,0), cols(), Array<Scalar>::strides(1));
   }
 
 
@@ -180,7 +191,7 @@ public:
    */
   inline Vector<Scalar> col(size_t j) const
   {
-    return Vector<Scalar>(this->_data, this->_getIndex(0,j), rows(), Array<Scalar>::strides(0));
+    return Vector<Scalar>(*this, this->_getIndex(0,j), rows(), Array<Scalar>::strides(0));
   }
 
 
@@ -207,7 +218,7 @@ public:
 
     std::vector<size_t> shape(2);
     shape[0] = nrow; shape[1] = ncol;
-    return Matrix<Scalar>(Array<Scalar>(this->_data, this->_getIndex(i,j), shape, this->strides()));
+    return Matrix<Scalar>(*this, this->_getIndex(i,j), nrow, ncol, this->strides()[0], this->strides()[1]);
   }
 
 
@@ -219,13 +230,13 @@ public:
                                  size_t rows, size_t cols, size_t rstride, size_t cstride,
                                  size_t offset=0)
   {
-    DataPtr<Scalar> *data_ptr = new SmartPtr<Scalar>(data, false);
-
     std::vector<size_t> dims(2); dims[0]=rows; dims[1]=cols;
     std::vector<size_t> strd(2); strd[0]=rstride; strd[1]=cstride;
-    Matrix<Scalar> ret(Array<Scalar>(data_ptr, offset, dims, strd));
+    Matrix<Scalar> ret(
+          Array<Scalar>(
+            DataPtr<Scalar>(new DataMngr<Scalar>(data, false)),
+            offset, dims, strd));
 
-    data_ptr->unref();
     return ret;
   }
 
@@ -239,9 +250,7 @@ public:
   {
     std::vector<size_t> dims(2); dims[0]=rows; dims[1]=cols;
     std::vector<size_t> strd(2); strd[0]=rstride; strd[1]=cstride;
-    DataPtr<Scalar> *data_ptr(data, true);
-    Matrix<Scalar> ret(Array<Scalar>(data_ptr, offset, dims, strd));
-    data_ptr->unref();
+    Matrix<Scalar> ret(Array<Scalar>(data, offset, dims, strd, true));
     return ret;
   }
 
@@ -251,18 +260,7 @@ public:
    */
   static Matrix<Scalar> empty(size_t rows, size_t cols, bool rowmajor=true)
   {
-    DataPtr<Scalar> *data = new SmartPtr<Scalar>(new Scalar[rows*cols], true);
-    std::vector<size_t> shape(2); shape[0] = rows; shape[1] = cols;
-    std::vector<size_t> strides(2);
-
-    if (rowmajor) {
-      strides[0] = cols; strides[1] = 1;
-    } else {
-      strides[0] = 1; strides[1] = rows;
-    }
-
-    Matrix<Scalar> ret(Array<Scalar>(data, 0, shape, strides)); data->unref();
-
+    Matrix<Scalar> ret(rows, cols, rowmajor);
     return ret;
   }
 

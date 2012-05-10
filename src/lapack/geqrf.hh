@@ -4,6 +4,7 @@
 #include "matrix.hh"
 #include "vector.hh"
 #include "blas/dot.hh"
+#include "blas/axpy.hh"
 #include "operators.hh"
 
 
@@ -20,10 +21,8 @@ inline void
 __prod_householder(const Vector<double> &v, Vector<double> &a)
 throw (ShapeError)
 {
-  double scale = 2*Blas::dot(v,a);
-  /// \todo Implement this using @c Blas::axpby function.
-  for (size_t i=0; i<v.dim(); i++)
-    a(i) -= scale*v(i);
+  double scale = -2*Blas::dot(v,a);
+  Blas::__axpy(scale, v, a);
 }
 
 

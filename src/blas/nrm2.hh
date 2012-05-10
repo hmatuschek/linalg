@@ -21,12 +21,12 @@ namespace Blas {
 
 
 /**
- * Internal function to perform @c nrm2 using SIMD instructions.
+ * Internal function to perform @c nrm2sq using SIMD instructions.
  *
  * @ingroup blas_internal
  */
 template <class Scalar>
-inline Scalar __nrm2_dense(size_t N, const Scalar *x) {
+inline Scalar __nrm2sq_dense(size_t N, const Scalar *x) {
   typename SIMDTraits<Scalar>::uvector res;
   const typename SIMDTraits<Scalar>::uvector *x_ptr = (const typename SIMDTraits<Scalar>::uvector *)x;
 
@@ -54,24 +54,46 @@ inline Scalar __nrm2_dense(size_t N, const Scalar *x) {
     res.d[0] += res.d[i];
   }
 
-  return sqrt(res.d[0]);
+  return res.d[0];
 }
 
 
 /**
- * Internal function to perform @c nrm2 for non-dense vectors.
+ * Internal function to perform @c nrm2sq for non-dense vectors.
  *
  * @ingroup blas_internal
  */
 template <class Scalar>
-inline Scalar __nrm2_incremental(size_t N, const Scalar *x, size_t incx) {
+inline Scalar __nrm2sq_incremental(size_t N, const Scalar *x, size_t incx) {
   Scalar res = Scalar(0);
 
   for (size_t i=0; i<N; i++, x+=incx) {
     res += (*x) * (*x);
   }
 
-  return sqrt(res);
+  return res;
+}
+
+
+
+/**
+ * Calculates squared 2-norm of a vector.
+ *
+ * \f[nrm2sq(x) = dot(x,x) \f]
+ *
+ * @ingroup blas1
+ */
+template <class Scalar>
+inline Scalar nrm2sq(const Vector<Scalar> &x)
+{
+  int N   = BLAS_DIMENSION(x);
+  int INC = BLAS_INCREMENT(x);
+
+  if (1 == INC) {
+    return __nrm2sq_dense(N, x.ptr());
+  }
+
+  return __nrm2sq_incremental(N, x.ptr(), INC);
 }
 
 
@@ -90,10 +112,10 @@ inline Scalar nrm2(const Vector<Scalar> &x)
   int INC = BLAS_INCREMENT(x);
 
   if (1 == INC) {
-    return __nrm2_dense(N, x.ptr());
+    return sqrt(__nrm2sq_dense(N, x.ptr()));
   }
 
-  return __nrm2_incremental(N, x.ptr(), INC);
+  return sqrt(__nrm2sq_incremental(N, x.ptr(), INC));
 }
 
 
