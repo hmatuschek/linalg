@@ -32,7 +32,7 @@
  */
 #include "gemv.hh"
 #include "trmv.hh"
-#include "getc2.hh"
+//#include "getc2.hh"
 
 /**
  * @defgroup blas3 BLAS level 3 routines

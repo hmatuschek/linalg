@@ -18,14 +18,30 @@
 #include "matrix.hh"
 #include "vector.hh"
 
+
 extern "C" {
 #include <Python.h>
 #include <numpy/arrayobject.h>
 }
 
 
+
 namespace Linalg {
 
+/**
+ * Template declaration for the python numpy-array data manager.
+ */
+template <class Scalar> class NumpyArrayMngr;
+
+/**
+ * Implementation of the python numpy-array data manager (doubles).
+ *
+ * This class manages a reference to a numpy-array object and extracts the pointer
+ * to the data. On construction, the reference counter of the numpy array is increased and
+ * decreased on destruction of the manager.
+ *
+ * @ingroup python
+ */
 template<>
 class NumpyArrayMngr<double> : public DataMngr<double>
 {
@@ -38,8 +54,11 @@ private:
 public:
   NumpyArrayMngr(PyObject *array)
   throw (PythonError)
-    : DataMngr((double *) PyArray_DATA(array), false), _array(array)
+    : DataMngr<double>((double *) PyArray_DATA(array), false), _array(array)
   {
+    // Increment reference counter of NumPy array:
+    Py_INCREF(_array);
+
     // Check if array is a NumPy array:
     if (0 == PyArray_Check(array)) {
       PythonError err;
@@ -68,19 +87,16 @@ public:
       err << "Can not convert NumPy array to Matrix<double>: Memory is not writable!";
       throw err;
     }
-
-    // Increment reference counter of NumPy array:
-    Py_INCREF(_array);
-    // Get pointer to data:
-    _data = (double *) PyArray_DATA(array);
   }
+
 
   /**
    * Destructor. Simply dereferences the array.
    */
-  virtual ~PythonError() {
+  virtual ~NumpyArrayMngr() {
     Py_DECREF(_array);
   }
+
 
   /**
    * Retunrs the pointer to the numpy array.
@@ -100,7 +116,7 @@ public:
  */
 inline Matrix<double> doubleMatrixFromNumpyArray(PyObject *array)
 {
-  NumpyArrayMngr<double> *mngr = new NumpyArrayMngr<double>(array);
+  DataPtr<double> data(new NumpyArrayMngr<double>(array));
 
   // Check if array is a matrix (2D):
   if (2 != PyArray_NDIM(array)) {
@@ -109,78 +125,35 @@ inline Matrix<double> doubleMatrixFromNumpyArray(PyObject *array)
     throw err;
   }
 
-  bool is_transposed = false;
-  void *data = PyArray_DATA(array);
-
   size_t rows = PyArray_DIM(array, 0);
   size_t cols = PyArray_DIM(array, 1);
-
-  size_t stride;
-  bool   is_rowmajor;
   size_t row_stride = PyArray_STRIDE(array, 0)/NPY_SIZEOF_DOUBLE;
   size_t col_stride = PyArray_STRIDE(array, 1)/NPY_SIZEOF_DOUBLE;
 
-  if (1 == col_stride) {
-    is_rowmajor = true;
-    stride      = row_stride;
-  } else if (1 == row_stride) {
-    is_rowmajor = false;
-    stride      = col_stride;
-  }
-
-  return Matrix<double>::fromData(static_cast<double *>(data), rows, cols, stride, 0,
-                                  is_transposed, is_rowmajor);
+  return Matrix<double>(data, 0, rows, cols, row_stride, col_stride);
 }
 
 
 /**
- * Creates a @c Vector view as a weak reference to a 1D NumPy array.
+ * Creates a @c Linalg::Vector view from reference to a 1D NumPy array.
  *
  * @ingroup python
  */
 inline Vector<double> doubleVectorFromNumpyArray(PyObject *array)
 {
-  // Check if array is a NumPy array:
-  if (0 == PyArray_Check(array)) {
-    PythonError err;
-    err << "Can not convert to Vector<double>: Object is not a PyArray instance!";
-    throw err;
-  }
+  // Create data-reference from array object:
+  DataPtr<double> data(new NumpyArrayMngr<double>(array));
 
-  // Check if data type is double:
-  if (NPY_DOUBLE != PyArray_TYPE(array)) {
-    PythonError err;
-    err << "Can not convert NumPy array to Vector<double>: Elements are not of type double.";
-    throw err;
-  }
-
-  // Check if data is aligned:
-  if (0 == PyArray_ISALIGNED(array)) {
-    PythonError err;
-    err << "Can not convert NumPy array to Vector<double>: Memory is not aligned!";
-    throw err;
-  }
-
-  // Check if data is writable:
-  if (0 == PyArray_ISWRITEABLE(array))
-  {
-    PythonError err;
-    err << "Can not convert NumPy array to Vector<double>: Memory is not writable!";
-    throw err;
-  }
-
-  // Check if array is a matrix (1D):
+  // Check if array is a vector (1D):
   if (1 != PyArray_NDIM(array)) {
     PythonError err;
     err << "Can not convert NumPy array to Vector<double>: Array is not of dimension 1!";
     throw err;
   }
 
-  void *data = PyArray_DATA(array);
   size_t dim = PyArray_DIM(array, 0);
   size_t stride = PyArray_STRIDE(array, 0)/NPY_SIZEOF_DOUBLE;
-
-  return Vector<double>(static_cast<double *>(data), dim, 0, stride, false);
+  return Vector<double>(data, dim, 0, stride);
 }
 
 

@@ -68,37 +68,16 @@ linalg_blas_dgemv(PyObject *self, PyObject *args)
   Matrix<double> A;
   Vector<double> x, y;
   try {
-
+    // Crate matrix and vector views:
     A = doubleMatrixFromNumpyArray(py_A);
     x = doubleVectorFromNumpyArray(py_x);
     y = doubleVectorFromNumpyArray(py_y);
 
+    // Perform operation in-place
     Blas::gemv(alpha, A, x, beta, y);
 
   } catch (Exception &err) {
-    PyErr_SetString(PyExc_RuntimeError, err.what());
-    return 0;
-  }
-
-  return Py_None;
-}
-
-
-
-static PyObject *
-linalg_blas_print_matrix(PyObject *self, PyObject *args)
-{
-  PyObject *array = 0;
-  if (!PyArg_ParseTuple(args, "O", &array)) {
-    return 0;
-  }
-
-  // Get matrix from numpy-array and print it:
-  Matrix<double> matrix;
-  try {
-    matrix = doubleMatrixFromNumpyArray(array);
-    Linalg::print(matrix);
-  } catch (Exception &err) {
+    // On error...
     PyErr_SetString(PyExc_RuntimeError, err.what());
     return 0;
   }
@@ -115,7 +94,6 @@ static PyMethodDef LinalgBlasMethods[] = {
   {"ddot", linalg_blas_ddot, METH_VARARGS, "BLAS level-1 DDOT() wrapper."},
   {"dnrm2", linalg_blas_dnrm2, METH_VARARGS, "BLAS level-1 DNRM2() wrapper."},
   {"dgemv", linalg_blas_dgemv, METH_VARARGS, "BLAS level-2 DGEMV() wrapper."},
-  {"print_matrix", linalg_blas_print_matrix, METH_VARARGS, "Just prints the details of a Linalg::Matrix<> instance."},
   {NULL, NULL, 0, NULL}
 };
 
@@ -125,7 +103,7 @@ static PyMethodDef LinalgBlasMethods[] = {
  * Initialize module
  */
 PyMODINIT_FUNC
-initblas(void)
+init_blas(void)
 {
   (void) Py_InitModule("blas", LinalgBlasMethods);
 

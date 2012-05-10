@@ -45,11 +45,11 @@ public:
     }
   }
 
-  virtual Scalar *ptr() const {
+  Scalar *ptr() const {
     return _data;
   }
 
-  virtual bool ownsData() const {
+  bool ownsData() const {
     return _owned;
   }
 };
