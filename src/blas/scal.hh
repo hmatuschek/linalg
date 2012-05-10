@@ -24,19 +24,28 @@ namespace Blas {
  *
  * @ingroup blas_internal
  */
-inline void __scal_dense(size_t N, double a, double *x) {
-  __vec2df *x_ptr = (__vec2df *)x;
-  __v2df a_vec; a_vec = (__v2df) {a, a};
+template <class Scalar>
+inline void __scal_dense(size_t N, const Scalar &a, Scalar *x) {
+  typename SIMDTraits<Scalar>::uvector a_vec;
+  typename SIMDTraits<Scalar>::uvector *x_ptr = (typename SIMDTraits<Scalar>::uvector *)x;
 
-  size_t N2 = N/2;
-  size_t r  = N%2;
+  size_t N_elm  = SIMDTraits<Scalar>::num_elements;
+  size_t N_step = N/N_elm;
+  size_t N_rem  = N%N_elm;
 
-  for (size_t i=0; i<N2; i++, x_ptr++) {
-    x_ptr->v *= a_vec;
+  // Initialize constant vector a_vec
+  for (size_t i=0; i<N_elm; i++) {
+    a_vec.d[i] = a;
   }
 
-  if (1 == r) {
-    x_ptr->d[0] *= a;
+  // Perform operations on vectors:
+  for (size_t i=0; i<N_step; i++, x_ptr++) {
+    x_ptr->v *= a_vec.v;
+  }
+
+  // Handle remaining elements:
+  for (size_t i=0; i<N_rem; i++) {
+    x_ptr->d[i] *= a;
   }
 }
 
@@ -46,7 +55,8 @@ inline void __scal_dense(size_t N, double a, double *x) {
  *
  * @ingroup blas_internal
  */
-inline void __scal_incremental(size_t N, const double &a, double *x, size_t xinc) {
+template <class Scalar>
+inline void __scal_incremental(size_t N, const Scalar &a, Scalar *x, size_t xinc) {
   for (size_t i=0; i<N; i++, x += xinc) {
     (*x) *= a;
   }
@@ -63,7 +73,8 @@ inline void __scal_incremental(size_t N, const double &a, double *x, size_t xinc
  *
  * @ingroup blas1
  */
-inline void scal(const double &a, Vector<double> &x) {
+template <class Scalar>
+inline void scal(const Scalar &a, Vector<Scalar> &x) {
   size_t N    = x.dim();
   size_t xinc = BLAS_INCREMENT(x);
 

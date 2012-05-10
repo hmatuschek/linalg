@@ -24,6 +24,52 @@ void dtrmv_(char *uplo, char *transa, char *diag, int *n,
 namespace Linalg {
 namespace Blas {
 
+
+/**
+ * Interfaces the DTRMV BLAS function.
+ *
+ * Calculates:
+ * \f[x \leftarrow A\cdot x\f]
+ * where @c A is a unit or non-unit, upper- or lower-triangular square matrix and @c x is a
+ * vector.
+ *
+ * @param A Specifies the triangulat matrix A.
+ * @param upper If true, A is upper triangular, else A is lower triangular.
+ * @param diag If true, A has unit diagonal.
+ * @param x The vector x.
+ * @throws ShapeError If A is not a square matrix, rows(A) != dim(x).
+ *
+ *
+ * @ingroup blas2
+ */
+inline void trmv(const Matrix<double> &A, bool upper, bool diag, Vector<double> &x)
+throw (ShapeError)
+{
+  // Assert Acol is square:
+  LINALG_SHAPE_ASSERT(A.rows() == A.cols());
+  LINALG_SHAPE_ASSERT(A.rows() == x.dim());
+
+  Matrix<double> Acol = A;
+  char transa = 'N';
+  // Make A column-major:
+  if (A.isRowMajor()) {
+    upper = !upper;
+    transa = 'T';
+    Acol = Acol.t();
+  }
+
+  // Get flags and dimensions:
+  char uplo  = upper ? 'U' : 'L';
+  char d     = diag ? 'U' : 'N';
+  int  N     = Acol.cols();
+  int  lda   = Acol.strides()[1];
+  int  incx  = BLAS_INCREMENT(x);
+
+  // Call Fortran function
+  dtrmv_(&uplo, &transa, &d, &N, Acol.ptr(), &lda, x.ptr(), &incx);
+}
+
+
 /**
  * Interfaces the DTRMV BLAS function.
  *
@@ -36,23 +82,7 @@ namespace Blas {
  */
 inline void trmv(const TriMatrix<double> &A, Vector<double> &x)
 {
-  // Assert Acol is square:
-  LINALG_SHAPE_ASSERT(A.rows() == A.cols());
-  LINALG_SHAPE_ASSERT(A.rows() == x.dim());
-
-  // Make A column-major:
-  char transa = 'N';
-  TriMatrix<double> Acol = A; BLAS_ENSURE_COLUMN_MAJOR(Acol, transa);
-
-  // Get flags and dimensions:
-  char uplo  = BLAS_UPLO_FLAG(Acol);
-  char diag  = BLAS_UNIT_DIAG_FLAG(Acol);
-  int  N     = BLAS_NUM_COLS(Acol, transa);
-  int  lda   = BLAS_LEADING_DIMENSION(Acol);
-  int  incx  = BLAS_INCREMENT(x);
-
-  // Call Fortran function
-  dtrmv_(&uplo, &transa, &diag, &N, Acol.ptr(), &lda, x.ptr(), &incx);
+  trmv(A, A.isUpper(), A.hasUnitDiag(), x);
 }
 
 

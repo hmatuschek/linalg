@@ -26,66 +26,38 @@ namespace Blas {
  *
  * @ingroup blas_internal
  */
-inline double __dot_dense(size_t N, const double *x, const double *y)
+template <class Scalar>
+Scalar __dot_dense(size_t N, const Scalar *x, const Scalar *y)
 {
-  // Allocate and initialize result vector:
-  __vec2df res; res.v = (__v2df){0.0, 0.0};
-  // Cast pointer to x and y
-  const __vec2df *x_ptr = (const __vec2df *)x;
-  const __vec2df *y_ptr = (const __vec2df *)y;
+  typename SIMDTraits<Scalar>::uvector res;
+  const typename SIMDTraits<Scalar>::uvector *x_ptr = (const typename SIMDTraits<Scalar>::uvector *)x;
+  const typename SIMDTraits<Scalar>::uvector *y_ptr = (const typename SIMDTraits<Scalar>::uvector *)y;
 
   // get n-blocks, and remainder
-  size_t N2 = N/2;
-  size_t r  = N%2;
+  size_t N_elm  = SIMDTraits<Scalar>::num_elements;
+  size_t N_step = N/N_elm;
+  size_t N_rem  = N%N_elm;
 
-  // Work on two-element vectors
-  for (size_t i=0; i<N2; i++, x_ptr++, y_ptr++) {
+  // Initialize result vector:
+  for (size_t i=0; i<N_elm; i++) {
+    res.d[i] = Scalar(0);
+  }
+
+  // Work on SIMD vectors
+  for (size_t i=0; i<N_step; i++, x_ptr++, y_ptr++) {
     res.v += x_ptr->v * y_ptr->v;
   }
 
-  // Handle last element, if N is odd
-  if (r) {
-    res.d[0] += x_ptr->d[0] * y_ptr->d[0];
+  // Handle last elements...
+  for (size_t i=0; i<N_rem; i++) {
+    res.d[i] += x_ptr->d[i] * y_ptr->d[i];
   }
 
   // Compute sum:
-  res.d[0] += res.d[1];
-  return res.d[0];
-}
-
-
-/**
- * Specialized, internal function to calculate the inner product of 2 dense vectors in an
- * efficient way using SIMD instructions.
- *
- * @note This function does no dimension checks on x and y.
- *
- * @ingroup blas_internal
- */
-inline float __dot_dense(size_t N, const float *x, const float *y)
-{
-  // Allocate and initialize result vector:
-  __vec4sf res; res.v = (__v4sf){0.0f, 0.0f, 0.0f, 0.0f};
-  // Cast pointer to x and y
-  const __vec4sf *x_ptr = (const __vec4sf *)x;
-  const __vec4sf *y_ptr = (const __vec4sf *)y;
-
-  // get n-blocks, and remainder
-  size_t N4 = N/4;
-  size_t r  = N%4;
-
-  // Work on two-element vectors
-  for (size_t i=0; i<N4; i++, x_ptr++, y_ptr++) {
-    res.v += x_ptr->v * y_ptr->v;
+  for (size_t i=1; i<N_elm; i++) {
+    res.d[0] += res.d[i];
   }
 
-  // Handle last elements
-  for (size_t i=0; i<r; i++) {
-    res.d[0] += x_ptr->d[i] * y_ptr->d[i];
-  }
-
-  // Compute sum:
-  res.d[0] += res.d[1] + res.d[2] + res.d[3];
   return res.d[0];
 }
 
@@ -97,34 +69,17 @@ inline float __dot_dense(size_t N, const float *x, const float *y)
  *
  * @ingroup blas_internal
  */
-inline double __dot_incremental(size_t N, const double *x, size_t inc_x, const double *y, size_t inc_y)
+template <class Scalar>
+inline Scalar __dot_incremental(size_t N, const Scalar *x, size_t inc_x, const Scalar *y, size_t inc_y)
 {
-  double r = 0.0;
+  Scalar r = Scalar(0);
 
   for (size_t i=0; i<N; i++, x+=inc_x, y+=inc_y) {
     r +=  (*x) * (*y);
   }
+
   return r;
 }
-
-
-/**
- * Internal used function, calculateing the inner product as \f$x^Ty\f$.
- *
- * @note This function does no dimension check on x & y.
- *
- * @ingroup blas_internal
- */
-inline float __dot_incremental(size_t N, const float *x, size_t inc_x, const float *y, size_t inc_y)
-{
-  float r = 0;
-
-  for (size_t i=0; i<N; i++, x+=inc_x, y+=inc_y) {
-    r +=  (*x) * (*y);
-  }
-  return r;
-}
-
 
 
 /**
@@ -148,11 +103,11 @@ inline Scalar dot(const Vector<Scalar> &x, const Vector<Scalar> &y)
 
   // If x and y are dense, use optimized methods:
   if ( (1 == incx) && (1 == incy) ) {
-    return __dot_dense(N, x.ptr(), y.ptr());
+    return __dot_dense<Scalar>(N, x.ptr(), y.ptr());
   }
 
   // otherwise use incremental operation
-  return __dot_incremental(N, x.ptr(), incx, y.ptr(), incy);
+  return __dot_incremental<Scalar>(N, x.ptr(), incx, y.ptr(), incy);
 }
 
 

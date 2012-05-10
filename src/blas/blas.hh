@@ -24,6 +24,7 @@
 #include "scal.hh"
 #include "dot.hh"
 #include "nrm2.hh"
+#include "axpy.hh"
 
 /**
  * @defgroup blas2 BLAS level 2 routines

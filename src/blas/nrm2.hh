@@ -25,22 +25,35 @@ namespace Blas {
  *
  * @ingroup blas_internal
  */
-inline double __nrm2_dense(size_t N, const double *x) {
-  __vec2df res; res.v = (__v2df){0.0, 0.0};
-  const __vec2df *x_ptr = (const __vec2df *)x;
+template <class Scalar>
+inline Scalar __nrm2_dense(size_t N, const Scalar *x) {
+  typename SIMDTraits<Scalar>::uvector res;
+  const typename SIMDTraits<Scalar>::uvector *x_ptr = (const typename SIMDTraits<Scalar>::uvector *)x;
 
-  size_t N2 = N/2;
-  size_t r  = N%2;
+  size_t N_elm  = SIMDTraits<Scalar>::num_elements;
+  size_t N_step = N/N_elm;
+  size_t N_rem  = N%N_elm;
 
-  for(size_t i=0; i<N2; i++, x_ptr++) {
+  // Initialize result vector:
+  for (size_t i=0; i<N_elm; i++) {
+    res.d[i] = Scalar(0);
+  }
+
+  // Perform operations on vectors:
+  for(size_t i=0; i<N_step; i++, x_ptr++) {
     res.v += x_ptr->v * x_ptr->v;
   }
 
-  if (r) {
-    res.d[0] += x_ptr->d[0] * x_ptr->d[0];
+  // Handle remaining elements:
+  for (size_t i=0; i<N_rem; i++) {
+    res.d[i] += x_ptr->d[i] * x_ptr->d[i];
   }
 
-  res.d[0] += res.d[1];
+  // calc result
+  for (size_t i=1; i<N_elm; i++) {
+    res.d[0] += res.d[i];
+  }
+
   return sqrt(res.d[0]);
 }
 
@@ -50,8 +63,9 @@ inline double __nrm2_dense(size_t N, const double *x) {
  *
  * @ingroup blas_internal
  */
-inline double __nrm2_incremental(size_t N, const double *x, size_t incx) {
-  double res = 0.0;
+template <class Scalar>
+inline Scalar __nrm2_incremental(size_t N, const Scalar *x, size_t incx) {
+  Scalar res = Scalar(0);
 
   for (size_t i=0; i<N; i++, x+=incx) {
     res += (*x) * (*x);
@@ -69,7 +83,8 @@ inline double __nrm2_incremental(size_t N, const double *x, size_t incx) {
  *
  * @ingroup blas1
  */
-inline double nrm2(const Vector<double> &x)
+template <class Scalar>
+inline Scalar nrm2(const Vector<Scalar> &x)
 {
   int N   = BLAS_DIMENSION(x);
   int INC = BLAS_INCREMENT(x);

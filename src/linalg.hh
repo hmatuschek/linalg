@@ -10,7 +10,20 @@
  * @mainpage Linalg -- A C++ frontend to BLAS and LAPACK
  *
  * Linalg is a template library, that provides easy to use matrix and vector classes and a
- * collection of functions directly interfacing the BLAS and LAPACK Fortran routines.
+ * collection of functions directly interfacing the BLAS and LAPACK Fortran routines. This library
+ * is intented to be easy usable and able to deal with NumPy arrays directly. This implies that
+ * all methods provided by this library can handle matrices in any storage order. As some functions
+ * of the LAPACK library are not capable to handle matrices in row-major storage, these functions
+ * are reimplemented in C++ in an efficient way using SIMD instructions where it is possible.
+ *
+ * The most basic data type in this library is the @c Linalg::Array type, which represents a
+ * multi-dimensional array of values. It is implemented as a class template to be able to deal with
+ * any scalar value type. Note, that not all operations are implemented for all scalar types. There
+ * are two linear algebra types derived from this array class, (a) the @c Linlag::Matrix class
+ * representing a 2 dimensional array of scalars and (b) the @c Linalg::Vector type, representing
+ * a column vector of scalars.
+ *
+ *
  */
 
 

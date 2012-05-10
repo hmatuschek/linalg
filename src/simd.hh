@@ -11,56 +11,47 @@
 
 namespace Linalg {
 
-/** Type of a two-element vector of doubles. */
-typedef double __v2df __attribute__( (vector_size(16), aligned(8)) );
-
-/** Type of a 4-element vector of flaots. */
-typedef float  __v4sf __attribute__( (vector_size(16), aligned(4)) );
-
-/** Type of a 2-element vector of doubles with element access. */
-typedef union {
-  __v2df   v;
-  double   d[2];
-} __vec2df;
-
-/** Type of a 4-element vector of floats with element access. */
-typedef union {
-  __v4sf   v;
-  float    d[4];
-} __vec4sf;
-
-
 /**
  * Template prototype of all SMID traits.
  */
-template <class Scalar> class SMIDTraits;
+template <class Scalar> class SIMDTraits;
+
 
 /**
  * SMID traits for double vectors.
  */
 template<>
-class SMIDTraits<double>
+class SIMDTraits<double>
 {
-  typedef double vector __attribute__ ( (vector_size(16), aligned(8)) );
+public:
+  /** Defines the elementary vector type for the scalar type. */
+  typedef double vector __attribute__( (vector_size(16), aligned(8)) );
+
+  /** Defines an union, that allows for a direct element access. */
   typedef union {
+    /** The elements as vector type for operations. */
     vector   v;
+    /** The elements as array for element access. */
     double   d[2];
   } uvector;
 
+  /** Holds the number of elements in the vector/array. */
   const static size_t num_elements = 2;
 };
 
 
 /**
- * SMID traits for double vectors.
+ * SMID traits for float vectors.
  */
 template<>
-class SMIDTraits<float>
+class SIMDTraits<float>
 {
+public:
   typedef float vector __attribute__ ( (vector_size(16), aligned(4)) );
+
   typedef union {
     vector   v;
-    double   d[4];
+    float    d[4];
   } uvector;
 
   const static size_t num_elements = 4;
