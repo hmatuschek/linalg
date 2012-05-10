@@ -31,7 +31,7 @@ protected:
   /**
    * Holds a pointer to the allocated workspace memory.
    */
-  void *_data;
+  char *_data;
 
 
 public:
