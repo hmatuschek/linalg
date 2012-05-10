@@ -15,12 +15,9 @@ linalg_blas_ddot(PyObject *self, PyObject *args)
     return 0;
   }
 
-  // Get matrix from numpy-array:
-  Vector<double> x,y;
   try {
-    x = doubleVectorFromNumpyArray(py_x);
-    y = doubleVectorFromNumpyArray(py_y);
-
+    Vector<double> x = doubleVectorFromNumpyArray(py_x);
+    Vector<double> y = doubleVectorFromNumpyArray(py_y);
     return PyFloat_FromDouble(Blas::dot(x, y));
   } catch (Exception &err) {
     PyErr_SetString(PyExc_RuntimeError, err.what());
@@ -105,7 +102,7 @@ static PyMethodDef LinalgBlasMethods[] = {
 PyMODINIT_FUNC
 init_blas(void)
 {
-  (void) Py_InitModule("blas", LinalgBlasMethods);
+  (void) Py_InitModule("_blas", LinalgBlasMethods);
 
   import_array();
 }

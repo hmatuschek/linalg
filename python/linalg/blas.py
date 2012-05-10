@@ -25,6 +25,6 @@ def gemv(alpha, A, x, beta, y):
 	assert (A.dtype == x.dtype)
 	
 	if (np.float64 == x.dtype):
-		return _blas.nrm2(x)
+		_blas.dgemv(alpha, A, x, beta, y)
 	else:
 		raise TypeError("Can not call gemv() with arrays of type {0}".format(x.dtype));

@@ -153,7 +153,9 @@ inline Vector<double> doubleVectorFromNumpyArray(PyObject *array)
 
   size_t dim = PyArray_DIM(array, 0);
   size_t stride = PyArray_STRIDE(array, 0)/NPY_SIZEOF_DOUBLE;
-  return Vector<double>(data, dim, 0, stride);
+
+  Vector<double> vec(data, 0, dim, stride);
+  return vec;
 }
 
 

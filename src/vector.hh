@@ -69,7 +69,7 @@ public:
   /**
    * Copy constructor from array.
    */
-  Vector(const Array<Scalar> &other)
+  explicit Vector(const Array<Scalar> &other)
     : Array<Scalar>(other)
   {
     LINALG_SHAPE_ASSERT(1 == other.ndim());
