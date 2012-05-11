@@ -33,7 +33,7 @@ namespace Blas {
  * where @c A is a unit or non-unit, upper- or lower-triangular square matrix and @c x is a
  * vector.
  *
- * @param A Specifies the triangulat matrix A.
+ * @param A Specifies the triangular matrix A.
  * @param upper If true, A is upper triangular, else A is lower triangular.
  * @param diag If true, A has unit diagonal.
  * @param x The vector x.

@@ -24,6 +24,9 @@ static PyObject *linalg_blas_dscal(PyObject *self, PyObject *args);
 /** Interface to BLAS DGEMV. */
 static PyObject *linalg_blas_dgemv(PyObject *self, PyObject *args);
 
+/** Interface to BLAS DTRMV. */
+static PyObject *linalg_blas_dtrmv(PyObject *self, PyObject *args);
+
 /** Interface to BLAS DGEMM. */
 static PyObject *linalg_blas_dgemm(PyObject *self, PyObject *args);
 

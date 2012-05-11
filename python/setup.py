@@ -5,6 +5,8 @@ from distutils.core import setup, Extension
 from numpy.distutils.system_info import numpy_info
 numpy_info = numpy_info();
 include_dirs = numpy_info.get_include_dirs() + ['../src/'];
+cxx_flags = ['-fopenmp'] 
+ld_flags  = ['-fopenmp']
 
 setup(name="Linalg",
       version="0.1",
@@ -16,4 +18,6 @@ setup(name="Linalg",
       ext_package='linalg',
       ext_modules=[Extension('_blas', ['src/blas.cc'],
                              include_dirs=include_dirs,
-                             libraries=['blas', 'lapack', 'm'])])
+                             libraries=['blas', 'lapack', 'm'],
+                             extra_compile_args=cxx_flags,
+                             extra_link_args=ld_flags)])

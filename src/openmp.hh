@@ -12,6 +12,9 @@
 #include <cstdlib>
 #include <omp.h>
 
+#ifdef _OPENMP
+#define LINALG_HAS_OPENMP
+#endif
 
 /**
  * Simple wrapper class to encapsulate OpenMP.

@@ -135,6 +135,35 @@ linalg_blas_dgemv(PyObject *self, PyObject *args)
 
 
 static PyObject *
+linalg_blas_dtrmv(PyObject *self, PyObject *args)
+{
+  PyObject *py_A, *py_x = 0;
+  unsigned char upper, unit_diag;
+  if (!PyArg_ParseTuple(args, "ObbO", &py_A, &upper, &unit_diag, &py_x)) {
+    return 0;
+  }
+
+  Matrix<double> A;
+  Vector<double> x;
+  try {
+    // Crate matrix and vector views:
+    A = doubleMatrixFromNumpyArray(py_A);
+    x = doubleVectorFromNumpyArray(py_x);
+
+    // Perform operation in-place
+    Blas::trmv(A, upper, unit_diag, x);
+
+  } catch (Exception &err) {
+    // On error...
+    PyErr_SetString(PyExc_RuntimeError, err.what());
+    return 0;
+  }
+
+  return Py_None;
+}
+
+
+static PyObject *
 linalg_blas_dgemm(PyObject *self, PyObject *args)
 {
   PyObject *py_A, *py_B, *py_C = 0;
@@ -173,6 +202,7 @@ static PyMethodDef LinalgBlasMethods[] = {
   {"dscal", linalg_blas_dscal, METH_VARARGS, "BLAS level-1 DSCAL() wrapper."},
   {"daxpy", linalg_blas_daxpy, METH_VARARGS, "BLAS level-1 DAXPY() wrapper."},
   {"dgemv", linalg_blas_dgemv, METH_VARARGS, "BLAS level-2 DGEMV() wrapper."},
+  {"dtrmv", linalg_blas_dtrmv, METH_VARARGS, "BLAS level-2 DTRMV() wrapper."},
   {"dgemm", linalg_blas_dgemm, METH_VARARGS, "BLAS level-3 DGEMM() wrapper."},
   {NULL, NULL, 0, NULL}
 };
